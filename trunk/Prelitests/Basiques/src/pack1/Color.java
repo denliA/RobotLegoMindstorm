@@ -24,6 +24,6 @@ public class Color {
 			Delay.msDelay(250);
 			//LCD.clear();
 		}
-		//cs.close();
+		cs.close();
 	}
 }
