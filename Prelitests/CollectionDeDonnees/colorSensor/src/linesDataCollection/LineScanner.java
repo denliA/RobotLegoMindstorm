@@ -10,7 +10,6 @@ import lejos.hardware.port.Port;
 import lejos.hardware.lcd.*;
 import lejos.hardware.motor.Motor;
 import lejos.hardware.motor.NXTRegulatedMotor;
-import lejos.utility.Delay;
 
 import java.io.*;
 

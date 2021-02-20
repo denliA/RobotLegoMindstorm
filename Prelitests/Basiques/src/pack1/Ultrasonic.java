@@ -24,6 +24,6 @@ public class Ultrasonic {
 			Delay.msDelay(250);
 			//LCD.clear();
 		}
-		//cs.close();
+		us.close();
 	}
 }
