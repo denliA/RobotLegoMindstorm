@@ -44,6 +44,7 @@ public class Tourner {
 	}
 	
 	public static void toLigne(float [] bornes, int with_delay) {
+		//System.out.println("Tourner.toLigne");
 		Droit.G.setAcceleration(6000);
 		Droit.D.setAcceleration(6000);
 		float [] value = new float[3];
@@ -51,17 +52,20 @@ public class Tourner {
 		boolean gauche_avant = true;
 		_toLigne(bornes, value, speed, gauche_avant, with_delay);
 		while (value[2]*255<bornes[4] || value[2]*255>bornes[5] || value[1]*255<bornes[2] || value[1]*255>bornes[3] || value[0]*255<bornes[0] || value[0]*255>bornes[1]) {
-			_toLigne(bornes, value, (speed = speed/2), (gauche_avant = !gauche_avant), 0);
+			_toLigne(bornes, value, (speed = speed/10), (gauche_avant = !gauche_avant), 0);
 		}
 		
 	}
 	
 	public static void _toLigne(float[] bornes, float [] value, int speed, boolean gauche_avant, int with_delay) {
+		//System.out.println("_TOLIGNE");
 		Droit.G.setSpeed(speed);
 		Droit.D.setSpeed(speed);
 		if (gauche_avant) {
+			System.out.println("111");
 			Droit.G.forward();
 			Droit.D.backward();
+			System.out.println("222");
 		}
 		else {
 			Droit.D.forward();
@@ -72,6 +76,8 @@ public class Tourner {
 		System.out.println(value[2]*255+"<"+bornes[4]+" || "+value[2]*255+">"+bornes[5]+" || "+value[1]*255+"<"+bornes[2]+" || "+value[1]*255+">"+bornes[3]+" || "+value[0]*255+"<"+bornes[0]+" || "+value[0]*255+">"+bornes[1]);
 		while (value[2]*255<bornes[4] || value[2]*255>bornes[5] || value[1]*255<bornes[2] || value[1]*255>bornes[3] || value[0]*255<bornes[0] || value[0]*255>bornes[1]) {
 			SuivreLigneCouleur.RGB.fetchSample(value, 0);
+			System.out.println(value[2]*255+"<"+bornes[4]+" || "+value[2]*255+">"+bornes[5]+" || "+value[1]*255+"<"+bornes[2]+" || "+value[1]*255+">"+bornes[3]+" || "+value[0]*255+"<"+bornes[0]+" || "+value[0]*255+">"+bornes[1]);
+
 		}
 		Droit.G.stop();
 		Droit.D.stop();

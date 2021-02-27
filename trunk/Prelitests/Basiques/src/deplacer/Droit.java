@@ -44,7 +44,7 @@ public class Droit {
 		
 		
 	
-	public static void droitRotate(int angle) { //Une seule roue tourne
+/*	public static void droitRotate(int angle) { //Une seule roue tourne
 		G.setAcceleration(1500);
 		D.setAcceleration(1500);
 		G.rotate(angle,true);
@@ -52,7 +52,7 @@ public class Droit {
 		G.close();
 		D.close();
 		
-	}
+	}*/
 	
 	/*
 	public static void DroitDiffPilot(float distance) {
