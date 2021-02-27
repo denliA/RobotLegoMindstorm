@@ -21,13 +21,11 @@ public class Pince {
 		while(!(pliers.isStalled())&&Button.ENTER.isUp()) {
 		}
 		pliers.stop();
-		pliers.close();
 	}
 	
 	public static void pinceDegre(int angle) { //angle positif pour ouvrir, négatif pour fermer
 		pliers.setSpeed(360*245);
 		pliers.rotate(angle);
 		pliers.stop();
-		pliers.close();
 	}
 }

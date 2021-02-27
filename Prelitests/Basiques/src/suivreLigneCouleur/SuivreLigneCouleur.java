@@ -18,7 +18,7 @@ public class SuivreLigneCouleur {
 	final static float INCREMENT = 1.0f; // pas entre chaque mesure
     final static float LONG_LIGNE = 174.0f; // longueur de la partie mesurée
     static EV3ColorSensor color_sensor = new EV3ColorSensor(COLOR_SENSOR_PORT); 
-    static SampleProvider RGB = color_sensor.getRGBMode(); 
+    public static SampleProvider RGB = color_sensor.getRGBMode(); 
     static float value[] = new float[RGB.sampleSize()];
     static FileWriter outputer = null;
     
@@ -30,7 +30,7 @@ public class SuivreLigneCouleur {
 		LCD.drawString("R : "+value[0]*255, 0, 4);
 		LCD.drawString("G : "+value[1]*255, 0, 5);
 		LCD.drawString("B : "+value[2]*255, 0, 6);
-		System.out.println("R: "+value[0]*255+"\tG :"+value[1]*255+"\tB : "+value[2]*255);
+		//System.out.println("R: "+value[0]*255+"\tG :"+value[1]*255+"\tB : "+value[2]*255);
 	}
 	
 	public static void mesurerCouleurFich() {
@@ -67,11 +67,7 @@ public class SuivreLigneCouleur {
 		}
 	}
 	
-	public static void Ligne() {
-		float LigneRouge_RougeMin = 27f;
-		float LigneRouge_RougeMax = 35f;
-		float Lignejaune_BleuMin = 9.5f;
-		float Lignejaune_BleuMax = 11.5f;
+	public static void Ligne(float[] bornes) {
 			
 		//float Lignejaune_BleuMin = 35; guillaume
 		//float Lignejaune_BleuMax = 43;
@@ -80,24 +76,32 @@ public class SuivreLigneCouleur {
 		//Prise de la mesure 
         RGB.fetchSample(value, 0); 
         //Verification que robot ne sort pas de sa ligne
-        if (value[2]*255<Lignejaune_BleuMin || value[2]*255>Lignejaune_BleuMax) {
+        if (value[2]*255<bornes[4] || value[2]*255>bornes[5] || value[1]*255<bornes[2] || value[1]*255>bornes[3] || value[0]*255<bornes[0] || value[0]*255>bornes[1]) {
         	Sound.twoBeeps();
         	debut = System.currentTimeMillis();
         	Droit.G.setSpeed((float)(default_speed*1.2));
-        	while ((value[2]*255<Lignejaune_BleuMin || value[2]*255>Lignejaune_BleuMax) && System.currentTimeMillis() - debut < 250) {
+        	while ((value[2]*255<bornes[4] || value[2]*255>bornes[5] || value[1]*255<bornes[2] || value[1]*255>bornes[3] || value[0]*255<bornes[0] || value[0]*255>bornes[1]) && System.currentTimeMillis() - debut < 250) {
         		RGB.fetchSample(value, 0);
         	}
         	Droit.G.setSpeed(default_speed);
         }
         RGB.fetchSample(value, 0); 
-        if (value[2]*255<Lignejaune_BleuMin || value[2]*255>Lignejaune_BleuMax) {
+        if (value[2]*255<bornes[4] || value[2]*255>bornes[5] || value[1]*255<bornes[2] || value[1]*255>bornes[3] || value[0]*255<bornes[0] || value[0]*255>bornes[1]) {
         	Sound.beep();
         	debut = System.currentTimeMillis();
         	Droit.D.setSpeed((float)(default_speed*1.2));
-        	while ((value[2]*255<Lignejaune_BleuMin || value[2]*255>Lignejaune_BleuMax) && System.currentTimeMillis() - debut < 500) {
+        	while ((value[2]*255<bornes[4] || value[2]*255>bornes[5] || value[1]*255<bornes[2] || value[1]*255>bornes[3] || value[0]*255<bornes[0] || value[0]*255>bornes[1]) && System.currentTimeMillis() - debut < 500) {
         		RGB.fetchSample(value, 0);
         	}
         	Droit.D.setSpeed(default_speed);
+        }
+        if (value[2]*255<bornes[4] || value[2]*255>bornes[5] || value[1]*255<bornes[2] || value[1]*255>bornes[3] || value[0]*255<bornes[0] || value[0]*255>bornes[1]) {
+        	int tmp = Droit.G.getSpeed();
+        	int tmp2 = Droit.G.getAcceleration();
+        	Droit.arreter();
+        	Tourner.toLigne(bornes);
+        	Droit.droitMoteur(tmp2, tmp);
+        	
         }
 	}
 	
@@ -130,15 +134,15 @@ public class SuivreLigneCouleur {
         }
 	}
 	
-	public static void ramenerPaletSolo() {
+	public static void ramenerPaletSolo() throws Exception {
 		boolean res = DetecterPalet.detecterPalet();
-		Sound.beepSequence();
 		if (res) {
-			
+			System.out.println("Trouvé palet!!");
 			MainSuivreLigne.mPalet = System.currentTimeMillis();
-			Droit.arreter();
-			Tourner.turnDiffPilot(180);
-			Droit.droitMoteur(1500);
+			//Droit.arreter();
+			//Tourner.turnDiffPilot(180);
+			//Tourner.turnMotor(360);
+			//Droit.droitMoteur(1500, Droit.DEFAULT_SPEED);
 		}
 	}
 }
