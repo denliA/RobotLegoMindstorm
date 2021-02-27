@@ -8,25 +8,38 @@ import lejos.robotics.navigation.DifferentialPilot;
 public class Droit {
 	public static EV3LargeRegulatedMotor G = new EV3LargeRegulatedMotor(MotorPort.A);
 	public static EV3LargeRegulatedMotor D = new EV3LargeRegulatedMotor(MotorPort.B);
+	final static public int DEFAULT_SPEED = G.getSpeed();
 	final static double DIST_ROUES_INCH = 3.90; // Pour le DifferentialPilot, mesure approximative 
     final static double DIAM_ROUE_INCH = 1.77165;
     //static DifferentialPilot pilot = new DifferentialPilot(DIAM_ROUE_INCH, DIST_ROUES_INCH, Motor.A, Motor.B); //parametres en inches
     //static int acceleration = 3000;
     
-	public static void droitMoteur(int acceleration){
+	public static void droitMoteur(int acceleration, int vitesse){
+		G.setSpeed(Math.abs(vitesse));
+		D.setSpeed(Math.abs(vitesse));
 		G.setAcceleration(acceleration);
 		D.setAcceleration(acceleration);
-		G.forward();
-		D.forward();	
+		if (vitesse>0) {
+			G.forward();
+			D.forward();
+		}
+		else {
+			G.backward();
+			D.backward();
+		}
 	}
+	
 		
 	public static void arreter(){
 		G.setSpeed(0); // robot s'arrete sans dévier
 		D.setSpeed(0);
 		//G.flt(); robot s'arrete sans freiner à priori
 		//D.flt();
+		/*
+		 * 27/02  W, peut être que fermer les moteurs cause le problème?
 		G.close();
 		D.close();
+		*/
 	}
 		
 		

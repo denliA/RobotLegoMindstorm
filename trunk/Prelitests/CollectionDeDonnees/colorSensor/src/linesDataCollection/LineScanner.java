@@ -35,7 +35,7 @@ public class LineScanner {
 		BLANCHE_FENETRE,
 		NOIRE_LONGUE,
 		NOIRE_LARGE
-	}; // Différentes lignes à mesurer
+	}; // Différentes lignes à mesurer P
 	final static LIGNES choix = LIGNES.BLEUE;
 	final static float INCREMENT = 1.0f; // pas entre chaque mesure
 	final static float LONG_LIGNE = 174.0f; // longueur de la partie mesurée 
