@@ -19,7 +19,7 @@ public class DetecterPalet {
 		vtouch.fetchSample(touched, 0);
 		if (touched[0]==1) {
 			//Pince.pinceDegre(500); Contrôle de la pince à l'exterieur 
-			System.out.println("Trouvé palet??");
+			//System.out.println("Trouvé palet??");
 			return true;
 		}
 		return false;

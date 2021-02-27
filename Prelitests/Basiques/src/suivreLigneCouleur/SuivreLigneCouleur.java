@@ -31,6 +31,7 @@ public class SuivreLigneCouleur {
 		LCD.drawString("G : "+value[1]*255, 0, 5);
 		LCD.drawString("B : "+value[2]*255, 0, 6);
 		//System.out.println("R: "+value[0]*255+"\tG :"+value[1]*255+"\tB : "+value[2]*255);
+		Delay.msDelay(200);
 	}
 	
 	public static void mesurerCouleurFich() {
@@ -95,14 +96,14 @@ public class SuivreLigneCouleur {
         	}
         	Droit.D.setSpeed(default_speed);
         }
-        if (value[2]*255<bornes[4] || value[2]*255>bornes[5] || value[1]*255<bornes[2] || value[1]*255>bornes[3] || value[0]*255<bornes[0] || value[0]*255>bornes[1]) {
+        /*if (value[2]*255<bornes[4] || value[2]*255>bornes[5] || value[1]*255<bornes[2] || value[1]*255>bornes[3] || value[0]*255<bornes[0] || value[0]*255>bornes[1]) {
         	int tmp = Droit.G.getSpeed();
         	int tmp2 = Droit.G.getAcceleration();
         	Droit.arreter();
         	Tourner.toLigne(bornes);
-        	Droit.droitMoteur(tmp2, tmp);
+        	Droit.droitMoteur(tmp2, tmp); 
         	
-        }
+        }*/
 	}
 	
 	public static void LigneRouge1() {
@@ -113,18 +114,18 @@ public class SuivreLigneCouleur {
 		//Prise de la mesure 
         RGB.fetchSample(value, 0); 
         //Verification que robot ne sort pas de sa ligne
-        System.out.println(value[0]*255);
+        //System.out.println(value[0]*255);
         RGB.fetchSample(value, 0);
-        System.out.println(value[0]*255);
+        //System.out.println(value[0]*255);
         if (value[0]*255<Lignejaune_BleuMin || value[0]*255>Lignejaune_BleuMax) {
-        	System.out.println("entre");
+        	//System.out.println("entre");
         	//Tourner.turnDiffPilot(angle);
         	Droit.G.setSpeed((float)(default_speed*1.2));
         	Delay.msDelay(250);
         	Droit.G.setSpeed(default_speed);
         }
         RGB.fetchSample(value, 0); 
-        System.out.println("Deuxieme : "+value[0]*255);
+        //System.out.println("Deuxieme : "+value[0]*255);
         if (value[0]*255<Lignejaune_BleuMin || value[0]*255>Lignejaune_BleuMax) {
         	//Tourner.turnDiffPilot(-2*angle);
         	System.out.println("Entree 2");
@@ -137,7 +138,7 @@ public class SuivreLigneCouleur {
 	public static void ramenerPaletSolo() throws Exception {
 		boolean res = DetecterPalet.detecterPalet();
 		if (res) {
-			System.out.println("Trouvé palet!!");
+			//System.out.println("Trouvé palet!!");
 			MainSuivreLigne.mPalet = System.currentTimeMillis();
 			//Droit.arreter();
 			//Tourner.turnDiffPilot(180);

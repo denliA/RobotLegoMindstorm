@@ -15,12 +15,12 @@ class MainSuivreLigne {
 	public static volatile boolean keepRunning = true;
 	public static long mDebut=0;
 	public static long mPalet=0;
-	public final static float [] LigneRougeBornes = { 27f, 35f, 7f, 10f, 4f, 8f };
+	public final static float [] LigneRougeBornes = { 19f, 35f, 6f, 10f, 3f, 8f }; //{ 27f, 35f, 7f, 10f, 4f, 8f };
 	public final static float [] LigneJauneBornes = { 0f, 255f, 0f, 255f, 9.5f, 11.5f};
-	public final static float LimitBlancLigneRougeR = 50f;
+	public final static float LimitBlancLigneRougeR = 42f; // 50
 	public final static float LimitBlancLigneJauneR = 35f;
 	public final static float LimitBlancLigneJauneB = 29f;
-	public static boolean gotToWhite = false;
+	public static volatile boolean gotToWhite = false;
 	static SuivreLigneCouleur e = new SuivreLigneCouleur();
 	
 	public static void main(String[] args) {
@@ -28,17 +28,16 @@ class MainSuivreLigne {
 		long dureeRest;
 		int acceleration = 1500;
 		ScheduledExecutorService service = Executors.newScheduledThreadPool(4);
-		service.scheduleWithFixedDelay(new Task1_2(), 0, 200, TimeUnit.MILLISECONDS); // afficher les couleurs
+		//service.scheduleWithFixedDelay(new Task1_2(), 0, 200, TimeUnit.MILLISECONDS); // afficher les couleurs
 		//SuivreLigneCouleur.creerFichier("Ligne_grise.txt");
-
 		/* Mesure le début du mouvement */
 		mDebut = System.currentTimeMillis();
-		
 		
 		
 		//service.schedule(new Task1_1(),dureeDepl,TimeUnit.SECONDS); // Programme l'arret du mouvement et de la mesure de couleur
 		for (int i = 0; i<3;i++) {
 			/* Robot commence à avancer droit */
+
 			Droit.droitMoteur(acceleration, Droit.DEFAULT_SPEED);
 			Future<?> suivre_couleur = service.scheduleWithFixedDelay(new Task3(),0,100,TimeUnit.MILLISECONDS);// Mesure couleur toutes les 0.1 secondes après fin de tache
 			Future<?> ligne_blanche = service.scheduleWithFixedDelay(new Task1_3(),0,100,TimeUnit.MILLISECONDS); // Detecte palet toutes les 0.1 secondes après fin de tache
@@ -47,27 +46,34 @@ class MainSuivreLigne {
 			
 			}
 			if (mPalet!=0) {
-				System.out.println("on entre dans la phase de tournage");
+				//System.out.println("on entre dans la phase de tournage");
 				suivre_couleur.cancel(true);
 				palet.cancel(true);
 				Droit.arreter();
-				Pince.pinceDegre(-1500);
+				//System.out.println("Fermeture de la pince");
+				Pince.pinceDegre(-500);
+				//System.out.println("Pince fermée, tournage");
 				Tourner.toLigne(LigneRougeBornes, 200);
 				//dureeRest = dureeDepl - (mPalet - mDebut);
 				//service.schedule(new Task4_1(),dureeRest,TimeUnit.MILLISECONDS); // Programme l'arret du mouvement et de la mesure de couleur et de contact
+				//System.out.println("Tournage fini, avancement jusqu'à blanc");
 				Droit.droitMoteur(acceleration, Droit.DEFAULT_SPEED);
 				suivre_couleur = service.scheduleWithFixedDelay(new Task3(),0,100,TimeUnit.MILLISECONDS);
 				while (!gotToWhite)
 					;
-				
-				Delay.msDelay(100);
-				Droit.arreter();
-				Pince.pinceDegre(1250);
-				Droit.droitMoteur(acceleration, -Droit.DEFAULT_SPEED);
+				Sound.beepSequence();
+				//System.out.println("Blanc atteint");
 				suivre_couleur.cancel(true);
+				Droit.arreter();
+				//Droit.droitMoteur(acceleration, Droit.DEFAULT_SPEED/4);
+				//Delay.msDelay(500);
+				//Droit.arreter();
+				Pince.pinceDegre(500);
+				Droit.droitMoteur(acceleration, -Droit.DEFAULT_SPEED);
 				Delay.msDelay(400);
 				Droit.arreter();
 				Tourner.toLigne(LigneRougeBornes, 200);
+				mPalet = 0;
 			}
 			else 
 				service.shutdownNow(); // fin du threadpool
