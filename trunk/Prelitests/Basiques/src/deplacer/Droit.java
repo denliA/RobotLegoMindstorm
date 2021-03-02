@@ -23,7 +23,7 @@ public class Droit {
 			G.forward();
 			D.forward();
 		}
-		else {
+		else if (vitesse<0) {
 			G.backward();
 			D.backward();
 		}
@@ -33,13 +33,11 @@ public class Droit {
 	public static void arreter(){
 		G.setSpeed(0); // robot s'arrete sans dévier
 		D.setSpeed(0);
-		//G.flt(); robot s'arrete sans freiner à priori
-		//D.flt();
-		/*
-		 * 27/02  W, peut être que fermer les moteurs cause le problème?
+	}
+	
+	public static void fermerMoteur() {
 		G.close();
 		D.close();
-		*/
 	}
 		
 		

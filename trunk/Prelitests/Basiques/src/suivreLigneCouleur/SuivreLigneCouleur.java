@@ -11,6 +11,8 @@ import lejos.hardware.sensor.EV3ColorSensor;
 import lejos.robotics.SampleProvider;
 import lejos.hardware.Sound;
 import lejos.utility.Delay;
+import lejos.hardware.motor.BaseRegulatedMotor;
+import lejos.hardware.motor.EV3LargeRegulatedMotor;
 
 
 public class SuivreLigneCouleur {
@@ -21,6 +23,11 @@ public class SuivreLigneCouleur {
     public static SampleProvider RGB = color_sensor.getRGBMode(); 
     static float value[] = new float[RGB.sampleSize()];
     static FileWriter outputer = null;
+    
+    final static float targetLigneRougeR = 25f; // a mesurer le rgb sur bord ligne
+	final static float KP = 1f; //if small, robot smooth turns
+	final static float KI = 1f;
+	final static float KD = 1f;
     
 	
 	public static void mesurerCouleurAff(){
@@ -72,7 +79,7 @@ public class SuivreLigneCouleur {
 			
 		//float Lignejaune_BleuMin = 35; guillaume
 		//float Lignejaune_BleuMax = 43;
-		int default_speed = Droit.G.getSpeed();
+		int DEFAULT_SPEED = Droit.G.getSpeed();
 		long debut;
 		//Prise de la mesure 
         RGB.fetchSample(value, 0); 
@@ -80,70 +87,73 @@ public class SuivreLigneCouleur {
         if (value[2]*255<bornes[4] || value[2]*255>bornes[5] || value[1]*255<bornes[2] || value[1]*255>bornes[3] || value[0]*255<bornes[0] || value[0]*255>bornes[1]) {
         	Sound.twoBeeps();
         	debut = System.currentTimeMillis();
-        	Droit.G.setSpeed((float)(default_speed*1.2));
+        	Droit.G.setSpeed((float)(DEFAULT_SPEED*1.2));
         	while ((value[2]*255<bornes[4] || value[2]*255>bornes[5] || value[1]*255<bornes[2] || value[1]*255>bornes[3] || value[0]*255<bornes[0] || value[0]*255>bornes[1]) && System.currentTimeMillis() - debut < 250) {
         		RGB.fetchSample(value, 0);
         	}
-        	Droit.G.setSpeed(default_speed);
+        	Droit.G.setSpeed(DEFAULT_SPEED);
         }
         RGB.fetchSample(value, 0); 
         if (value[2]*255<bornes[4] || value[2]*255>bornes[5] || value[1]*255<bornes[2] || value[1]*255>bornes[3] || value[0]*255<bornes[0] || value[0]*255>bornes[1]) {
         	Sound.beep();
         	debut = System.currentTimeMillis();
-        	Droit.D.setSpeed((float)(default_speed*1.2));
+        	Droit.D.setSpeed((float)(DEFAULT_SPEED*1.2));
         	while ((value[2]*255<bornes[4] || value[2]*255>bornes[5] || value[1]*255<bornes[2] || value[1]*255>bornes[3] || value[0]*255<bornes[0] || value[0]*255>bornes[1]) && System.currentTimeMillis() - debut < 500) {
         		RGB.fetchSample(value, 0);
         	}
-        	Droit.D.setSpeed(default_speed);
+        	Droit.D.setSpeed(DEFAULT_SPEED);
         }
-        /*if (value[2]*255<bornes[4] || value[2]*255>bornes[5] || value[1]*255<bornes[2] || value[1]*255>bornes[3] || value[0]*255<bornes[0] || value[0]*255>bornes[1]) {
-        	int tmp = Droit.G.getSpeed();
-        	int tmp2 = Droit.G.getAcceleration();
-        	Droit.arreter();
-        	Tourner.toLigne(bornes);
-        	Droit.droitMoteur(tmp2, tmp); 
-        	
-        }*/
 	}
 	
-	public static void LigneRouge1() {
-		float Lignejaune_BleuMin = 27;
-		float Lignejaune_BleuMax = 35;
-		int angle = 10;
-		int default_speed = Droit.G.getSpeed();
-		//Prise de la mesure 
-        RGB.fetchSample(value, 0); 
-        //Verification que robot ne sort pas de sa ligne
-        //System.out.println(value[0]*255);
-        RGB.fetchSample(value, 0);
-        //System.out.println(value[0]*255);
-        if (value[0]*255<Lignejaune_BleuMin || value[0]*255>Lignejaune_BleuMax) {
-        	//System.out.println("entre");
-        	//Tourner.turnDiffPilot(angle);
-        	Droit.G.setSpeed((float)(default_speed*1.2));
-        	Delay.msDelay(250);
-        	Droit.G.setSpeed(default_speed);
-        }
-        RGB.fetchSample(value, 0); 
-        //System.out.println("Deuxieme : "+value[0]*255);
-        if (value[0]*255<Lignejaune_BleuMin || value[0]*255>Lignejaune_BleuMax) {
-        	//Tourner.turnDiffPilot(-2*angle);
-        	System.out.println("Entree 2");
-        	Droit.D.setSpeed((float)(default_speed*1.2));
-    		Delay.msDelay(500);
-    		Droit.D.setSpeed(default_speed);
-        }
+	public static void Ligne_PID() {
+		float DEFAULT_SPEED = Droit.D.getSpeed();
+		float MAX_SPEED = Droit.D.getMaxSpeed();
+		float ERROR_MARGIN = 0.1f;
+		float error = 0f;
+		float previousError = 0f;
+		float integral = 0f;
+		float derivative = 0f;
+		float correction = 0f;
+		do {
+		RGB.fetchSample(value, 0); //input de la couleur mesurée
+		error = (targetLigneRougeR - value[0]);
+		if (Math.abs(error)>ERROR_MARGIN) { //on ne fait rien si l'erreur est negligeable
+			integral += error;
+			derivative = error - previousError;
+			correction = (error * KP)+(integral * KI)+(derivative * KD); //PID control
+			previousError = error;
+			// limiter le output 
+			if (correction>MAX_SPEED)
+				correction = MAX_SPEED;
+			else if (correction<-MAX_SPEED)
+				correction = -MAX_SPEED;
+			// tourner robot
+			if (error<0) { // robot sur ligne rouge
+				Droit.G.setSpeed(DEFAULT_SPEED+correction);
+				Droit.D.setSpeed(DEFAULT_SPEED-correction);
+			}
+			else if (error>0) { // robot sur zone grise
+				Droit.D.setSpeed(DEFAULT_SPEED+correction);
+				Droit.G.setSpeed(DEFAULT_SPEED-correction);
+			}
+		}
+		}while(Math.abs(error)>ERROR_MARGIN); // sortie de boucle quand robot s'est redressé sur l'entre ligne rouge-grise
+		/* robot avance tout droit */
+		Droit.G.setSpeed(DEFAULT_SPEED);
+		Droit.D.setSpeed(DEFAULT_SPEED);	
 	}
 	
 	public static void ramenerPaletSolo() throws Exception {
 		boolean res = DetecterPalet.detecterPalet();
 		if (res) {
-			//System.out.println("Trouvé palet!!");
 			MainSuivreLigne.mPalet = System.currentTimeMillis();
-			//Droit.arreter();
-			//Tourner.turnDiffPilot(180);
-			//Tourner.turnMotor(360);
-			//Droit.droitMoteur(1500, Droit.DEFAULT_SPEED);
+		}
+	}
+	
+	public static void ramenerPaletSoloPID() throws Exception {
+		boolean res = DetecterPalet.detecterPalet();
+		if (res) {
+			Main_PID_LineFollower.foundPalet = true;
 		}
 	}
 }
