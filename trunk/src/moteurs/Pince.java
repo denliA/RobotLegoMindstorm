@@ -1,5 +1,7 @@
 package moteurs;
 
+import lejos.utility.Delay;
+
 public class Pince {
 	
 	//Attribut
@@ -16,7 +18,8 @@ public class Pince {
 	//méthodes modifiant la valeur de ouvert simultanément
 	public static void ouvrir() {
 		if(ouvert==true) {
-			//TO DO			
+			//TO DO	
+			//envoyer message d'erreur ?
 		}
 		else {
 			
@@ -26,12 +29,17 @@ public class Pince {
 	public static void fermer() {
 		if(ouvert==false) {
 			//TO DO
+			//envoyer message d'erreur ?
 		}
 		else {
-			Moteur.MOTEUR_PINCE.setSpeed();
+			
+			Moteur.MOTEUR_PINCE.setSpeed(36000);
 			Moteur.MOTEUR_PINCE.backward();
-			Delay.msDelay();
+			Delay.msDelay(1000);
+			Moteur.MOTEUR_PINCE.stop();
+			
 			ouvert = false;
+			
 		}
 	}
 }
