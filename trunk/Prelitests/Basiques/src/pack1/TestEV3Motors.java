@@ -28,15 +28,17 @@ public class TestEV3Motors {
 			LCD.drawString("Pince", 3, 2);
 			LCD.drawString("Roues", 3, 3);
 			button = Button.waitForAnyPress();
-			if (button == Button.ID_DOWN || button == Button.ID_UP)
+			if (button == Button.ID_DOWN || button == Button.ID_UP) {
+				LCD.clear(1, choice+1, 2); 
 				choice = (choice%2)+1;
+			}
 			else if (button == Button.ID_ENTER) {
 				if (choice == 1)
 					menuPince(pince_speed, pince_acceleration, pince_rotation, pince_delay);
 				else 
 					menuRoues(new int[] {gauche_speed,gauche_acceleration, droite_speed, droite_acceleration, avancer_delay, 0},
 							new int[] {1,1,1,1,50,1},
-							new String[] {"Vitesse gauche", "Acceleration gauche", "Vitesse droite", "Acceleration drote", "DélaiOUangle", "rotate?"});
+							new String[] {"VitG", "AccG", "VitD", "AccD", "DélaiOUangle", "rotate?"});
 				Button.waitForAnyEvent();
 			}
 			
@@ -64,42 +66,46 @@ public class TestEV3Motors {
 	public static void menuPince(int pince_speed, int pince_acceleration, int pince_rotation, int pince_delay) {
 		LCD.clear();
 		LCD.drawString("Pince", 7, 1);
-		int button;
-		boolean rotate = false;
-		while(Button.ESCAPE.isUp()) {
+		int button = -1;
+		int rotate = 0;
+		int choix = 1;
+		while(button != Button.ID_ESCAPE) {
 			LCD.clear(1,2, 100);
-			int choix = 1;
+			//Delay.msDelay(200);
 			LCD.drawString("->", 1, choix+1);
-			LCD.drawString("Vitesse: "+pince_speed, 3, 2);
-			LCD.drawString("Acceleration: "+pince_acceleration, 3, 3);
-			LCD.drawString("temps : "+pince_delay, 3, 4);
-			LCD.drawString("Rotation de : "+pince_rotation, 3,5);
-			LCD.drawString("Rotate? " +rotate,3,6);
+			LCD.drawString("Vit: "+pince_speed, 3, 2);
+			LCD.drawString("Acc: "+pince_acceleration, 3, 3);
+			LCD.drawString("T : "+pince_delay, 3, 4);
+			LCD.drawString("Rot: "+pince_rotation, 3,5);
+			LCD.drawString("Rot? " +rotate,3,6);
 			button = Button.waitForAnyPress();
 			if (button == Button.ID_DOWN) {
 				choix = (choix%5)+1;
+				//lejos.hardware.Sound.beep();
 			}
 			else if (button == Button.ID_UP)
 				choix = (choix == 1) ? 5 :(choix-1);
 			else if (button == Button.ID_ENTER) {
 				switch (choix) {
 				case 1:
-					pince_speed = intButtonInput(pince_speed, 10, "Vitesse pince");
+					pince_speed = intButtonInput(pince_speed, 1, "Vitesse pince");
 					break;
 				case 2:
-					pince_acceleration = intButtonInput(pince_acceleration, 10, "Acceleration pince");
+					pince_acceleration = intButtonInput(pince_acceleration, 1, "Acceleration pince");
 					break;
 				case 3:
 					pince_delay = intButtonInput(pince_delay, 10,"Temps pince");
 					break;
 				case 4:
 					pince_rotation = intButtonInput(pince_rotation, 10, "Rotation pince");
+				case 5:
+					rotate = intButtonInput(rotate, 1, "Rotate?");
 				}
 			}
 			else if (button == Button.ID_LEFT || button == Button.ID_RIGHT) {
 				moteur_pince.setSpeed(pince_speed);
 				moteur_pince.setAcceleration(pince_acceleration);
-				if(!rotate) {
+				if(rotate >0) {
 					if (button==Button.ID_LEFT)
 						moteur_pince.backward();
 					else
@@ -122,15 +128,14 @@ public class TestEV3Motors {
 	public static void menuRoues(int [] options, int[] pas, String [] noms) {
 		LCD.clear();
 		LCD.drawString("Roues", 8, 1);
-		int choix = 1, button;
-		while (Button.ESCAPE.isUp()) {
+		int choix = 1, button=-1;
+		while (button != Button.ID_ESCAPE) {
 			LCD.clear(1, 2, 100);
 			LCD.drawString("->", 1, choix+1);
-			button=Button.waitForAnyPress();
-			boolean rotate = options[5]>0;
 			for (int i=0; i<options.length; i++) {
 				LCD.drawString(noms[i]+" "+options[i], 3, i+2);
 			}
+			button=Button.waitForAnyPress();
 			if (button == Button.ID_DOWN) {
 				choix = (choix%options.length)+1;
 			}
@@ -145,7 +150,7 @@ public class TestEV3Motors {
 				moteur_gauche.setAcceleration(options[1]);
 				moteur_droite.setSpeed(options[2]);
 				moteur_droite.setAcceleration(options[3]);
-				if(!rotate) {
+				if(options[5]>0) {
 					moteur_gauche.startSynchronization();
 					if (button==Button.ID_LEFT) {
 						moteur_gauche.backward();

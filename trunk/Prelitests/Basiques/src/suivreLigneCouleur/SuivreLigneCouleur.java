@@ -1,6 +1,9 @@
 package suivreLigneCouleur;
 import java.io.FileWriter;
 import java.io.IOException;
+
+import org.freedesktop.dbus.bin.IdentifierMangler;
+
 import deplacer.Droit;
 import deplacer.Tourner;
 import palet.*;
@@ -21,6 +24,7 @@ public class SuivreLigneCouleur {
     final static float LONG_LIGNE = 174.0f; // longueur de la partie mesurée
     static EV3ColorSensor color_sensor = new EV3ColorSensor(COLOR_SENSOR_PORT); 
     public static SampleProvider RGB = color_sensor.getRGBMode(); 
+    public static SampleProvider ID = color_sensor.getColorIDMode();
     static float value[] = new float[RGB.sampleSize()];
     static FileWriter outputer = null;
     
