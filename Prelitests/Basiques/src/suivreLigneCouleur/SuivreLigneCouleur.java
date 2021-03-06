@@ -11,6 +11,7 @@ import lejos.hardware.ev3.LocalEV3;
 import lejos.hardware.lcd.LCD;
 import lejos.hardware.port.Port;
 import lejos.hardware.sensor.EV3ColorSensor;
+import lejos.robotics.Color;
 import lejos.robotics.SampleProvider;
 import lejos.hardware.Sound;
 import lejos.utility.Delay;
@@ -24,8 +25,10 @@ public class SuivreLigneCouleur {
     final static float LONG_LIGNE = 174.0f; // longueur de la partie mesurée
     static EV3ColorSensor color_sensor = new EV3ColorSensor(COLOR_SENSOR_PORT); 
     public static SampleProvider RGB = color_sensor.getRGBMode(); 
+    public static SampleProvider AmbientLightMode = color_sensor.getAmbientMode();
+    public static SampleProvider RedMode = color_sensor.getRedMode();
     public static SampleProvider ID = color_sensor.getColorIDMode();
-    static float value[] = new float[RGB.sampleSize()];
+    static float value[] = new float[RGB.sampleSize()+3];
     static FileWriter outputer = null;
     
     final static float targetLigneRougeR = 25f; // a mesurer le rgb sur bord ligne
@@ -37,19 +40,26 @@ public class SuivreLigneCouleur {
 	public static void mesurerCouleurAff(){
 		/* Prise de la mesure */
         RGB.fetchSample(value, 0); 
+        AmbientLightMode.fetchSample(value, 3);
+        RedMode.fetchSample(value, 4);
+        ID.fetchSample(value, 5);
         /* Affichage de la dernière mesure sur l'écran du robot  */
+        LCD.clear();
 		LCD.drawString("R : "+value[0]*255, 0, 4);
 		LCD.drawString("G : "+value[1]*255, 0, 5);
 		LCD.drawString("B : "+value[2]*255, 0, 6);
+		LCD.drawString("AMB : "+value[3], 0, 3);
+		LCD.drawString("RedIntensity : "+value[4], 0, 2);
+		LCD.drawString("Color : "+value[5], 0, 0);
 		//System.out.println("R: "+value[0]*255+"\tG :"+value[1]*255+"\tB : "+value[2]*255);
-		Delay.msDelay(200);
 	}
 	
 	public static void mesurerCouleurFich() {
 		mesurerCouleurAff();
 		/* Ecriture des mesures dans le fichier déjà ouvert */
 		try {
-			outputer.write(value[0]*255 + "\t"+value[1]*255+"\t"+value[2]*255+"\n");
+			outputer.write(value[0]*255 + "\t"+value[1]*255+"\t"+value[2]*255+ 
+					"\t" + value[3] + "\t" + value[4] + "\t" + value[5] + "\n");
 		} catch (IOException e) {
 			System.err.println("Erreur lors de l'écriture de la mesure!");
 			e.printStackTrace();
@@ -66,6 +76,16 @@ public class SuivreLigneCouleur {
 			outputer = new FileWriter(nomFichier);	
 		} catch (IOException e) {
 			System.err.println("Erreur à l'ouverture du fichier!");
+			e.printStackTrace();
+		}
+	}
+	
+	public static void metadataFichier(int vitesse, int acceleration, int delai, int roue) {
+		try {
+			outputer.write(vitesse+"°/s" + "\t" + acceleration+"°/s²"+ "\t" + roue+"pi*mm/360°"+ "\t" + delai+"ms/snap" + "\n");
+			outputer.write("R\tG\tB\tAmbient\tRedMode\tID\n");
+		} catch (IOException e) {
+			System.err.println("Erreur lors de l'écriture des métadonnées!");
 			e.printStackTrace();
 		}
 	}
@@ -157,7 +177,7 @@ public class SuivreLigneCouleur {
 	public static void ramenerPaletSoloPID() throws Exception {
 		boolean res = DetecterPalet.detecterPalet();
 		if (res) {
-			Main_PID_LineFollower.foundPalet = true;
+			//Main_PID_LineFollower.foundPalet = true;
 		}
 	}
 }
