@@ -21,15 +21,17 @@ public class Ultrason {
 	public static boolean getStatus() {
 		return status;
 	}
-	//Renvoie la distance mesurée par le capteur
-	public static float getDistance() {
+	//Gestion de la distance mesurée par le capteur
+	public static void setDistance() {
 		float[] tabDistance = new float[Capteur.ULTRASON.sampleSize()];
 		Capteur.ULTRASON.fetchSample(tabDistance, 0);
 		distance = tabDistance[0];
+	}
+	public static float getDistance() {
 		return distance;
 	}
-	//Détecte la présence d'un autre robot
-	public static boolean autreRobot() {
+	//Détection de la présence d'un autre robot
+	public static void setBruitDetecte() {
 		bruitDetecte=false;
 		
 		float[] autreRobot = new float[Capteur.ECOUTE.sampleSize()];
@@ -37,7 +39,8 @@ public class Ultrason {
 		
 		//ECOUTE renvoie 1 ou 0
 		if(autreRobot[0]==1) {bruitDetecte=true;}
-		
+	}
+	public static boolean getBruitDetecte() {
 		return bruitDetecte;
 	}
 	
