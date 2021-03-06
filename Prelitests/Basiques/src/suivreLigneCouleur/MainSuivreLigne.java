@@ -39,7 +39,7 @@ class MainSuivreLigne {
 			/* Robot commence à avancer droit */
 
 			Droit.droitMoteur(acceleration, Droit.DEFAULT_SPEED);
-			Future<?> suivre_couleur = service.scheduleWithFixedDelay(new Task3(),0,100,TimeUnit.MILLISECONDS);// Mesure couleur toutes les 0.1 secondes après fin de tache
+			Future<?> suivre_couleur = service.scheduleWithFixedDelay(new ResterSurLigneTask(),0,100,TimeUnit.MILLISECONDS);// Mesure couleur toutes les 0.1 secondes après fin de tache
 			Future<?> ligne_blanche = service.scheduleWithFixedDelay(new Task1_3(),0,100,TimeUnit.MILLISECONDS); // Detecte palet toutes les 0.1 secondes après fin de tache
 			Future<?> palet = service.scheduleWithFixedDelay(new Task4_2(),0,100,TimeUnit.MILLISECONDS);
 			while(keepRunning&&(mPalet==0)) {
@@ -58,13 +58,15 @@ class MainSuivreLigne {
 				//service.schedule(new Task4_1(),dureeRest,TimeUnit.MILLISECONDS); // Programme l'arret du mouvement et de la mesure de couleur et de contact
 				//System.out.println("Tournage fini, avancement jusqu'à blanc");
 				Droit.droitMoteur(acceleration, Droit.DEFAULT_SPEED);
-				suivre_couleur = service.scheduleWithFixedDelay(new Task3(),0,100,TimeUnit.MILLISECONDS);
+				ResterSurLigneTask sln = new ResterSurLigneTask();
+				suivre_couleur = service.scheduleWithFixedDelay(sln,0,100,TimeUnit.MILLISECONDS);
 				while (!gotToWhite)
 					;
 				Sound.beepSequence();
 				//System.out.println("Blanc atteint");
 				suivre_couleur.cancel(true);
 				Droit.arreter();
+				
 				//Droit.droitMoteur(acceleration, Droit.DEFAULT_SPEED/4);
 				//Delay.msDelay(500);
 				//Droit.arreter();
@@ -121,10 +123,12 @@ class Task2_2 implements Runnable{
 	}	
 }
 
-class Task3 implements Runnable{
+class ResterSurLigneTask implements Runnable{
+	private boolean is_running;
 	public void run() {
 		SuivreLigneCouleur.Ligne(MainSuivreLigne.LigneRougeBornes);
 	}
+	
 }
 
 class Task4_1 implements Runnable{
