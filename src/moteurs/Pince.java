@@ -1,5 +1,6 @@
 package moteurs;
 
+import exceptions.OuvertureException;
 import lejos.utility.Delay;
 
 public class Pince {
@@ -16,20 +17,26 @@ public class Pince {
 	
 	//Ouverture et fermeture des pinces
 	//méthodes modifiant la valeur de ouvert simultanément
-	public static void ouvrir() {
+	public static void ouvrir() throws OuvertureException {
 		if(ouvert==true) {
 			//TO DO	
 			//envoyer message d'erreur ?
+			throw new OuvertureException("Pinces déjà ouvertes.");
 		}
 		else {
+			Moteur.MOTEUR_PINCE.setSpeed(36000);
+			Moteur.MOTEUR_PINCE.forward();
+			Delay.msDelay(1000);
+			Moteur.MOTEUR_PINCE.stop();
 			
 			ouvert = true;
 		}
 	}
-	public static void fermer() {
+	public static void fermer() throws OuvertureException {
 		if(ouvert==false) {
 			//TO DO
 			//envoyer message d'erreur ?
+			throw new OuvertureException("Pinces déjà fermées.");
 		}
 		else {
 			
