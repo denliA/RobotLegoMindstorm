@@ -51,9 +51,10 @@ class MainSuivreLigne {
 				palet.cancel(true);
 				Droit.arreter();
 				//System.out.println("Fermeture de la pince");
-				Pince.pinceDegre(-500);
+				Pince.pinceDegre(-600);
 				//System.out.println("Pince fermée, tournage");
-				Tourner.toLigne(LigneRougeBornes, 200);
+				Droit.t360();
+				//Tourner.toLigne(LigneRougeBornes, 200);
 				//dureeRest = dureeDepl - (mPalet - mDebut);
 				//service.schedule(new Task4_1(),dureeRest,TimeUnit.MILLISECONDS); // Programme l'arret du mouvement et de la mesure de couleur et de contact
 				//System.out.println("Tournage fini, avancement jusqu'à blanc");
@@ -74,7 +75,8 @@ class MainSuivreLigne {
 				Droit.droitMoteur(acceleration, -Droit.DEFAULT_SPEED);
 				Delay.msDelay(400);
 				Droit.arreter();
-				Tourner.toLigne(LigneRougeBornes, 200);
+				//Tourner.toLigne(LigneRougeBornes, 200);
+				Droit.t360();
 				mPalet = 0;
 			}
 			else 
