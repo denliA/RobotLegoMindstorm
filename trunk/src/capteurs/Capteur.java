@@ -13,9 +13,8 @@ public class Capteur {
 	final public static SampleProvider RGB = COLOR_SENSOR.getRGBMode();
 	final public static SampleProvider LUMIERE_AMBIANTE = COLOR_SENSOR.getAmbientMode();
 	final public static SampleProvider ID_COULEUR = COLOR_SENSOR.getColorIDMode();
+	final public static SampleProvider ROUGE = COLOR_SENSOR.getRedMode();
 	final public static SampleProvider ULTRASON = ULTRASONIC_SENSOR.getDistanceMode();
 	final public static SampleProvider ECOUTE = ULTRASONIC_SENSOR.getListenMode();
-	
-	
 	
 }

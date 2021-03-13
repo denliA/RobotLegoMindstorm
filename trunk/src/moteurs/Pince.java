@@ -5,22 +5,22 @@ import lejos.utility.Delay;
 public class Pince {
 	
 	//Attribut
-	//les pinces s'ouvriront toujours de la même valeur par défaut
-	private static final float OUVERTURE = 1000;//TODO d'après EV3CONTROL l'angle pour passer de ouverture (grande) à fermé (les pinces se touchent) est d'environ 1735 donc je pense que l'on peut se base entre 1000 et 1500 pour avoir une ouverture assez grande pour les palets et ne pas perdre de temps
+	//les pinces s'ouvriront toujours de la meme valeur par defaut
+	private static final float OUVERTURE = 1000;//TODO d'apres EV3CONTROL l'angle pour passer de ouverture (grande) a ferme (les pinces se touchent) est d'environ 1735 donc je pense que l'on peut se base entre 1000 et 1500 pour avoir une ouverture assez grande pour les palets et ne pas perdre de temps
 	private static boolean ouvert;
 	
-	//Méthodes
+	//Methodes
 	public static boolean getOuvert() {
 		return ouvert;
 	}
 	
 	//Ouverture et fermeture des pinces
-	//méthodes modifiant la valeur de ouvert simultanément
+	//methodes modifiant la valeur de ouvert simultanement
 	public static void ouvrir() throws OuvertureException {
 		if(ouvert) {
 			//TO DO	
 			//envoyer message d'erreur ?
-			throw new OuvertureException("Pinces déjà ouvertes.");
+			throw new OuvertureException("Pinces dï¿½jï¿½ ouvertes.");
 		}
 		else {
 			Moteur.MOTEUR_PINCE.setSpeed(36000);
@@ -36,7 +36,7 @@ public class Pince {
 		if(!ouvert) {
 			//TO DO
 			//envoyer message d'erreur ?
-			throw new OuvertureException("Pinces déjà fermées.");
+			throw new OuvertureException("Pinces deje fermees.");
 		}
 		else {
 			

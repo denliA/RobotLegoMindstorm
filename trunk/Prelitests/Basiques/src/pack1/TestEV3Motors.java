@@ -9,14 +9,14 @@ import lejos.hardware.Button;
 import lejos.hardware.lcd.LCD;
 
 public class TestEV3Motors {
-	static EV3LargeRegulatedMotor moteur_gauche = new EV3LargeRegulatedMotor(MotorPort.A);
-	static EV3LargeRegulatedMotor moteur_droite = new EV3LargeRegulatedMotor(MotorPort.B);
+	static EV3LargeRegulatedMotor moteur_gauche = new EV3LargeRegulatedMotor(MotorPort.B);
+	static EV3LargeRegulatedMotor moteur_droite = new EV3LargeRegulatedMotor(MotorPort.A);
 	static EV3MediumRegulatedMotor moteur_pince = new EV3MediumRegulatedMotor(MotorPort.C);
 	static {
 		moteur_gauche.synchronizeWith(new EV3LargeRegulatedMotor[] {moteur_droite});
 	}
 	public static void main (String [] args) {
-		int gauche_speed=360, gauche_acceleration=360, droite_speed=360, droite_acceleration=6000, pince_speed=36000, pince_acceleration=6000, pince_rotation=360;
+		int gauche_speed=360, gauche_acceleration=3000, droite_speed=360, droite_acceleration=3000, pince_speed=36000, pince_acceleration=6000, pince_rotation=360;
 		int avancer_delay=3000, pince_delay=1000;
 		int choice = 1;
 		int button;
@@ -111,6 +111,7 @@ public class TestEV3Motors {
 					else
 						moteur_pince.forward();
 					Delay.msDelay(pince_delay);
+					moteur_pince.setSpeed(0);
 				}
 				else {
 					if(button==Button.ID_LEFT)
@@ -150,7 +151,7 @@ public class TestEV3Motors {
 				moteur_gauche.setAcceleration(options[1]);
 				moteur_droite.setSpeed(options[2]);
 				moteur_droite.setAcceleration(options[3]);
-				if(options[5]>0) {
+				if(options[5]==0) {
 					moteur_gauche.startSynchronization();
 					if (button==Button.ID_LEFT) {
 						moteur_gauche.backward();
@@ -163,8 +164,8 @@ public class TestEV3Motors {
 					moteur_gauche.endSynchronization();
 					Delay.msDelay(options[4]);
 					moteur_gauche.startSynchronization();
-					moteur_gauche.stop(true);
-					moteur_droite.stop(true);
+					moteur_gauche.setSpeed(0);
+					moteur_droite.setSpeed(0);
 					moteur_gauche.endSynchronization();
 					
 				}
@@ -175,13 +176,17 @@ public class TestEV3Motors {
 						moteur_droite.rotate(options[4], true);
 					}
 					else {
-						moteur_gauche.rotate(options[4], true);
-						moteur_droite.rotate(options[4], true);
+						moteur_gauche.rotate(-options[4], true);
+						moteur_droite.rotate(-options[4], true);
 					}
 					moteur_gauche.endSynchronization();
 				}
 				LCD.drawString("Gauche: " + moteur_gauche.getTachoCount(), 1, 3);
 				LCD.drawString("Droite: " + moteur_droite.getTachoCount(), 1, 4);
+				Button.waitForAnyEvent();
+				moteur_gauche.resetTachoCount();
+				moteur_droite.resetTachoCount();
+				Button.waitForAnyEvent();
 			}
 			Button.waitForAnyEvent();
 		}
@@ -195,33 +200,29 @@ public class TestEV3Motors {
 		LCD.drawString(name, 4, 1);
 		LCD.drawInt(default_value, 3, 4);
 		Delay.msDelay(500);
-		while (Button.ENTER.isUp()) {
-			//int button = Button.waitForAnyPress();
+		int button = -1, event=-1;
+		while (button != Button.ID_ENTER) {
+			if (event!=0)
+				button = Button.waitForAnyPress();
 			if (Button.ESCAPE.isDown()) 
 				return -1;
-			else if (Button.DOWN.isDown()) {
+			else if (button == Button.ID_DOWN) {
 				default_value -=10*pas;
-				LCD.drawInt(default_value, 3, 4);
-				Delay.msDelay(50);
 			}
-			else if (Button.UP.isDown()) {
+			else if (button==Button.ID_UP) {
 				default_value += 10*pas;
-				LCD.drawInt(default_value, 3, 4);
-				Delay.msDelay(50);
 			}
-			else if (Button.RIGHT.isDown()) {
+			else if (button == Button.ID_RIGHT) {
 				default_value+=1*pas;
-				LCD.drawInt(default_value, 3, 4);
-				Delay.msDelay(50);
 				
 			}
-			else if (Button.LEFT.isDown()) {
+			else if (button == Button.ID_LEFT) {
 				default_value-= pas;
-				LCD.drawInt(default_value, 3, 4);
-				Delay.msDelay(50);
 			}
+			LCD.clear(3,4,10);
+			LCD.drawInt(default_value, 3, 4);
+			event = Button.waitForAnyEvent(50);
 		}
-		Button.waitForAnyEvent();
 		return default_value;
 	}
 }
