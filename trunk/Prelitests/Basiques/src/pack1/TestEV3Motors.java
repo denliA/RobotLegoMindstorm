@@ -4,6 +4,8 @@ package pack1;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
 import lejos.hardware.motor.EV3MediumRegulatedMotor;
 import lejos.hardware.port.MotorPort;
+import lejos.robotics.chassis.WheeledChassis;
+import lejos.robotics.navigation.MovePilot;
 import lejos.utility.*;
 import lejos.hardware.Button;
 import lejos.hardware.lcd.LCD;
@@ -12,6 +14,16 @@ public class TestEV3Motors {
 	static EV3LargeRegulatedMotor moteur_gauche = new EV3LargeRegulatedMotor(MotorPort.B);
 	static EV3LargeRegulatedMotor moteur_droite = new EV3LargeRegulatedMotor(MotorPort.A);
 	static EV3MediumRegulatedMotor moteur_pince = new EV3MediumRegulatedMotor(MotorPort.C);
+	final static double DIST_ROUES_INCH = 12.280002254568; // Pour le DifferentialPilot, mesure approximative 
+    final static double DIAM_ROUE_INCH = 5.6;
+	static double trackWidth = DIST_ROUES_INCH;
+	static double leftWheelDiameter = DIAM_ROUE_INCH*1.002;
+	static double rightWheelDiameter = DIAM_ROUE_INCH;
+	static MovePilot pilot = new MovePilot (new WheeledChassis(
+			new WheeledChassis.Modeler[] { 
+				WheeledChassis.modelWheel(moteur_gauche, leftWheelDiameter).offset(trackWidth / 2).invert(false),
+				WheeledChassis.modelWheel(moteur_droite, rightWheelDiameter).offset(-trackWidth / 2).invert(false) },
+			WheeledChassis.TYPE_DIFFERENTIAL));
 	static {
 		moteur_gauche.synchronizeWith(new EV3LargeRegulatedMotor[] {moteur_droite});
 	}
@@ -147,27 +159,28 @@ public class TestEV3Motors {
 			}
 			else if (button == Button.ID_LEFT || button == Button.ID_RIGHT) {
 				LCD.clear(1,2,100);
-				moteur_gauche.setSpeed(options[0]);
-				moteur_gauche.setAcceleration(options[1]);
-				moteur_droite.setSpeed(options[2]);
-				moteur_droite.setAcceleration(options[3]);
-				if(options[5]==0) {
-					moteur_gauche.startSynchronization();
-					if (button==Button.ID_LEFT) {
-						moteur_gauche.backward();
-						moteur_droite.backward();
-					}
-					else {
-						moteur_gauche.forward();
-						moteur_droite.forward();
-					}
-					moteur_gauche.endSynchronization();
-					Delay.msDelay(options[4]);
-					moteur_gauche.startSynchronization();
-					moteur_gauche.setSpeed(0);
-					moteur_droite.setSpeed(0);
-					moteur_gauche.endSynchronization();
-					
+//				moteur_gauche.setSpeed(options[0]);
+//				moteur_gauche.setAcceleration(options[1]);
+//				moteur_droite.setSpeed(options[2]);
+//				moteur_droite.setAcceleration(options[3]);
+//				if(options[5]==0) {
+//					moteur_gauche.startSynchronization();
+//					if (button==Button.ID_LEFT) {
+//						moteur_gauche.backward();
+//						moteur_droite.backward();
+//					}
+//					else {
+//						moteur_gauche.forward();
+//						moteur_droite.forward();
+//					}
+//					moteur_gauche.endSynchronization();
+//					Delay.msDelay(options[4]);
+//					moteur_gauche.startSynchronization();
+//					moteur_gauche.setSpeed(0);
+//					moteur_droite.setSpeed(0);
+//					moteur_gauche.endSynchronization();
+//					
+				pilot.forward(60);
 				}
 				else {
 					moteur_gauche.startSynchronization();
