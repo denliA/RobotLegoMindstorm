@@ -6,6 +6,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import deplacer.Droit;
+import lejos.hardware.Button;
 import palet.DetecterPalet;
 
 public class Main_PID_LineFollower {
@@ -17,23 +18,28 @@ public class Main_PID_LineFollower {
 	static SuivreLigneCouleur e = new SuivreLigneCouleur();
 	
 	public static void main(String[] args) {
-		ScheduledExecutorService service = Executors.newScheduledThreadPool(4);
-		Future<?> suivre_couleur = service.scheduleWithFixedDelay(new TaskA(),0,100,TimeUnit.MILLISECONDS);
+		
+		ScheduledExecutorService service = Executors.newScheduledThreadPool(3);
+		Future<?> suivre_couleur = service.scheduleWithFixedDelay(new TaskA(),0,1,TimeUnit.MILLISECONDS);
 		Future<?> ligne_blanche = service.scheduleWithFixedDelay(new TaskB(),0,100,TimeUnit.MILLISECONDS);
-		Future<?> palet = service.scheduleWithFixedDelay(new TaskC(),0,100,TimeUnit.MILLISECONDS);
+		//Future<?> palet = service.scheduleWithFixedDelay(new TaskC(),0,100,TimeUnit.MILLISECONDS);
 		
-	do {
 		Droit.droitMoteur(acceleration, Droit.DEFAULT_SPEED);
+		while(!gotToWhite);
+		SuivreLigneCouleur.stopMesure(); // ferme port du capteur couleur
+		Droit.fermerMoteur(); // ferme port du moteur
+		service.shutdownNow(); // fin du threadpool
 		
-		
-		
-	}while( (gotToWhite&&!(foundPalet)) || (scoredPalet==maxPalet) ); // on sort si le robot a atteint la ligne blanche sans trouver de palet ou si il ramene tous les palets
+	/*	
+	while( (gotToWhite&&!(foundPalet)) || (scoredPalet==maxPalet) ); // on sort si le robot a atteint la ligne blanche sans trouver de palet ou si il ramene tous les palets
 	Droit.arreter();
 	SuivreLigneCouleur.stopMesure(); // ferme port du capteur couleur
 	Droit.fermerMoteur(); // ferme port du moteur
 	service.shutdownNow(); // fin du threadpool
+	*/
 	}
 }
+	
 
 class TaskA implements Runnable{
 	
