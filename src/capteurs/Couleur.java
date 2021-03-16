@@ -54,7 +54,7 @@ public class Couleur {
 		Intervalle IRatios;
 		
 		
-		// bc : bonesCouleurs : {rouge_min, rouge_max, vert_min, vert_max, bleu_min, bleu_max} 
+		// bc : bornesCouleurs : {rouge_min, rouge_max, vert_min, vert_max, bleu_min, bleu_max} 
 		// br : bornesRatios : { R/G_min, R/G_max, B/G_min, B/G_max, B/R_min, B/R_max }
 		// pour des valeurs à ne pas prendre en compte, le min et le max de celles-ci doivent tous les deux être à Float.NaN
 		private CouleurLigne(float[] bc, float[] br) {
