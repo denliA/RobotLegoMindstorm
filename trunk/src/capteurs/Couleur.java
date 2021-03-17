@@ -86,7 +86,7 @@ public class Couleur {
 	public static void stopScan() {
 		lanceur.stop();
 	}
-	
+	/*
 	//Fait des choix d'approximation en fonction des valeurs des autres methodes pour retourner la couleur analyse
 	public static CouleurLigne getCouleurLigne() {
 		setScanMode((byte) (getScanMode() | REDMODE));
@@ -122,7 +122,7 @@ public class Couleur {
 			return cand==null?  CouleurLigne.INCONNU : cand;
 		}
 		
-	}
+	}*/
 	
 	private static void update() {
 		update(0);

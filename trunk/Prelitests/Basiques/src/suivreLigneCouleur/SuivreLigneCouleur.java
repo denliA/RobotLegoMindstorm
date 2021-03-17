@@ -140,7 +140,7 @@ public class SuivreLigneCouleur {
 		float correction = 0f;
 		do {
 			RGB.fetchSample(value, 0); //input de la couleur mesurée
-			error = (targetLigneRougeR - value[0]);
+			error = (targetLigneRougeR - value[0]*255);
 			if (Math.abs(error)>ERROR_MARGIN) { //on ne fait rien si l'erreur est negligeable
 				integral += error;
 				derivative = error - previousError;
