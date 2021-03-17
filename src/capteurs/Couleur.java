@@ -46,7 +46,9 @@ public class Couleur {
 	
 	//Avoir la valeur de la couleur suivant un encodage RGB
 	public static float[] getRGB() {
-		return(new float[] {rouge,vert,bleu});
+		synchronized (lock) {
+			return(new float[] {rouge,vert,bleu});
+		}
 	}
 	
 	//Ratios R/G, B/G et B/R
