@@ -20,7 +20,7 @@ public class Pince {
 		if(ouvert) {
 			//TO DO	
 			//envoyer message d'erreur ?
-			throw new OuvertureException("Pinces d�j� ouvertes.");
+			throw new OuvertureException("Pinces deja ouvertes.");
 		}
 		else {
 			Moteur.MOTEUR_PINCE.setSpeed(36000);
@@ -63,14 +63,14 @@ public class Pince {
  *  ... 3 more
  */
 
-//class TestPince{
-//	public static void main(String[] args) {
-////		new Pince();  //juste pour voir s'il fallait charger la classe avant avec un new dans le vide
-//		try {
-//			Pince.ouvrir();
-//		} catch (OuvertureException e) {
-//			e.printStackTrace();
-//			System.out.println(e.getMessage());
-//		}
-//	}
-//}
+class TestPince{
+	public static void main(String[] args) {
+//		new Pince();  //juste pour voir s'il fallait charger la classe avant avec un new dans le vide
+		try {
+			Pince.ouvrir();
+		} catch (OuvertureException e) {
+			e.printStackTrace();
+			System.out.println(e.getMessage());
+		}
+	}
+}
