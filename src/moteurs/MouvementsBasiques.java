@@ -8,7 +8,8 @@ public class MouvementsBasiques {
 	final static double DIST_ROUES_INCH = 12.280002254568; // Pour le DifferentialPilot, mesure approximative 
     final static double DIAM_ROUE_INCH = 5.6;
 	static double trackWidth = DIST_ROUES_INCH;
-	static double leftWheelDiameter = DIAM_ROUE_INCH*1.003;
+	static double leftWheelDiameter = DIAM_ROUE_INCH*1.0045;
+	//1.0045 bien
 	static double rightWheelDiameter = DIAM_ROUE_INCH;
 	
 	public static MovePilot pilot = new MovePilot (new WheeledChassis(
@@ -38,9 +39,9 @@ public class MouvementsBasiques {
 		Moteur.MOTEUR_DROIT.setSpeed(Math.abs(vitesse));
 		Moteur.MOTEUR_GAUCHE.setAcceleration(acceleration);
 		Moteur.MOTEUR_DROIT.setAcceleration(acceleration);
-		int k=1; // coeff de proportionalite a definir
-		long vitesseRobot = k*vitesse; //en secondes
-		long dureeDepl = distance/vitesseRobot; //en secondes
+		float k=1/1000; // coeff de proportionalite a definir
+		float vitesseRobot = k*vitesse; //en secondes
+		long dureeDepl = (long)(distance/vitesseRobot); //en secondes
 		
 		if (vitesse>0) {
 			Moteur.MOTEUR_GAUCHE.forward();
@@ -50,25 +51,27 @@ public class MouvementsBasiques {
 			Moteur.MOTEUR_GAUCHE.backward();
 			Moteur.MOTEUR_DROIT.backward();
 		}
-		Delay.msDelay(dureeDepl*1000);
+		//Delay.msDelay(dureeDepl*1000);
+		Delay.msDelay(10000);
 		Moteur.MOTEUR_GAUCHE.setSpeed(0);
 		Moteur.MOTEUR_DROIT.setSpeed(0);
 	}
 	
-	public static void tourner(int vitesse, int acceleration, float angle) {
+	public static void tourner(int vitesse, int acceleration, int angle) {
 		pilot.setLinearAcceleration(acceleration);
 		pilot.setLinearSpeed(vitesse);
 		pilot.rotate(angle);
 	}
 	
-	public static void tourner(int vitesse, int acceleration, float angle, boolean deux_roues) {
+	public static void tourner(int vitesse, int acceleration, int angle, boolean deux_roues) {
 		//methode sans chassis à definir eventuellement si on veut faire bouger les roues differement
 	}
 	
+	/*
 	public static void vide() {
 		if () {
 			
 		}
-	}
+	}*/
 
 }
