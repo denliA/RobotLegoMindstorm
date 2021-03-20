@@ -1,6 +1,7 @@
 package moteurs;
 
 import exceptions.OuvertureException;
+import lejos.hardware.Sound;
 import lejos.utility.Delay;
 public class Pince {
 	
@@ -71,6 +72,37 @@ class TestPince{
 		} catch (OuvertureException e) {
 			e.printStackTrace();
 			System.out.println(e.getMessage());
+			Sound.beep();
+		}
+		try {
+			Pince.fermer();
+		}
+		catch(OuvertureException e) {
+			e.printStackTrace();
+			System.out.println(e.getMessage());
+			Sound.beep();
+		}
+		try {
+			Pince.ouvrir();
+		} catch (OuvertureException e) {
+			e.printStackTrace();
+			System.out.println(e.getMessage());
+			Sound.beep();
+		}
+		try {
+			Pince.ouvrir();
+		} catch (OuvertureException e) {
+			e.printStackTrace();
+			System.out.println(e.getMessage());
+			Sound.beep();
+		}
+		try {
+			Pince.fermer();
+		}
+		catch(OuvertureException e) {
+			e.printStackTrace();
+			System.out.println(e.getMessage());
+			Sound.beep();
 		}
 	}
 }
