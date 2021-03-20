@@ -78,6 +78,7 @@ public class Pilote {
 		//TO DO
 	}
 	*/
+/*
 	Deplacement suivreLigne(ConditionArret condition) {
 		return new DeplacementSuivreLigne(condition);
 	}
@@ -117,4 +118,5 @@ class DeplacementSuivreLigne implements Deplacement {
 	public boolean getStatus() {
 		return status;
 	}
+ */
 }
