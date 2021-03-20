@@ -1,6 +1,8 @@
 package moteurs;
 
 import java.util.concurrent.Semaphore;
+
+import lejos.robotics.RegulatedMotor;
 import lejos.robotics.chassis.WheeledChassis;
 import lejos.robotics.navigation.MovePilot;
 import lejos.utility.Delay;
@@ -68,16 +70,7 @@ public class MouvementsBasiques {
 	}
 	
 	public static void avancerTravel(double vitesse, double distance) {
-		try {
-			s1.acquire();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		pilot.setLinearSpeed(vitesse);
-		pilot.setLinearAcceleration(pilot.getLinearAcceleration()/3); //robot va accelerer en debut du mouvement et decelerer a la fin du mouvement avec cette valeur trouvée par expérimentation. Le robot ne se décale pas trop de sa position lors du début du mouvement
-		pilot.travel(distance);
-		s1.release();
+		avancerTravel(vitesse, pilot.getLinearAcceleration()/3, distance);
 	}
 	
 	public static void avancerToutDroit(int vitesse, int acceleration) throws InterruptedException{
@@ -124,8 +117,8 @@ public class MouvementsBasiques {
 	
 	public static void tourner(double vitesse, double acceleration, double angle) throws InterruptedException {
 		s1.acquire();
-		pilot.setLinearAcceleration(acceleration);
-		pilot.setLinearSpeed(vitesse);
+		pilot.setAngularAcceleration(acceleration);
+		pilot.setAngularSpeed(vitesse);
 		pilot.rotate(angle);
 		s1.release();
 	}
@@ -134,6 +127,18 @@ public class MouvementsBasiques {
 		//methode sans chassis à definir eventuellement si on veut faire bouger les roues differement
 		s1.acquire();
 		s1.release();
+	}
+	
+	@SuppressWarnings("resource")
+	public static void tourner(double angle, int duree, boolean moteur_gauche) {
+		double vitesse = 2*Math.PI*trackWidth/DIAM_ROUE_INCH*angle/duree*1000;
+		RegulatedMotor moteur = (moteur_gauche ? Moteur.MOTEUR_GAUCHE : Moteur.MOTEUR_DROIT);
+		moteur.setSpeed((int)vitesse);
+		if (vitesse >= 0)
+			moteur.forward();
+		else
+			moteur.backward();
+		
 	}
 	
 	/*
