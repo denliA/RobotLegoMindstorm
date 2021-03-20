@@ -6,7 +6,7 @@ import lejos.robotics.navigation.MovePilot;
 import lejos.utility.Delay;
 
 public class MouvementsBasiques {
-	final static double DIST_ROUES_INCH = 12.280002254568; // Pour le DifferentialPilot, mesure approximative 
+	final static double DIST_ROUES_INCH = 12.280002254568; // Pour le MovePilot, mesure approximative 
     final static double DIAM_ROUE_INCH = 5.6;
 	static double trackWidth = DIST_ROUES_INCH;
 	/* Moteur gauche tourne plus vite que le moteur droit. Pour compenser, on cosidère que la roue gauche est plus grande que celle de droite.
