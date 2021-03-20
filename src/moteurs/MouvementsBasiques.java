@@ -38,6 +38,10 @@ public class MouvementsBasiques {
 		pilot.setLinearAcceleration(a);
 	}
 	
+	public static void changeVitesseRobot( double ratio) {
+		pilot.setLinearSpeed(pilot.getLinearSpeed()*ratio);
+	}
+	
 	public static void avancer() {
 		pilot.forward();
 	}
