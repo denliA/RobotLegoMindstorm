@@ -1,7 +1,6 @@
 package moteurs;
 import capteurs.*;
 
-import capteurs.*;
 
 public class Pilote {
 	static private boolean seDeplace = false;;
@@ -55,10 +54,35 @@ public class Pilote {
 		MouvementsBasiques.arreter(); //Le robot s'arrete
 	}
 	
+
+	
 	//Le robot doit etre posé sur une ligne à suivre
 	public static void suivreLigne() {
-		Couleur.update(); //robot détecte la couleur de la ligne sur laquelle il est posé
 		suivreLigne(Couleur.getCouleurLigne());
+	}
+	
+	
+	public static void seRedresserSurLigne(CouleurLigne c, boolean gauche_bouge) {
+		//int def_gauche = Moteur.MOTEUR_GAUCHE.getSpeed();
+		//int def_droit = Moteur.MOTEUR_DROIT.getSpeed();
+		boolean trouve; 
+		while(Couleur.getCouleurLigne() != c) {
+			trouve = tournerToCouleur(c, gauche_bouge, 90, 1000);
+			if (!trouve) {
+				tournerToCouleur(c, gauche_bouge, -180, 1000);
+			}
+			MouvementsBasiques.avancerTravel(MouvementsBasiques.getVitesseRobot(), 2);
+			gauche_bouge = !gauche_bouge;
+			
+		}
+	}
+	
+	private static boolean tournerToCouleur(CouleurLigne c, boolean gauche_bouge, double angle, int timeOut) {
+		MouvementsBasiques.tourner(angle, timeOut, gauche_bouge);
+		long debut = System.currentTimeMillis();
+		while(Couleur.getCouleurLigne() != c && System.currentTimeMillis()-debut<timeOut);
+		(gauche_bouge ? Moteur.MOTEUR_GAUCHE : Moteur.MOTEUR_DROIT).stop();
+		return Couleur.getCouleurLigne() == c;
 	}
 	
 	/*
