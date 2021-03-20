@@ -126,7 +126,10 @@ public class Couleur {
 		
 	}
 	
-	private static void update() {
+	/* J'ai mis update en public car pour le suivi de ligne, je dois m'assurer que les valeurs des couleurs soient bien mis à jour dans la boucle
+	 * et ne dependent pas d'un autre thread. Lors du redressage du robot, le timer lanceur est arreté. Ceci est un test. On mettra en private si necessaire (Deniza)
+	*/
+	public static void update() {
 		update(0);
 	}
 	
