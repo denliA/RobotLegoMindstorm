@@ -1,7 +1,7 @@
 package moteurs;
 import capteurs.*;
 
-
+import capteurs.*;
 
 public class Pilote {
 	private boolean seDeplace;
@@ -78,4 +78,43 @@ public class Pilote {
 		//TO DO
 	}
 	*/
+	Deplacement suivreLigne(ConditionArret condition) {
+		return new DeplacementSuivreLigne(condition);
+	}
+}
+
+
+
+
+class DeplacementSuivreLigne implements Deplacement {
+	boolean status;
+	ConditionArret condition_arret;
+	Thread action = new Thread(new Runnable() {
+		@Override
+		public void run() {
+			MouvementsBasiques.pilot.forward();
+		}
+	});
+	
+	public DeplacementSuivreLigne(ConditionArret c) {
+		condition_arret = c;
+		status = false;
+	}
+	public DeplacementSuivreLigne() {
+		this(new ConditionArret() { 
+				public boolean event() {
+					return false;}}); } 
+		
+	public void lancer() {
+		
+	}
+	public void interrompre() {
+		
+	}
+	public void arreter() {
+		
+	}
+	public boolean getStatus() {
+		return status;
+	}
 }
