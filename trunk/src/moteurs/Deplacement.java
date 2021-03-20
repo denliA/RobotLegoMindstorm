@@ -1,15 +1,13 @@
 package moteurs;
 
 public interface Deplacement {
-	public boolean status = false;
 	
-	public void lancer(); //permet de lancer/démarrer le déplacement
+	public void lancer(); //permet de lancer/demarrer le deplacement
 	
-	public boolean getStatus(); //permet de retourner si le déplacement est "activé" ou non
+	public boolean getStatus(); //permet de retourner si le deplacement est "active" ou non
 	
-	public void interrompre(); //permet de mettre pause au milieu du déplacement, il pourra être repris, ou non, ensuite
+	public void interrompre(); //permet de mettre pause au milieu du deplacement, il pourra etre repris, ou non, ensuite
 	
-	public void reprendre(); //permet de reprendre un mouvement interrompu
 	
-	public void arreter(); //permet d'arrêter le déplacement, il ne pourra pas être repris après
+	public void arreter(); //permet d'arreter le deplacement, il ne pourra pas etre repris apres
 }
