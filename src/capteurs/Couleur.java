@@ -18,10 +18,10 @@ public class Couleur {
 	private static float IDCouleur;
 	private static float intensiteRouge;
 	private static byte modeFlag;  //4bits 0000e3e2e1e0 avec e3 : light, e2 : RGB, e1 : ID, e0 : RedMode
-	final static byte REDMODE = 0b1;
-	final static byte IDMODE = 0b10;
-	final static byte RGBMODE = 0b100;
-	final static byte LIGHTMODE = 0b1000;
+	final static public byte REDMODE = 0b1;
+	final static public byte IDMODE = 0b10;
+	final static public byte RGBMODE = 0b100;
+	final static public byte LIGHTMODE = 0b1000;
 	
 	
 	private final static Object lock = new Object();
@@ -112,7 +112,7 @@ public class Couleur {
 						candidats.put(couleur, (val==null)? -.5f : (val=val-0.5f));
 				}
 			}
-			System.out.println(candidats.toString());
+			//System.out.println(candidats.toString());
 			CouleurLigne cand=null;
 			float max = 0;
 			for (CouleurLigne c : CouleurLigne.values()) {
@@ -126,10 +126,8 @@ public class Couleur {
 		
 	}
 	
-	/* J'ai mis update en public car pour le suivi de ligne, je dois m'assurer que les valeurs des couleurs soient bien mis à jour dans la boucle
-	 * et ne dependent pas d'un autre thread. Lors du redressage du robot, le timer lanceur est arreté. Ceci est un test. On mettra en private si necessaire (Deniza)
-	*/
-	public static void update() {
+
+	private static void update() {
 		update(0);
 	}
 	
