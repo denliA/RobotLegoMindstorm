@@ -50,6 +50,8 @@ public class Ultrason {
 
 class TestUltrason{
 	public static void main(String[] args) {
+		new Capteur();
+		
 		Ultrason.startScan();
 		LCD.clear();
 		
