@@ -55,7 +55,7 @@ class testToucher{
 		new Capteur();
 		while(Button.ENTER.isUp()) {
 			System.out.println(Toucher.getTouche());
-			Delay.msDelay(500);
+			Delay.msDelay(200);
 		}
 		Toucher.stopScan();
 	}

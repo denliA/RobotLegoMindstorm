@@ -1,5 +1,6 @@
 package capteurs;
 
+import lejos.hardware.Button;
 import lejos.hardware.lcd.LCD;
 import lejos.utility.Timer;
 import lejos.utility.TimerListener;
@@ -45,6 +46,7 @@ public class Ultrason {
 		float[] tabDistance = new float[Capteur.ULTRASON.sampleSize()];
 		Capteur.ULTRASON.fetchSample(tabDistance, 0);
 		distance = tabDistance[0];
+		System.out.println(tabDistance[0]);
 	}
 	public static float getDistance() {
 		return distance;
@@ -66,21 +68,23 @@ public class Ultrason {
 	
 }
 
+
 class TestUltrason{
 	public static void main(String[] args) {
 		new Capteur();
-		
 		Ultrason.startScan();
 		LCD.clear();
 		
-		float d;
-		Ultrason.setDistance();
-		d = Ultrason.getDistance();
-		LCD.drawString("Le palet est à une distance : "+d, 0, 0);
-		
-		Ultrason.setBruitDetecte();
-		boolean b = Ultrason.getBruitDetecte();
-		if(b) LCD.drawString("Il y a un robot", 0, 2);
-		else LCD.drawString("Y a pas de robot", 0, 2);
+		while(Button.ENTER.isUp()) {
+			float d;
+			Ultrason.setDistance();
+			d = Ultrason.getDistance();
+			LCD.drawString("distance : "+d, 0, 0);
+			
+			Ultrason.setBruitDetecte();
+			boolean b = Ultrason.getBruitDetecte();
+			if(b) LCD.drawString("Il y a un robot", 0, 2);
+			else LCD.drawString("Y a pas de robot", 0, 2);
+		}
 	}
 }
