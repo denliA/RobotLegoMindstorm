@@ -4,7 +4,11 @@ import capteurs.*;
 
 
 public class Pilote {
-	private boolean seDeplace=true;
+	private boolean seDeplace;
+	
+	public Pilote(boolean b) {
+		this.seDeplace = b;
+	}
 	
 	//Le robot doit etre posé et suivre une ligne de couleur donnée par l'utilisateur
 	public void suivreLigne(CouleurLigne c) { //je mets en void car l'interface Deplacement n'est pas encore realisée. Je ne sais pas quoi retourner
@@ -57,6 +61,7 @@ public class Pilote {
 	
 	//Le robot doit etre posé sur une ligne à suivre
 	public void suivreLigne() {
+		Couleur.update(); //robot détecte la couleur de la ligne sur laquelle il est posé
 		suivreLigne(Couleur.getCouleurLigne());
 	}
 	
