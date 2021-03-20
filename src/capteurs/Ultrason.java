@@ -1,5 +1,7 @@
 package capteurs;
 
+import lejos.hardware.lcd.LCD;
+
 public class Ultrason {
 	
 	//Attributs 
@@ -44,4 +46,21 @@ public class Ultrason {
 		return bruitDetecte;
 	}
 	
+}
+
+class TestUltrason{
+	public static void main(String[] args) {
+		Ultrason.startScan();
+		LCD.clear();
+		
+		float d;
+		Ultrason.setDistance();
+		d = Ultrason.getDistance();
+		LCD.drawString("Le palet est à une distance : "+d, 0, 0);
+		
+		Ultrason.setBruitDetecte();
+		boolean b = Ultrason.getBruitDetecte();
+		if(b) LCD.drawString("Il y a un robot", 0, 2);
+		else LCD.drawString("Y a pas de robot", 0, 2);
+	}
 }
