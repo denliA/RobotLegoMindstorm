@@ -1,6 +1,8 @@
 package capteurs;
 
 import lejos.hardware.lcd.LCD;
+import lejos.utility.Timer;
+import lejos.utility.TimerListener;
 
 public class Ultrason {
 	
@@ -11,18 +13,33 @@ public class Ultrason {
 	//pour savoir si le capteur est effectivement actif
 	private static boolean status;
 	
+	//Pour lancer des analyses de manière périodique
+		private static Timer lanceur = new Timer(100, 
+				new TimerListener() {
+			public void timedOut() {
+					setDistance();
+					setBruitDetecte();
+			}
+		});
+	
 	//Méthodes
-	//Modifient status
+		
+	//Lancent des scans périodiques avec lanceur et modifient status de manière adéquate
 	public static void startScan() {
+		lanceur.setDelay(50);
+		lanceur.start();
 		status = true;
 	}
 	public static void stopScan() {
+		lanceur.stop();
 		status = false;
 	}
-	//Donne la valuer de status
+	
+	//Donne la valeur de status
 	public static boolean getStatus() {
 		return status;
 	}
+	
 	//Gestion de la distance mesurée par le capteur
 	public static void setDistance() {
 		float[] tabDistance = new float[Capteur.ULTRASON.sampleSize()];
@@ -32,6 +49,7 @@ public class Ultrason {
 	public static float getDistance() {
 		return distance;
 	}
+	
 	//Détection de la présence d'un autre robot
 	public static void setBruitDetecte() {
 		bruitDetecte=false;
