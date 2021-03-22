@@ -18,7 +18,7 @@ public class MouvementsBasiques {
 	static double rightWheelDiameter = DIAM_ROUE_INCH;
 	public static Semaphore s1 = new Semaphore(1);
 	
-	private static MovePilot pilot = new MovePilot (new WheeledChassis(
+	public static MovePilot pilot = new MovePilot (new WheeledChassis(
 			new WheeledChassis.Modeler[] { 
 				WheeledChassis.modelWheel(Moteur.MOTEUR_GAUCHE, leftWheelDiameter).offset(trackWidth / 2).invert(false),
 				WheeledChassis.modelWheel(Moteur.MOTEUR_DROIT, rightWheelDiameter).offset(-trackWidth / 2).invert(false) },
@@ -29,6 +29,7 @@ public class MouvementsBasiques {
 	}
 	
 	public static double getAccelerationRobot() {
+		System.out.println(pilot.getLinearAcceleration());
 		return pilot.getLinearAcceleration();
 	}
 	

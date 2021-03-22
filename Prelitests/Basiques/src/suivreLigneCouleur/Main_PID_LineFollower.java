@@ -27,7 +27,7 @@ public class Main_PID_LineFollower {
 		Droit.droitMoteur(acceleration, Droit.DEFAULT_SPEED);
 		while(!gotToWhite);
 		SuivreLigneCouleur.stopMesure(); // ferme port du capteur couleur
-		Droit.fermerMoteur(); // ferme port du moteur
+		Droit.fermerMoteur(); // ferme port du moteur 
 		service.shutdownNow(); // fin du threadpool
 		
 	/*	

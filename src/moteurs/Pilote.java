@@ -1,5 +1,6 @@
 package moteurs;
 import capteurs.*;
+import lejos.robotics.RegulatedMotor;
 
 
 public class Pilote {
@@ -9,6 +10,7 @@ public class Pilote {
 	//Le robot doit etre posé et suivre une ligne de couleur donnée par l'utilisateur
 	public static void suivreLigne(CouleurLigne c) { //je mets en void car l'interface Deplacement n'est pas encore realisée. Je ne sais pas quoi retourner
 		seDeplace = true;
+		Moteur.MOTEUR_GAUCHE.synchronizeWith(new RegulatedMotor[] {Moteur.MOTEUR_DROIT});
 		float defaultSpeed;
 		MouvementsBasiques.changeVitesseRobot(0.5);
 		long debut;
@@ -47,7 +49,13 @@ public class Pilote {
 				//On relance le timer lanceur immediatement
 				if(Couleur.getCouleurLigne()!=c) {
 					//gestion d'erreur le robot n'a pas pu se redresser sur une ligne de couleur et il est perdu. Il faut arreter le mouvement
-					seDeplace = false|true;
+					Moteur.MOTEUR_GAUCHE.startSynchronization();
+					Moteur.MOTEUR_GAUCHE.stop();
+					Moteur.MOTEUR_DROIT.stop();
+					Moteur.MOTEUR_GAUCHE.endSynchronization();
+					seRedresserSurLigne(c, true);
+					MouvementsBasiques.avancer(); 
+					
 				}
 			}
 		}
@@ -67,11 +75,14 @@ public class Pilote {
 		//int def_droit = Moteur.MOTEUR_DROIT.getSpeed();
 		boolean trouve; 
 		while(Couleur.getCouleurLigne() != c) {
-			trouve = tournerToCouleur(c, gauche_bouge, 90, 1000);
+			trouve = tournerToCouleur(c, gauche_bouge, 90, 5000);
 			if (!trouve) {
-				tournerToCouleur(c, gauche_bouge, -180, 1000);
+				tournerToCouleur(c, gauche_bouge, -180, 2500);
 			}
-			MouvementsBasiques.avancerTravel(MouvementsBasiques.getVitesseRobot(), 2);
+			else if (Couleur.getCouleurLigne()!=c) {
+				tournerToCouleur(c, gauche_bouge, -20, 1000);
+			}
+			MouvementsBasiques.avancerTravel(MouvementsBasiques.getVitesseRobot(), 6);
 			gauche_bouge = !gauche_bouge;
 			
 		}
@@ -82,7 +93,7 @@ public class Pilote {
 		long debut = System.currentTimeMillis();
 		while(Couleur.getCouleurLigne() != c && System.currentTimeMillis()-debut<timeOut);
 		(gauche_bouge ? Moteur.MOTEUR_GAUCHE : Moteur.MOTEUR_DROIT).stop();
-		return Couleur.getCouleurLigne() == c;
+		return System.currentTimeMillis()-debut<timeOut;
 	}
 	
 	/*

@@ -31,7 +31,8 @@ public class SuivreLigneCouleur {
     static float value[] = new float[RGB.sampleSize()+3];
     static FileWriter outputer = null;
     
-    final static float targetLigneRougeR = 26f; // a mesurer le rgb sur bord ligne
+    final static float targetLigneRougeR = 1.45f;
+    //26f pour entre deux rouge inteval// a mesurer le rgb sur bord ligne
 	final static float KP = 1f; //if small, robot smooth turns
 	final static float KI = 1f;
 	final static float KD = 1f;
@@ -140,7 +141,7 @@ public class SuivreLigneCouleur {
 		float correction = 0f;
 		do {
 			RGB.fetchSample(value, 0); //input de la couleur mesurée
-			error = (targetLigneRougeR - value[0]*255);
+			error = (targetLigneRougeR - (value[0]/value[1]));
 			if (Math.abs(error)>ERROR_MARGIN) { //on ne fait rien si l'erreur est negligeable
 				integral += error;
 				derivative = error - previousError;
@@ -152,14 +153,16 @@ public class SuivreLigneCouleur {
 				else if (correction<-MAX_SPEED)
 					correction = -MAX_SPEED;
 				// tourner robot
-				if (error<0) { // robot sur ligne rouge
-					Droit.G.setSpeed(DEFAULT_SPEED+correction);
-					Droit.D.setSpeed(DEFAULT_SPEED-correction);
-				}
-				else if (error>0) { // robot sur zone grise
-					Droit.D.setSpeed(DEFAULT_SPEED+correction);
-					Droit.G.setSpeed(DEFAULT_SPEED-correction);
-				}
+				Droit.G.setSpeed(DEFAULT_SPEED+correction);
+				Droit.D.setSpeed(DEFAULT_SPEED-correction);
+//				if (error<0) { // robot sur ligne rouge
+//					Droit.G.setSpeed(DEFAULT_SPEED+correction);
+//					Droit.D.setSpeed(DEFAULT_SPEED-correction);
+//				}
+//				else if (error>0) { // robot sur zone grise
+//					Droit.D.setSpeed(DEFAULT_SPEED+correction);
+//					Droit.G.setSpeed(DEFAULT_SPEED-correction);
+//				}
 			}
 		}while(Math.abs(error)>ERROR_MARGIN); // sortie de boucle quand robot s'est redressé sur l'entre ligne rouge-grise
 		//robot avance tout droit 
