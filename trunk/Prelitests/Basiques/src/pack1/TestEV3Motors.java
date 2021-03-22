@@ -203,9 +203,9 @@ public class TestEV3Motors {
 			}
 			Button.waitForAnyEvent();
 		}
-		Button.waitForAnyEvent();
+		//Button.waitForAnyEvent();
 		
-	}
+	//}
 	
 	
 	public static int intButtonInput(int default_value, int pas, String name) {
