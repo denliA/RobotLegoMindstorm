@@ -15,18 +15,22 @@ public class Ultrason {
 	private static boolean status;
 	
 	//Pour lancer des analyses de manière périodique
-		private static Timer lanceur = new Timer(100, 
-				new TimerListener() {
-			public void timedOut() {
+		private static Timer lanceur = 
+			//création d'un objet Timer qui lancera les scans toutes les 100ms
+			new Timer(100, new TimerListener() {
+				public void timedOut() {
+					//appel aux deux fonctions lançant les scans nécessaire à la classe
 					setDistance();
 					setBruitDetecte();
+				}
 			}
-		});
+		);
 	
 	//Méthodes
 		
 	//Lancent des scans périodiques avec lanceur et modifient status de manière adéquate
 	public static void startScan() {
+		//scan toutes les 50 ms
 		lanceur.setDelay(50);
 		lanceur.start();
 		status = true;
@@ -43,10 +47,12 @@ public class Ultrason {
 	
 	//Gestion de la distance mesurée par le capteur
 	public static void setDistance() {
+		//création du tableau qui stockera les valeurs renvoyées par le sampler
 		float[] tabDistance = new float[Capteur.ULTRASON.sampleSize()];
+		//remplissage du tableau
 		Capteur.ULTRASON.fetchSample(tabDistance, 0);
 		distance = tabDistance[0];
-		System.out.println(tabDistance[0]);
+		//System.out.println(tabDistance[0]);
 	}
 	public static float getDistance() {
 		return distance;
@@ -56,10 +62,10 @@ public class Ultrason {
 	public static void setBruitDetecte() {
 		bruitDetecte=false;
 		
+		//le sampler contient normalement un seul élément : 1 si il y a un autre robot, 0 sinon
 		float[] autreRobot = new float[Capteur.ECOUTE.sampleSize()];
 		Capteur.ECOUTE.fetchSample(autreRobot, 0);
 		
-		//ECOUTE renvoie 1 ou 0
 		if(autreRobot[0]==1) {bruitDetecte=true;}
 	}
 	public static boolean getBruitDetecte() {
@@ -68,11 +74,14 @@ public class Ultrason {
 	
 }
 
-
+//classe de test
 class TestUltrason{
 	public static void main(String[] args) {
+		//initialisation : création des sampler de la classe Capteur
 		new Capteur();
 		Ultrason.startScan();
+		
+		//nettoyage de l'ecran du robot afin d'afficher les messages sans parasite
 		LCD.clear();
 		
 		while(Button.ENTER.isUp()) {
