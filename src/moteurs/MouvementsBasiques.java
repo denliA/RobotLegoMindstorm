@@ -71,7 +71,7 @@ public class MouvementsBasiques {
 	}
 	
 	public static void avancerTravel(double vitesse, double distance) {
-		avancerTravel(vitesse, pilot.getLinearAcceleration()/3, distance);
+		avancerTravel(vitesse, pilot.getLinearAcceleration(), distance);
 	}
 	
 	public static void avancerToutDroit(int vitesse, int acceleration) throws InterruptedException{
@@ -132,7 +132,7 @@ public class MouvementsBasiques {
 	
 	@SuppressWarnings("resource")
 	public static void tourner(double angle, int duree, boolean moteur_gauche) {
-		double vitesse = 2*Math.PI*trackWidth/DIAM_ROUE_INCH*angle/duree*1000;
+		double vitesse = 2*trackWidth/DIAM_ROUE_INCH*angle/duree*1000;
 		RegulatedMotor moteur = (moteur_gauche ? Moteur.MOTEUR_GAUCHE : Moteur.MOTEUR_DROIT);
 		moteur.setSpeed((int)vitesse);
 		if (vitesse >= 0)
