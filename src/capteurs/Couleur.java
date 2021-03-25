@@ -7,7 +7,18 @@ import java.util.concurrent.ConcurrentHashMap;
 
 
 
-
+/**
+ * Classe gérant toutes les mesures et les interprétations en rapport avec le capteur de couleurs.
+ * <p>
+ * Deux fonctions sont assurées ici:
+ * <ul>
+ * <li> La prise périodique de mesures.
+ * <li> L'intérprétation de ces mesures.
+ * </ul>
+ * 
+ * @see CouleurLigne
+ * @see Capteur
+ */
 public class Couleur {
 	
 	//Attributs de la classe Couleur
@@ -17,13 +28,26 @@ public class Couleur {
 	private static float lumiere;
 	private static float IDCouleur;
 	private static float intensiteRouge;
-	private static byte modeFlag;  //4bits 0000e3e2e1e0 avec e3 : light, e2 : RGB, e1 : ID, e0 : RedMode
+	
+	/**
+	 * indicateur permettant de décider quelles mesures prendre et lesquelles ignorer.
+	 * <p>
+	 * Les trois 4 bits inférieurs e3e2e1e0 sont utilisés:
+	 * <ul> 
+	 * <li> e3 pour la lumière ambiante
+	 * <li> e2 pour le mode RGB
+	 * <li> e1 pour le ColorID (algorithme par défaut de Lego)
+	 * <li> e0 pour le mode intensité du rouge 
+	 */
+	private static byte modeFlag;
+	
+	// Constantes pour le modeFlag
 	final static public byte REDMODE = 0b1;
 	final static public byte IDMODE = 0b10;
 	final static public byte RGBMODE = 0b100;
 	final static public byte LIGHTMODE = 0b1000;
 	
-	
+	// Assure la synchronisation des opérations : si une mesure est en train d'être faite, on ne veut pas accéder aux vairables modifées par celle-ci  entre temps.
 	private final static Object lock = new Object();
 	
 	// Pour lancer périodiquement des mesures
@@ -41,7 +65,9 @@ public class Couleur {
 	
 	//Avoir la valeur de la couleur suivant l'enumeration de leJOS
 	public static float getColorID() {
-		return(IDCouleur);
+		synchronized(lock) {
+			return(IDCouleur);
+		}
 	}
 	
 	//Avoir la valeur de la couleur suivant un encodage RGB
@@ -53,50 +79,82 @@ public class Couleur {
 	
 	//Ratios R/G, B/G et B/R
 	public static float[] getRatios() {
-		return (new float[] {rouge/vert, bleu/vert, bleu/rouge});
+		synchronized(lock) {
+			return (new float[] {rouge/vert, bleu/vert, bleu/rouge});
+		}
 	}
-	
 	
 	//Recuperer une valeur definissant l'intensite de la lumiere ambiante
 	public static float getAmbiantLight() {
-		return(lumiere);
+		synchronized(lock) {
+			return(lumiere);
+		}
 	}
 	
-	
+	// Récupérer une valeur définissant l'intensité de la lumière rouge
 	public static float getRedMode() {
-		return(intensiteRouge);
+		synchronized(lock) {
+			return(intensiteRouge);
+		}
 	}
 	
-	//Definir le mode de scanner de couleur (quelles couleurs capter et quelle couleur ignorer)
+	
+	/**
+	 * Change le mode de prise de mesure.
+	 * 
+	 * @param flag indicateur des mesures à prendre
+	 * @see #modeFlag
+	 */
 	public static void setScanMode(byte flag) {
 		modeFlag = flag;
 	}
 	
-	//Retourn le mode de scanner de couleur
+	/**
+	 * 
+	 * @return retourne le mode de prise de mesure
+	 * @see #modeFlag
+	 */
 	public static byte getScanMode() {
 		return(modeFlag);
 	}
 	
 	
-	// Démarrer le timer pour lancer des mesures périodiques
+	/**
+	 * Lance la prise de mesure périodique.
+	 * @param delay délai entre chaque mesure.
+	 */
 	public static void startScanAtRate(int delay) {
 		lanceur.setDelay(delay);
 		lanceur.start();
 	}
 	
-	// Arrêter le timer
+	/**
+	 * Arrête la prise de mesure périodique.
+	 */
 	public static void stopScan() {
 		lanceur.stop();
 	}
 	
-	//Fait des choix d'approximation en fonction des valeurs des autres methodes pour retourner la couleur analyse
+	/**
+	 * Fonction principale de la classe Couleur. Fait la décision de quelle couleur
+	 * il s'agit. Idéalement, pour un code extérieur qui aurait besoin de la couleur, cette méthode est la seule necessaire pour ce faire.
+	 * 
+	 * @return la couleur trouvée par l'algorithme, ou CouleurLigne.INCONNUE sinon.
+	 */
 	public static CouleurLigne getCouleurLigne() {
-		setScanMode((byte) (getScanMode() | REDMODE));
+		setScanMode((byte) (getScanMode() | RGBMODE)); // On s'assure que l'on scanne les valeurs RGB 
 		Delay.msDelay(10);
 		synchronized(lock) {
 			float[] RGB = getRGB();
 			float[] ratios = getRatios();
+			
+			// On associe pour chaque couleur rencontrée une valeur flottante, représentant grossièrement la probabilité que cette couleur soit la bonne.
 			ConcurrentHashMap <CouleurLigne, Float> candidats = new ConcurrentHashMap<>();
+			
+			/*
+			 * Pour chaque couleur, on vérifie si elle définit un intervalle de valeurs directes (resp de rapports),
+			 * et si c'est le cas on regarde si notre mesure appartient à cet intervalle.
+			 */
 			for (CouleurLigne couleur : CouleurLigne.values()) {
 				Float val = candidats.get(couleur);
 				if (couleur.IRGB!=null) {
@@ -112,7 +170,10 @@ public class Couleur {
 						candidats.put(couleur, (val==null)? -.5f : (val=val-0.5f));
 				}
 			}
-			//System.out.println(candidats.toString());
+			
+			/*
+			 * On trouve le candidat avec la probabilité la plus élevée d'être la bonne couleur
+			 */
 			CouleurLigne cand=null;
 			float max = 0;
 			for (CouleurLigne c : CouleurLigne.values()) {
@@ -121,16 +182,25 @@ public class Couleur {
 					max = candidats.get(c);
 				}
 			}
+			
+			// On retourne la couleur trouvée, ou CouleurLigne.INCONNU si il n'y a aucun candidat.
 			return cand==null?  CouleurLigne.INCONNU : cand;
 		}
 		
 	}
 	
-
+	
 	private static void update() {
 		update(0);
 	}
 	
+	
+	/**
+	 * Fait une prise de mesure pour chaque mesure activée dans <code>modeFlag</code>
+	 * 
+	 * @param delai temps d'attente entre deux mesures successives
+	 * @see lejos.robotics.SampleProvider
+	 */
 	private static void update(int delai) {
 		synchronized (lock) {
 			if((modeFlag & LIGHTMODE)!=0) {
