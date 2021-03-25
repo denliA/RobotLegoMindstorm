@@ -25,20 +25,20 @@ public class MouvementsBasiques {
 			WheeledChassis.TYPE_DIFFERENTIAL));
 	
 	public static double getVitesseRobot() {
-		return pilot.getLinearSpeed();
+		return pilot.getLinearSpeed(); //Vitesse de déplacement du robot lors d'un forward ou backward ou travel. Toutes les méthodes du MovePilot
 	}
 	
 	public static double getAccelerationRobot() {
 		System.out.println(pilot.getLinearAcceleration());
-		return pilot.getLinearAcceleration();
+		return pilot.getLinearAcceleration(); //Acceleration du robot
 	}
 	
 	public static void setVitesseRobot(double v) {
-		pilot.setLinearSpeed(v);
+		pilot.setLinearSpeed(v); //Regler la vitesse du robot
 	}
 	
 	public static void setAccelerationRobot(double a) {
-		pilot.setLinearAcceleration(a);
+		pilot.setLinearAcceleration(a); //Regler l'acceleration du robot
 	}
 	
 	public static void changeVitesseRobot( double ratio) {
@@ -59,7 +59,7 @@ public class MouvementsBasiques {
 	
 	public static void avancerTravel(double vitesse, double acceleration, double distance) {
 		try {
-			s1.acquire();
+			s1.acquire(); //proteger les moteurs du pilot avec une mutex (semaphore à exclusion mutuelle)
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -67,7 +67,7 @@ public class MouvementsBasiques {
 		pilot.setLinearSpeed(vitesse);
 		pilot.setLinearAcceleration(acceleration);
 		pilot.travel(distance);
-		s1.release();
+		s1.release(); //liberer le mutex
 	}
 	
 	public static void avancerTravel(double vitesse, double distance) {
@@ -76,6 +76,7 @@ public class MouvementsBasiques {
 	
 	public static void avancerToutDroit(int vitesse, int acceleration) throws InterruptedException{
 		s1.acquire();
+		//Calibrer la vitesse et l'acceleration des moteurs
 		Moteur.MOTEUR_GAUCHE.setSpeed(Math.abs(vitesse));
 		Moteur.MOTEUR_DROIT.setSpeed(Math.abs(vitesse));
 		Moteur.MOTEUR_GAUCHE.setAcceleration(acceleration);
@@ -131,14 +132,15 @@ public class MouvementsBasiques {
 	}
 	
 	@SuppressWarnings("resource")
+	//methode utilisée pour seRedresserSurLigne(). Pour éviter que le robot n'avance trop loin pendant qu'il se redresse, on va tourner une seule roue en meme temps.
 	public static void tourner(double angle, int duree, boolean moteur_gauche) {
 		double vitesse = 2*trackWidth/DIAM_ROUE_INCH*angle/duree*1000;
 		RegulatedMotor moteur = (moteur_gauche ? Moteur.MOTEUR_GAUCHE : Moteur.MOTEUR_DROIT);
 		moteur.setSpeed((int)vitesse);
 		if (vitesse >= 0)
-			moteur.forward();
+			moteur.forward(); //avancer
 		else
-			moteur.backward();
+			moteur.backward(); //reculer
 		
 	}
 	

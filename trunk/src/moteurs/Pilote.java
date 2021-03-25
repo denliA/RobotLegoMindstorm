@@ -120,18 +120,18 @@ public class Pilote {
 		}
 	}
 	
-	private static boolean tournerToCouleur(CouleurLigne c, boolean gauche_bouge, double angle, int timeOut) {
+	private static boolean tournerToCouleur(CouleurLigne c, boolean gauche_bouge, double angle, int timeOut) { //timeOut = timer qui indique la durée maximale de la rotation d'une roue
 		MouvementsBasiques.tourner(angle, timeOut, gauche_bouge);
 		Vector<CouleurLigne> couleurs = new Vector<>();
 		CouleurLigne t;
-		long debut = System.currentTimeMillis();
-		while((t=Couleur.getCouleurLigne()) != c && System.currentTimeMillis()-debut<timeOut)
+		long debut = System.currentTimeMillis(); //temps reel à l'instant ou cette instruction est executée
+		while((t=Couleur.getCouleurLigne()) != c && System.currentTimeMillis()-debut<timeOut)//On sort du while si le robot s'est redressé sur la bonne couleur ou si le temps est ecoulé.
 			couleurs.add(t);
 		Moteur.MOTEUR_GAUCHE.startSynchronization();
 			Moteur.MOTEUR_DROIT.stop();
 			Moteur.MOTEUR_GAUCHE.stop();
 		Moteur.MOTEUR_GAUCHE.endSynchronization();
-		return System.currentTimeMillis()-debut<timeOut;
+		return System.currentTimeMillis()-debut<timeOut;//retourne la durée du déplacement de la roue
 	}
 	
 	/*
