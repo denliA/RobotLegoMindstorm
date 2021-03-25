@@ -8,8 +8,8 @@ import lejos.hardware.Sound;
 public class TestPilote {
 	public static void main(String args[]) throws Exception {
 		MouvementsBasiques.pilot.rotate(-720);
-		Couleur.setScanMode(Couleur.RGBMODE);
-		Couleur.startScanAtRate(0);
+		Couleur.setScanMode(Couleur.RGBMODE); //precise que les scans de la couleur se feront en mode RGB
+		Couleur.startScanAtRate(0); //commence le scan de la couleur immediatement. Quand une tache est finie, une autre est relancée sans délai.
 		//testSeRedresserSurLigne(CouleurLigne.BLEUE) ;
 		testSuivreLigne();
 	}
