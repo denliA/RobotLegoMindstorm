@@ -26,15 +26,15 @@ package capteurs;
  */
 public enum CouleurLigne { 
 	
-	ROUGE ( new float[] {5f, Float.POSITIVE_INFINITY, 5f, Float.POSITIVE_INFINITY, 5f, Float.POSITIVE_INFINITY}, 0, -1, new float[] {2.80f, 3.80f, 0.45f, 0.60f, 0.10f, 0.20f}, 1,-1), 
-	VERTE (new float[] {5f, Float.POSITIVE_INFINITY, 5f, Float.POSITIVE_INFINITY, 5f, Float.POSITIVE_INFINITY}, 0, -1,  new float[] {0.30f, 0.40f, 0.20f, 0.25f, 0.58f, 0.70f},1,-1),
-	BLEUE (new float[] {5f, Float.POSITIVE_INFINITY, 5f, Float.POSITIVE_INFINITY, 5f, Float.POSITIVE_INFINITY}, 0, -1, new float[] {0.17f, 0.27f, 0.61f, 0.78f, 2.50f, 4.00f},1,-1),
+	ROUGE ( new float[] {2f, Float.POSITIVE_INFINITY, 2f, Float.POSITIVE_INFINITY, 2f, Float.POSITIVE_INFINITY}, 0, -1, new float[] {2.80f, 3.80f, 0.45f, 0.60f, 0.10f, 0.20f}, 1,-1), 
+	VERTE (new float[] {2f, Float.POSITIVE_INFINITY, 2f, Float.POSITIVE_INFINITY, 2f, Float.POSITIVE_INFINITY}, 0, -1,  new float[] {0.30f, 0.40f, 0.20f, 0.25f, 0.58f, 0.70f},1,-1),
+	BLEUE (new float[] {2f, Float.POSITIVE_INFINITY, 2f, Float.POSITIVE_INFINITY, 2f, Float.POSITIVE_INFINITY}, 0, -1, new float[] {0.17f, 0.27f, 0.61f, 0.78f, 2.50f, 4.00f},1,-1),
 	BLANCHEP (new float[] {40f, 255f, 60f, 255f, 30f, 255f}, new float[] {0.64f, 0.73f, 0.53f, 0.63f, 0.77f, 0.95f}),
 	BLANCHEF (new float[] {40f, 255f, 60f, 255f, 30f, 255f}, new float[] {0.63f, 0.77f, 0.52f, 0.65f, 0.67f, 0.95f}), 
 	NOIRE(new float[] {2,12,2,12,2,12 },null),
 	//NOIREH(new float[] {2,12,2,12,2,12 },null),
 	//NOIREV(new float[] {2,12,2,12,2,12 },null),
-	JAUNE (new float[] {5f, Float.POSITIVE_INFINITY, 10f, Float.POSITIVE_INFINITY, 10f, Float.POSITIVE_INFINITY}, 0, -1, new float[] {0.75f, 0.83f, 0.15f, 0.20f, 0.18f, 0.26f},1,-1),
+	JAUNE (new float[] {2f, Float.POSITIVE_INFINITY, 2f, Float.POSITIVE_INFINITY, 2f, Float.POSITIVE_INFINITY}, 0, -1, new float[] {0.75f, 0.83f, 0.15f, 0.20f, 0.18f, 0.26f},1,-1),
 	GRIS(new float[] {15f, 35f, 15f, 40f, 10f, 25f}, null), // {.69, .78, 0.5f, 0.6f, .67f, .82f} TOTEST
 	VIDE(new float[] {0,1,0,1,0,1 },null),
 	INCONNU(null, null);
