@@ -5,7 +5,7 @@ import exceptions.OuvertureException;
 
 public class TestModeSolo {
 
-	public static void main(String[] args) throws OuvertureException, InterruptedException {
+	public static void main(String[] args) throws Exception {
 		Couleur.startScanAtRate(0);
 		Toucher.startScan();
 		Ultrason.startScan();
