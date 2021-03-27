@@ -158,9 +158,6 @@ public class Couleur {
 			for (CouleurLigne couleur : CouleurLigne.values()) {
 				Float val = candidats.get(couleur);
 				if (couleur.IRGB!=null) {
-					if (couleur==CouleurLigne.BLANCHEF) {
-						//System.out.println("Ligne blanche dans IRGB? "+ couleur.IRGB.contains(RGB));
-					}
 					if (couleur.IRGB.contains(RGB))
 						candidats.put(couleur, (val == null ? (val=couleur.pos_confiance_IRGB) : (val=val+couleur.pos_confiance_IRGB)));
 					else 
