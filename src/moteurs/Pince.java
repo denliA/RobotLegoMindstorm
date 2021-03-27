@@ -19,7 +19,6 @@ public class Pince {
 	//methodes modifiant la valeur de ouvert simultanement
 	public static void ouvrir() throws OuvertureException {
 		if(ouvert) {
-			//TO DO	
 			//envoyer message d'erreur ?
 			throw new OuvertureException("Pinces deja ouvertes.");
 		}
@@ -28,7 +27,6 @@ public class Pince {
 			Moteur.MOTEUR_PINCE.forward();
 			Delay.msDelay(1000);
 			Moteur.MOTEUR_PINCE.stop();
-			
 			ouvert = true;
 		}
 	}
@@ -37,15 +35,13 @@ public class Pince {
 		if(!ouvert) {
 			//TO DO
 			//envoyer message d'erreur ?
-			throw new OuvertureException("Pinces deje fermees.");
+			throw new OuvertureException("Pinces deja fermees.");
 		}
 		else {
-			
 			Moteur.MOTEUR_PINCE.setSpeed(36000);
 			Moteur.MOTEUR_PINCE.backward();
 			Delay.msDelay(1000);
 			Moteur.MOTEUR_PINCE.stop();
-			
 			ouvert = false;
 			
 		}

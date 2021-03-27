@@ -2,6 +2,7 @@ package modeSolo;
 import moteurs.MouvementsBasiques;
 import moteurs.Pince;
 import moteurs.Pilote;
+import capteurs.Capteur;
 import capteurs.Couleur;
 import capteurs.CouleurLigne;
 import capteurs.Toucher;
@@ -9,9 +10,8 @@ import exceptions.OuvertureException;
 
 public class ModeSolo {
 	private int positionDepart;
-	//new Capteur();
-	
 	public static void ramasserPalet(int nbPalets) throws OuvertureException, InterruptedException {
+		new Capteur();
 		double vitesse = MouvementsBasiques.getVitesseRobot()/1.5;
 		double acceleration = MouvementsBasiques.getAccelerationRobot();
 		int scoredPalets = 0;
@@ -31,14 +31,26 @@ public class ModeSolo {
 			if (Toucher.getStatus()==false)
 				Toucher.startScan();
 			Thread t = new Thread() {
-			      public void run() {
-			    	  Pilote.suivreLigne();
-			      }
+				public void run() {
+					Pilote.suivreLigne();
+				}
 			};
-			t.start();
+			try{  
+				t.start();  
+			}catch(Exception e){
+				System.out.println("Le thread de suivreLigne n'est pas lancé");
+				System.out.println("Exception = "+e);
+				return; //on sort de la fonction
+			}
 			while((Toucher.getTouche()==false)&&(Couleur.getCouleurLigne()!=CouleurLigne.BLANCHEP)&&(Couleur.getCouleurLigne()!=CouleurLigne.BLANCHEF)); //on ne fait rien
 			Pilote.SetSeDeplace(false); //arrete le suivi de ligne
-			t.interrupt();
+			try{  
+				t.interrupt();  
+			}catch(Exception e){
+				System.out.println("Le thread de suivreLigne n'est pas interrompu");
+				System.out.println("Exception = "+e);
+				return; //on sort de la fonction
+			}
 			if(Toucher.getTouche()==true) {
 				Toucher.stopScan();
 				//MouvementsBasiques.arreter();
