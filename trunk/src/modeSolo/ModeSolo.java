@@ -9,13 +9,21 @@ import capteurs.Toucher;
 import exceptions.OuvertureException;
 import lejos.hardware.Button;
 import lejos.hardware.Sound;
-import lejos.hardware.Button;
-import capteurs.Capteur;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+
+
+class Task implements Runnable{
+	public void run() {
+		Pilote.suivreLigne();
+	}
+}
 
 public class ModeSolo {
 	private int positionDepart;
 	public static void ramasserPalet(int nbPalets) throws Exception, InterruptedException {
 		new Capteur();
+		Executor executor = Executors.newSingleThreadExecutor();
 		double vitesse = MouvementsBasiques.getVitesseRobot();
 		double acceleration = MouvementsBasiques.getAccelerationRobot()/5;
 		int scoredPalets=0;
@@ -41,18 +49,7 @@ public class ModeSolo {
 			while(trio<3) { //pour rammasser les 3 palets sur une ligne de couleur
 				if (Toucher.getStatus()==false)
 					Toucher.startScan();
-				Thread t = new Thread() {
-					public void run() {
-						Pilote.suivreLigne();
-					}
-				};
-				try{  
-					t.start();  
-				}catch(Exception e){
-					System.out.println("Le thread de suivreLigne n'est pas lancé");
-					System.out.println("Exception = "+e);
-					return; //on sort de la fonction
-				}
+				executor.execute(new Task());
 				while((tient_palet || Toucher.getTouche()==false)&&(Couleur.getCouleurLigne()!=CouleurLigne.BLANCHEP)&&(Couleur.getCouleurLigne()!=CouleurLigne.BLANCHEF)); //on ne fait rien
 				Pilote.SetSeDeplace(false); //arrete le suivi de ligne
 				if(Toucher.getTouche()) {
@@ -143,7 +140,8 @@ public class ModeSolo {
 				}
 			}
 		}	
-	}
+	}	
 }
+
 	
 
