@@ -117,6 +117,7 @@ public class MouvementsBasiques {
 		s1.release();
 	}
 	
+	//angle>0 : tourne à gauche, angle<0 : tourne à droite
 	public static void tourner(double vitesse, double acceleration, double angle) throws InterruptedException {
 		s1.acquire();
 		pilot.setAngularAcceleration(acceleration);
