@@ -126,6 +126,10 @@ public class MouvementsBasiques {
 		s1.release();
 	}
 	
+	public static void tourner(double angle) {
+		pilot.rotate(angle);
+	}
+	
 	public static void tourner(double vitesse, double acceleration, double angle, boolean deux_roues) throws InterruptedException {
 		//methode sans chassis à definir eventuellement si on veut faire bouger les roues differement
 		s1.acquire();

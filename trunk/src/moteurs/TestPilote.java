@@ -11,8 +11,8 @@ public class TestPilote {
 		Couleur.startScanAtRate(0); //commence le scan de la couleur immediatement. Quand une tache est finie, une autre est relancée sans délai.
 		//MouvementsBasiques.setAccelerationRobot(MouvementsBasiques.getAccelerationRobot()/5);
 		//MouvementsBasiques.setVitesseRobot(MouvementsBasiques.getVitesseRobot()/2);
-		//testSeRedresserSurLigne(CouleurLigne.ROUGE) ;
-		testSuivreLigne();
+		testSeRedresserSurLigne(CouleurLigne.JAUNE) ;
+		//testSuivreLigne();
 	}
 	
 	public static void testSeRedresserSurLigne(CouleurLigne ligne) {
@@ -20,7 +20,7 @@ public class TestPilote {
 			int button = Button.waitForAnyPress();
 			if (button == Button.ID_LEFT || button == Button.ID_RIGHT) {
 				try {
-					Pilote.seRedresserSurLigne(ligne, button==Button.ID_LEFT, 90, 2500);
+					Pilote.seRedresserSurLigne(ligne, button==Button.ID_LEFT, 90, 1000);
 				}
 				catch (Exception e) {
 					Sound.beep();

@@ -30,7 +30,7 @@ public class Pilote {
 		System.out.println("Linéar speed :"+MouvementsBasiques.pilot.getLinearSpeed());
 		System.out.println("Linear acceleration:"+MouvementsBasiques.pilot.getLinearAcceleration());
 		long debut;
-		long dureeRotation = 250; //millisecondes
+		long dureeRotation = 125; //millisecondes
 		int cycles = 0;
 		final int max_cycles = 4;
 		Couleur.startScanAtRate(0); //Lance immediatement le timer qui execute update() toutes les 0.1 secondes. C'est une méthode qui scanne la couleur et met à jour les attrubuts statiques de la classe Couleur 
@@ -49,20 +49,20 @@ public class Pilote {
 				}
 				//tourner à gauche pendant dureeRotation
 				debut = System.currentTimeMillis();
-				Moteur.MOTEUR_GAUCHE.setSpeed(defaultSpeed*1.2f);
+				Moteur.MOTEUR_DROIT.setSpeed(defaultSpeed*1.25f);
 				while((Couleur.getCouleurLigne()!=c)&&((System.currentTimeMillis() - debut) < dureeRotation) && seDeplace) {
 					;
 				}
-				Moteur.MOTEUR_GAUCHE.setSpeed(defaultSpeed);
+				Moteur.MOTEUR_DROIT.setSpeed(defaultSpeed);
 				if (Couleur.getCouleurLigne()!=c) {
 					//Sound.beep();
 					//tourner à droite pendant dureeRotation*2
 					debut = System.currentTimeMillis();
-					Moteur.MOTEUR_DROIT.setSpeed(defaultSpeed*1.2f);
+					Moteur.MOTEUR_GAUCHE.setSpeed(defaultSpeed*1.25f);
 					while((Couleur.getCouleurLigne()!=c)&&((System.currentTimeMillis() - debut) < (dureeRotation*2))&& seDeplace) {
 						;
 					}
-					Moteur.MOTEUR_DROIT.setSpeed(defaultSpeed);
+					Moteur.MOTEUR_GAUCHE.setSpeed(defaultSpeed);
 				}
 				else 
 					cycles=0;
@@ -105,6 +105,10 @@ public class Pilote {
 		boolean trouve;
 		System.out.println("Linéar speed :"+MouvementsBasiques.pilot.getLinearSpeed());
 		System.out.println("Linear acceleration:"+MouvementsBasiques.pilot.getLinearAcceleration());
+		double def_acc = MouvementsBasiques.pilot.getLinearAcceleration();
+		double def_speed = MouvementsBasiques.pilot.getLinearSpeed();
+		MouvementsBasiques.pilot.setLinearSpeed(10);
+		MouvementsBasiques.pilot.setLinearAcceleration(10);
 		int iterations = 0;
 		//float distance=0;
 		while(Couleur.getCouleurLigne() != c) {
@@ -112,7 +116,7 @@ public class Pilote {
 //			System.out.println("Je tourne");
 			trouve = tournerToCouleur(c, gauche_bouge, max_angle, temps);
 			if (!trouve) {
-				System.out.println("Pas trouvé,("+ Couleur.getCouleurLigne() + ") je m'apprête à tourner en sens inverse");
+				//System.out.println("Pas trouvé,("+ Couleur.getCouleurLigne() + ") je m'apprête à tourner en sens inverse");
 				//Button.waitForAnyEvent();
 				tournerToCouleur(c, gauche_bouge, -max_angle, temps);
 				
@@ -132,14 +136,16 @@ public class Pilote {
 			MouvementsBasiques.pilot.travel(6);
 //			System.out.println("J'inverse les moteurs");
 			gauche_bouge = !gauche_bouge;
-			if (iterations%2==0) {
-				max_angle = max_angle/2;
+			if (iterations%4==0) {
+				max_angle = max_angle/1.5f;
 				temps = (int) (temps/1.5);
 			}
 //			System.out.println(Couleur.getCouleurLigne());
 //			System.out.println();
 			
 		}
+		MouvementsBasiques.pilot.setLinearSpeed(10);
+		MouvementsBasiques.pilot.setLinearAcceleration(10);
 	}
 	
 	private static boolean tournerToCouleur(CouleurLigne c, boolean gauche_bouge, double angle, int timeOut) { //timeOut = timer qui indique la durée maximale de la rotation d'une roue
@@ -149,6 +155,8 @@ public class Pilote {
 		long debut = System.currentTimeMillis(); //temps reel à l'instant ou cette instruction est executée
 		while((t=Couleur.getCouleurLigne()) != c && System.currentTimeMillis()-debut<timeOut)//On sort du while si le robot s'est redressé sur la bonne couleur ou si le temps est ecoulé.
 			couleurs.add(t);
+		Moteur.MOTEUR_GAUCHE.setAcceleration(7000);
+		Moteur.MOTEUR_DROIT.setAcceleration(7000);
 		Moteur.MOTEUR_GAUCHE.startSynchronization();
 			Moteur.MOTEUR_DROIT.stop();
 			Moteur.MOTEUR_GAUCHE.stop();
