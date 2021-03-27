@@ -14,10 +14,10 @@ import capteurs.Capteur;
 
 public class ModeSolo {
 	private int positionDepart;
-	public static void ramasserPalet(int nbPalets) throws OuvertureException, InterruptedException {
+	public static void ramasserPalet(int nbPalets) throws Exception, InterruptedException {
 		new Capteur();
 		double vitesse = MouvementsBasiques.getVitesseRobot();
-		double acceleration = MouvementsBasiques.getAccelerationRobot();
+		double acceleration = MouvementsBasiques.getAccelerationRobot()/5;
 		int scoredPalets=0;
 		int lignesParcourues=0;
 		int trio;
@@ -34,7 +34,7 @@ public class ModeSolo {
 		}
 		else if(Couleur.getCouleurLigne()==CouleurLigne.JAUNE)
 			gauche=true;
-		
+		CouleurLigne couleur = Couleur.getCouleurLigne();
 		while((scoredPalets<nbPalets)||(lignesParcourues==3)) {
 			tient_palet=false; //pour voir si le robot a touché le palet pendant son aller
 			trio=0;
@@ -53,34 +53,27 @@ public class ModeSolo {
 					System.out.println("Exception = "+e);
 					return; //on sort de la fonction
 				}
-				while((Toucher.getTouche()==false)&&(Couleur.getCouleurLigne()!=CouleurLigne.BLANCHEP)&&(Couleur.getCouleurLigne()!=CouleurLigne.BLANCHEF)); //on ne fait rien
+				while((tient_palet || Toucher.getTouche()==false)&&(Couleur.getCouleurLigne()!=CouleurLigne.BLANCHEP)&&(Couleur.getCouleurLigne()!=CouleurLigne.BLANCHEF)); //on ne fait rien
 				Pilote.SetSeDeplace(false); //arrete le suivi de ligne
-				try{  
-					t.interrupt();  
-				}catch(Exception e){
-					System.out.println("Le thread de suivreLigne n'est pas interrompu");
-					System.out.println("Exception = "+e);
-					return; //on sort de la fonction
-				}
 				if(Toucher.getTouche()) {
 					tient_palet=true;
-					Toucher.stopScan();
-					//MouvementsBasiques.arreter();
 					Pince.fermer();
-					MouvementsBasiques.tourner(vitesse,acceleration,180); //demi-tour
+					MouvementsBasiques.tourner(180); //demi-tour
+					Pilote.seRedresserSurLigne(couleur, true, 45, 1000);
 				}else if (tient_palet){ //si le robot a atteint sa ligne blanche d'en but et qu'il a ramassé un palet
-					//MouvementsBasiques.arreter();
 					Pince.ouvrir();
 					scoredPalets++;
 					trio++;
 					if(trio<3) {
 						MouvementsBasiques.avancerTravel(vitesse,acceleration,-5); //robot recule
-						MouvementsBasiques.tourner(vitesse,acceleration,180); //demi-tour
+						MouvementsBasiques.tourner(180); //demi-tour
+						Pilote.seRedresserSurLigne(couleur, true, 45, 1000);
 					}else
 						lignesParcourues++;
 				}else { //si le robot a atteint la ligne blanche de l'adversaire sans ramasser de palets
 					lignesParcourues++;
-					MouvementsBasiques.tourner(vitesse,acceleration,180);
+					MouvementsBasiques.tourner(180);
+					Pilote.seRedresserSurLigne(couleur, true, 45, 1000);
 				}
 			}
 			if (gauche) {
