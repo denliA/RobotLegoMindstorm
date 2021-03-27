@@ -25,7 +25,7 @@ public class Pince {
 		else {
 			Moteur.MOTEUR_PINCE.setSpeed(36000);
 			Moteur.MOTEUR_PINCE.forward();
-			Delay.msDelay(1000);
+			Delay.msDelay(750);
 			Moteur.MOTEUR_PINCE.stop();
 			ouvert = true;
 		}
@@ -40,7 +40,7 @@ public class Pince {
 		else {
 			Moteur.MOTEUR_PINCE.setSpeed(36000);
 			Moteur.MOTEUR_PINCE.backward();
-			Delay.msDelay(1000);
+			Delay.msDelay(750);
 			Moteur.MOTEUR_PINCE.stop();
 			ouvert = false;
 			
