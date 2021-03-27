@@ -3,12 +3,13 @@ import java.util.Vector;
 
 import capteurs.*;
 import lejos.hardware.Button;
+import lejos.hardware.Sound;
 import lejos.robotics.RegulatedMotor;
 import lejos.utility.Delay;
 
 
 public class Pilote {
-	static private boolean seDeplace = false;;
+	static private boolean seDeplace = false;
 
 	public static boolean getSeDeplace(){
 		return seDeplace;
@@ -22,8 +23,12 @@ public class Pilote {
 	public static void suivreLigne(CouleurLigne c) { //je mets en void car l'interface Deplacement n'est pas encore realisée. Je ne sais pas quoi retourner
 		seDeplace = true;
 		double def_acc=MouvementsBasiques.pilot.getLinearAcceleration();
-		MouvementsBasiques.changeVitesseRobot(0.5);
-		MouvementsBasiques.pilot.setLinearAcceleration(def_acc/7);
+		//MouvementsBasiques.changeVitesseRobot(0.5);
+		//MouvementsBasiques.pilot.setLinearAcceleration(def_acc/7);
+		MouvementsBasiques.setVitesseRobot(15);
+		MouvementsBasiques.setAccelerationRobot(20);
+		System.out.println("Linéar speed :"+MouvementsBasiques.pilot.getLinearSpeed());
+		System.out.println("Linear acceleration:"+MouvementsBasiques.pilot.getLinearAcceleration());
 		long debut;
 		long dureeRotation = 250; //millisecondes
 		int cycles = 0;
@@ -32,9 +37,10 @@ public class Pilote {
 		MouvementsBasiques.avancer(); // Le robot commence à avancer tout droit sans arret
 		float defaultSpeed = Moteur.MOTEUR_DROIT.getSpeed();
 		while(seDeplace) {
-			if (Couleur.getCouleurLigne()!=c) { //Retourne sur quelle couleur le robot est posé en fonction des attributs statiques de Couleur. C'est une aapproximation en fonction de probabilités.
+			if (Couleur.getCouleurLigne()!=c && seDeplace) { //Retourne sur quelle couleur le robot est posé en fonction des attributs statiques de Couleur. C'est une aapproximation en fonction de probabilités.
 				//arreter le timer lanceur
 				//restreindre l'acces a la ressource citique du moteur grace à la semaphore. Il ne faut pas que MovePilot et LargeRegulatedMotor accèdent au meme moteur en meme temps
+				//Sound.beep();
 				try {
 					MouvementsBasiques.s1.acquire();
 				} catch (InterruptedException e) {
@@ -44,22 +50,25 @@ public class Pilote {
 				//tourner à gauche pendant dureeRotation
 				debut = System.currentTimeMillis();
 				Moteur.MOTEUR_GAUCHE.setSpeed(defaultSpeed*1.2f);
-				while((Couleur.getCouleurLigne()!=c)&&((System.currentTimeMillis() - debut) < dureeRotation)) {
+				while((Couleur.getCouleurLigne()!=c)&&((System.currentTimeMillis() - debut) < dureeRotation) && seDeplace) {
 					;
 				}
 				Moteur.MOTEUR_GAUCHE.setSpeed(defaultSpeed);
 				if (Couleur.getCouleurLigne()!=c) {
+					//Sound.beep();
 					//tourner à droite pendant dureeRotation*2
 					debut = System.currentTimeMillis();
 					Moteur.MOTEUR_DROIT.setSpeed(defaultSpeed*1.2f);
-					while((Couleur.getCouleurLigne()!=c)&&((System.currentTimeMillis() - debut) < (dureeRotation*2))) {
+					while((Couleur.getCouleurLigne()!=c)&&((System.currentTimeMillis() - debut) < (dureeRotation*2))&& seDeplace) {
 						;
 					}
 					Moteur.MOTEUR_DROIT.setSpeed(defaultSpeed);
 				}
+				else 
+					cycles=0;
 				//liberer la ressource critique
 				MouvementsBasiques.s1.release();
-				if(Couleur.getCouleurLigne()!=c && (cycles>= max_cycles)) {
+				if(Couleur.getCouleurLigne()!=c && (cycles>= max_cycles) && seDeplace) {
 					//gestion d'erreur le robot n'a pas pu se redresser sur une ligne de couleur et il est perdu. Il faut arreter le mouvement
 					MouvementsBasiques.pilot.stop();
 					try {
@@ -71,13 +80,17 @@ public class Pilote {
 					cycles = 0;
 					MouvementsBasiques.avancer(); 	
 				}
-				else if (cycles<max_cycles) 
+				else if (cycles<max_cycles && seDeplace) 
 					cycles++;
+			}
+			else {
+				cycles = 0;
 			}
 		}
 		MouvementsBasiques.pilot.setLinearAcceleration(def_acc);
 		if (MouvementsBasiques.pilot.isMoving())
 			MouvementsBasiques.arreter(); //Le robot s'arrete
+		MouvementsBasiques.changeVitesseRobot(2);
 	}
 	
 
@@ -91,6 +104,7 @@ public class Pilote {
 	public static void seRedresserSurLigne(CouleurLigne c, boolean gauche_bouge, float max_angle, int temps) throws Exception {
 		boolean trouve;
 		System.out.println("Linéar speed :"+MouvementsBasiques.pilot.getLinearSpeed());
+		System.out.println("Linear acceleration:"+MouvementsBasiques.pilot.getLinearAcceleration());
 		int iterations = 0;
 		//float distance=0;
 		while(Couleur.getCouleurLigne() != c) {
