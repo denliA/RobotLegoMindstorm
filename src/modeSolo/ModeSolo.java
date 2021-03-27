@@ -7,8 +7,6 @@ import capteurs.Couleur;
 import capteurs.CouleurLigne;
 import capteurs.Toucher;
 import exceptions.OuvertureException;
-import lejos.hardware.Button;
-import lejos.hardware.Sound;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
@@ -20,7 +18,6 @@ class Task implements Runnable{
 }
 
 public class ModeSolo {
-	private int positionDepart;
 	public static void ramasserPalet(int nbPalets) throws Exception, InterruptedException {
 		new Capteur();
 		Executor executor = Executors.newSingleThreadExecutor();
