@@ -26,30 +26,48 @@ package capteurs;
  */
 public enum CouleurLigne { 
 	
-	ROUGE ( null, new float[] {2.80f, 3.80f, 0.45f, 0.60f, 0.10f, 0.20f}), 
-	VERTE (null, new float[] {0.30f, 0.40f, 0.20f, 0.25f, 0.58f, 0.70f}),
-	BLEUE (null, new float[] {0.17f, 0.27f, 0.61f, 0.78f, 2.50f, 4.00f}),
+	ROUGE ( new float[] {5f, Float.POSITIVE_INFINITY, 5f, Float.POSITIVE_INFINITY, 5f, Float.POSITIVE_INFINITY}, 0, -1, new float[] {2.80f, 3.80f, 0.45f, 0.60f, 0.10f, 0.20f}, 1,-1), 
+	VERTE (new float[] {5f, Float.POSITIVE_INFINITY, 5f, Float.POSITIVE_INFINITY, 5f, Float.POSITIVE_INFINITY}, 0, -1,  new float[] {0.30f, 0.40f, 0.20f, 0.25f, 0.58f, 0.70f},1,-1),
+	BLEUE (new float[] {5f, Float.POSITIVE_INFINITY, 5f, Float.POSITIVE_INFINITY, 5f, Float.POSITIVE_INFINITY}, 0, -1, new float[] {0.17f, 0.27f, 0.61f, 0.78f, 2.50f, 4.00f},1,-1),
 	BLANCHEP (new float[] {40f, 255f, 60f, 255f, 30f, 255f}, new float[] {0.64f, 0.73f, 0.53f, 0.63f, 0.77f, 0.95f}),
 	BLANCHEF (new float[] {40f, 255f, 60f, 255f, 30f, 255f}, new float[] {0.63f, 0.77f, 0.52f, 0.65f, 0.67f, 0.95f}), 
-	NOIREH(new float[] {2,12,2,12,2,12 },null),
-	NOIREV(new float[] {2,12,2,12,2,12 },null),
-	NOIRE(new float[] {0,10,0,10,0,10 },null),
-	JAUNE (null, new float[] {0.75f, 0.83f, 0.15f, 0.20f, 0.18f, 0.26f}),
+	NOIRE(new float[] {2,12,2,12,2,12 },null),
+	//NOIREH(new float[] {2,12,2,12,2,12 },null),
+	//NOIREV(new float[] {2,12,2,12,2,12 },null),
+	JAUNE (new float[] {5f, Float.POSITIVE_INFINITY, 10f, Float.POSITIVE_INFINITY, 10f, Float.POSITIVE_INFINITY}, 0, -1, new float[] {0.75f, 0.83f, 0.15f, 0.20f, 0.18f, 0.26f},1,-1),
 	GRIS(new float[] {15f, 35f, 15f, 40f, 10f, 25f}, null), // {.69, .78, 0.5f, 0.6f, .67f, .82f} TOTEST
 	VIDE(new float[] {0,1,0,1,0,1 },null),
 	INCONNU(null, null);
 	
+	
 	Intervalle IRGB;
+	float pos_confiance_IRGB;
+	float neg_confiance_IRGB;
 	Intervalle IRatios;
+	float pos_confiance_IRatios;
+	float neg_confiance_IRatios;
 	
 
+	
+	private CouleurLigne(float[] bc ,float[] br) {
+		this(bc, 1f, -.5f,  br, 1f, -.5f);
+	}
+	
 	/**
 	 * Constructeur d'une couleur
 	 * 
 	 * @param bc bornes des intensités : {rouge_min, rouge_max, vert_min, vert_max, bleu_min, bleu_max} 
 	 * @param br bornes des rapports : { R/G_min, R/G_max, B/G_min, B/G_max, B/R_min, B/R_max }
+	 * @param pos_confiance_bc Précise la certitude de cet intervalle : par exemple, pour <code>confiance_bc==1</code>,
+	 * le fait qu'une mesure soit dans cet intervalle nous indique avec certitude si on est dans cette ligne ou 
+	 * pas
+	 * @param confiance_br même chose que confiance_bc mais pour les rapports
 	 */
-	private CouleurLigne(float[] bc, float[] br) {
+	private CouleurLigne(float[] bc, float pos_confiance_bc, float neg_confiance_bc,  float[] br, float pos_confiance_br, float neg_confiance_br) {
+		this.pos_confiance_IRatios = pos_confiance_br;
+		this.neg_confiance_IRatios = neg_confiance_br;
+		this.pos_confiance_IRGB = pos_confiance_bc;
+		this.neg_confiance_IRGB = neg_confiance_bc;
 		if (bc != null)
 			IRGB = new Intervalle(new float[] {bc[0], bc[2], bc[4]}, new float[] {bc[1], bc[3], bc[5]});
 		else

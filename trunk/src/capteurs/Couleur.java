@@ -158,16 +158,21 @@ public class Couleur {
 			for (CouleurLigne couleur : CouleurLigne.values()) {
 				Float val = candidats.get(couleur);
 				if (couleur.IRGB!=null) {
+					if (couleur==CouleurLigne.BLANCHEF) {
+						//System.out.println("Ligne blanche dans IRGB? "+ couleur.IRGB.contains(RGB));
+					}
 					if (couleur.IRGB.contains(RGB))
-						candidats.put(couleur, (val == null ? 1f : (val=val+1)));
+						candidats.put(couleur, (val == null ? (val=couleur.pos_confiance_IRGB) : (val=val+couleur.pos_confiance_IRGB)));
 					else 
-						candidats.put(couleur, (val==null)? -.5f : (val=val-0.5f));
+						candidats.put(couleur, (val==null)? (val=couleur.neg_confiance_IRGB) : (val=val+couleur.neg_confiance_IRGB));
+					//if (couleur==CouleurLigne.BLANCHEF) System.out.println(couleur+" IRGB "+couleur.pos_confiance_IRGB+" "+couleur.neg_confiance_IRGB + " " + candidats.get(couleur));
 				}
-				else if (couleur.IRatios!=null) {
+				if (couleur.IRatios!=null) {
 					if (couleur.IRatios.contains(ratios))
-						candidats.put(couleur, (val == null ? 1f : (val=val+1)));
+						candidats.put(couleur, (val == null ? (val=couleur.pos_confiance_IRatios) : (val=val+couleur.pos_confiance_IRatios)));
 					else 
-						candidats.put(couleur, (val==null)? -.5f : (val=val-0.5f));
+						candidats.put(couleur, (val==null)? (val=couleur.neg_confiance_IRatios) : (val=val+couleur.neg_confiance_IRatios));
+					//System.out.println(couleur+" IRatios "+couleur.pos_confiance_IRatios+" "+couleur.neg_confiance_IRatios);
 				}
 			}
 			
@@ -184,6 +189,7 @@ public class Couleur {
 			}
 			
 			// On retourne la couleur trouvée, ou CouleurLigne.INCONNU si il n'y a aucun candidat.
+			//System.out.println(candidats);
 			return cand==null?  CouleurLigne.INCONNU : cand;
 		}
 		
