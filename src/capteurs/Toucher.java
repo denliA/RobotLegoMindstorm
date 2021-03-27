@@ -10,7 +10,7 @@ public class Toucher{
 	//Atrributs de la classe Toucher
 	//status indique si la capteur est actif
 	private static boolean status;
-	//touche contient True si le capteur est activé par un palet
+	//touche contient True si le capteur est activï¿½ par un palet
 	private static boolean touche;
 	
 	//Pour lancer des analyses de maniere periodique et eviter l'activation permanente du capteur
@@ -18,7 +18,7 @@ public class Toucher{
 		new Timer(100, new TimerListener() {
 			//au bout du temps imparti (100 ms)
 				public void timedOut() {
-					//appel à la foction qui scanne effectivement
+					//appel ï¿½ la foction qui scanne effectivement
 					setTouche();
 				}
 		}
@@ -30,29 +30,29 @@ public class Toucher{
 	
 	//change la valeur de touche en fonction du scan
 	public static void setTouche() {
-		//creation du tableau recueillant les données du sampler
+		//creation du tableau recueillant les donnï¿½es du sampler
 		float[] touched = new float[Capteur.TOUCHER.sampleSize()];
-		//récupération des données
+		//rï¿½cupï¿½ration des donnï¿½es
 		Capteur.TOUCHER.fetchSample(touched, 0);
 		touche = (touched[0]==1);
 		
 	}
 	
-	//Pour activer la lecture de la valeur envoyée par le scanner
+	//Pour activer la lecture de la valeur envoyï¿½e par le scanner
 	public static void startScan() {
-		//le temps passe à 50 ms entre chaque scan
+		//le temps passe ï¿½ 50 ms entre chaque scan
 		lanceur.setDelay(50);
 		lanceur.start();
 		status = true;
 	}
 	
-	//Pour désactiver la lecture de la valeur envoyée par le scanner
+	//Pour dï¿½sactiver la lecture de la valeur envoyï¿½e par le scanner
 	public static void stopScan() {
 		lanceur.stop();
 		status = false;
 	}
 	
-	//Retourne le status pour savoir l'état actuel
+	//Retourne le status pour savoir l'ï¿½tat actuel
 	public static boolean getStatus() {
 		return(status);
 	}
