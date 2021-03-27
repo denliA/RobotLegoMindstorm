@@ -8,7 +8,7 @@ public class Pince {
 	//Attribut
 	//les pinces s'ouvriront toujours de la meme valeur par defaut
 	private static final float OUVERTURE = 1000;//TODO d'apres EV3CONTROL l'angle pour passer de ouverture (grande) a ferme (les pinces se touchent) est d'environ 1735 donc je pense que l'on peut se base entre 1000 et 1500 pour avoir une ouverture assez grande pour les palets et ne pas perdre de temps
-	private static boolean ouvert;
+	private static boolean ouvert=false;
 	
 	//Methodes
 	public static boolean getOuvert() {

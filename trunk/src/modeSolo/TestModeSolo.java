@@ -15,8 +15,7 @@ public class TestModeSolo {
 			System.out.println("Prob d'ouverture de pince");
 		}catch(InterruptedException e) {
 			System.out.println("Prob pour tourner le robot");
-		}
-		
+		}	
 	}
 
 }

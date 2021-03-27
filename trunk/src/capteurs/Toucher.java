@@ -50,6 +50,7 @@ public class Toucher{
 	public static void stopScan() {
 		lanceur.stop();
 		status = false;
+		touche = false;
 	}
 	
 	//Retourne le status pour savoir l'�tat actuel
