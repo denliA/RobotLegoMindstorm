@@ -10,6 +10,13 @@ import lejos.utility.Delay;
 public class Pilote {
 	static private boolean seDeplace = false;;
 
+	public static boolean getSeDeplace(){
+		return seDeplace;
+	}
+	
+	public static void SetSeDeplace(boolean b){
+		seDeplace=b;
+	}
 	
 	//Le robot doit etre posé et suivre une ligne de couleur donnée par l'utilisateur
 	public static void suivreLigne(CouleurLigne c) { //je mets en void car l'interface Deplacement n'est pas encore realisée. Je ne sais pas quoi retourner
@@ -69,7 +76,8 @@ public class Pilote {
 			}
 		}
 		MouvementsBasiques.pilot.setLinearAcceleration(def_acc);
-		MouvementsBasiques.arreter(); //Le robot s'arrete
+		if (MouvementsBasiques.pilot.isMoving())
+			MouvementsBasiques.arreter(); //Le robot s'arrete
 	}
 	
 
