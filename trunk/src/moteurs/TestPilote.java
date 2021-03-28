@@ -9,9 +9,15 @@ public class TestPilote {
 	public static void main(String args[]) throws Exception {
 		Couleur.setScanMode(Couleur.RGBMODE); //precise que les scans de la couleur se feront en mode RGB
 		Couleur.startScanAtRate(0); //commence le scan de la couleur immediatement. Quand une tache est finie, une autre est relancée sans délai.
+		Pilote.startVideAtRate(0); //commence de tester si le robot detecte du vide. Quand une tache est finie, une autre est relancée sans délai.
+		
+		MouvementsBasiques.avancerTravel(30);
+		//il faut que le robot rencontre du vide
+		
+		
 		//MouvementsBasiques.setAccelerationRobot(MouvementsBasiques.getAccelerationRobot()/5);
 		//MouvementsBasiques.setVitesseRobot(MouvementsBasiques.getVitesseRobot()/2);
-		testSeRedresserSurLigne(CouleurLigne.JAUNE) ;
+		//testSeRedresserSurLigne(CouleurLigne.JAUNE) ;
 		//testSuivreLigne();
 	}
 	

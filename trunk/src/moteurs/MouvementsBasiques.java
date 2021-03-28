@@ -57,7 +57,8 @@ public class MouvementsBasiques {
 		pilot.stop();
 	}
 	
-	public static void avancerTravel(double vitesse, double acceleration, double distance) {
+	//le mouvement peut etre interrompu par un autre mouvement si immediateReturn==true
+	public static void avancerTravel(double vitesse, double acceleration, double distance,boolean immediateReturn) {
 		try {
 			s1.acquire(); //proteger les moteurs du pilot avec une mutex (semaphore à exclusion mutuelle)
 		} catch (InterruptedException e) {
@@ -66,12 +67,24 @@ public class MouvementsBasiques {
 		}
 		pilot.setLinearSpeed(vitesse);
 		pilot.setLinearAcceleration(acceleration);
-		pilot.travel(distance);
+		pilot.travel(distance,immediateReturn);
 		s1.release(); //liberer le mutex
 	}
 	
-	public static void avancerTravel(double vitesse, double distance) {
-		avancerTravel(vitesse, pilot.getLinearAcceleration(), distance);
+	public static void avancerTravel(double vitesse, double acceleration, double distance) {
+		avancerTravel(vitesse, acceleration, distance, false); //le mouvement ne peut etre interrompu par un autre mouvement
+	}
+	
+	public static void avancerTravel(double acceleration, double distance) {
+		avancerTravel(pilot.getLinearSpeed(), acceleration, distance, false); //le mouvement ne peut etre interrompu par un autre mouvement
+	}
+	
+	public static void avancerTravel(double distance) {
+		avancerTravel(pilot.getLinearSpeed(), pilot.getLinearAcceleration(), distance, false); //le mouvement ne peut etre interrompu par un autre mouvement
+	}
+	
+	public static void avancerTravel(double distance,boolean immediateReturn) {
+		avancerTravel(pilot.getLinearSpeed(), pilot.getLinearAcceleration(), distance, immediateReturn);
 	}
 	
 	public static void avancerToutDroit(int vitesse, int acceleration) throws InterruptedException{
@@ -118,22 +131,22 @@ public class MouvementsBasiques {
 	}
 	
 	//angle>0 : tourne à gauche, angle<0 : tourne à droite
-	public static void tourner(double vitesse, double acceleration, double angle) throws InterruptedException {
+	
+	//le mouvement peut etre interrompu par un autre mouvement si immediateReturn==true
+	public static void tourner(double vitesse, double acceleration, double angle,boolean immediateReturn) throws InterruptedException {
 		s1.acquire();
 		pilot.setAngularAcceleration(acceleration);
 		pilot.setAngularSpeed(vitesse);
-		pilot.rotate(angle);
+		pilot.rotate(angle,immediateReturn);
 		s1.release();
 	}
 	
 	public static void tourner(double angle) {
-		pilot.rotate(angle);
+		pilot.rotate(angle,false); //le mouvement ne peut etre interrompu par un autre mouvement
 	}
 	
-	public static void tourner(double vitesse, double acceleration, double angle, boolean deux_roues) throws InterruptedException {
-		//methode sans chassis à definir eventuellement si on veut faire bouger les roues differement
-		s1.acquire();
-		s1.release();
+	public static void tourner(double angle,boolean immediateReturn) {
+		pilot.rotate(angle,immediateReturn);
 	}
 	
 	@SuppressWarnings("resource")
@@ -148,12 +161,4 @@ public class MouvementsBasiques {
 			moteur.backward(); //reculer
 		
 	}
-	
-	/*
-	public static void vide() {
-		if () {
-			
-		}
-	}*/
-
 }

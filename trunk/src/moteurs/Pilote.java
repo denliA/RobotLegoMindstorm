@@ -6,6 +6,8 @@ import lejos.hardware.Button;
 import lejos.hardware.Sound;
 import lejos.robotics.RegulatedMotor;
 import lejos.utility.Delay;
+import lejos.utility.Timer;
+import lejos.utility.TimerListener;
 
 
 public class Pilote {
@@ -17,6 +19,35 @@ public class Pilote {
 	
 	public static void SetSeDeplace(boolean b){
 		seDeplace=b;
+	}
+	
+	// Pour lancer périodiquement une fonction qui test si le robot detecte du vide
+	private static Timer videListener = new Timer(100, 
+			new TimerListener() {
+		public void timedOut() {
+				vide();
+		}
+	});
+	
+	public static void startVideAtRate(int delay) {
+		videListener.setDelay(delay);
+		videListener.start();
+	}
+	
+	/**
+	 * Arrête la prise de mesure périodique.
+	 */
+	public static void stopVide() {
+		videListener.stop();
+	}
+	
+	public static void vide() {
+		double acceleration = MouvementsBasiques.getAccelerationRobot()/5;
+		if(Couleur.getCouleurLigne()==CouleurLigne.VIDE) {
+			MouvementsBasiques.arreter();
+			MouvementsBasiques.avancerTravel(acceleration,-5); //robot recule
+			MouvementsBasiques.tourner(180); //demi-tour
+		}
 	}
 	
 	//Le robot doit etre posé et suivre une ligne de couleur donnée par l'utilisateur
