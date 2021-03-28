@@ -10,7 +10,7 @@ public class TestModeSolo {
 		Toucher.startScan();
 		Ultrason.startScan();
 		try{  
-			ModeSolo.ramasserPalet(3);
+			ModeSolo.ramasserPalet(9,true); //attention le robot demarre coté armoire (ligneRouge à gauche)
 		}catch(OuvertureException e){
 			System.out.println("Prob d'ouverture de pince");
 		}catch(InterruptedException e) {

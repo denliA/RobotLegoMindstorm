@@ -11,13 +11,12 @@ import capteurs.Couleur;
 import capteurs.CouleurLigne;
 import capteurs.Toucher;
 import exceptions.OuvertureException;
-import lejos.hardware.Button;
 import lejos.hardware.Sound;
 import lejos.hardware.Button;
 import capteurs.Capteur;
 
 public class ModeSolo {
-	public static void ramasserPalet(int nbPalets) throws Exception, InterruptedException {
+	public static void ramasserPalet(int nbPalets,boolean rougeAgauche) throws Exception, InterruptedException {
 		new Capteur();
 		Executor executor = Executors.newSingleThreadExecutor();
 		double vitesse = MouvementsBasiques.getVitesseRobot();
@@ -32,13 +31,23 @@ public class ModeSolo {
 		int rien_trouve;
 		Pince.ouvrir();
 		System.out.println("AVANTOuvert?" + Pince.getOuvert());
-		if (Couleur.getCouleurLigne()==CouleurLigne.ROUGE)
-			droite=true;
-		else if(Couleur.getCouleurLigne()==CouleurLigne.NOIRE) {
-			milieu=true;
+		if (rougeAgauche) { //robot demarre coté armoire
+			if (Couleur.getCouleurLigne()==CouleurLigne.ROUGE)
+				droite=true; //je bifurque tjrs vers la ligne de droite
+			else if(Couleur.getCouleurLigne()==CouleurLigne.NOIRE) {
+				milieu=true;
+			}
+			else if(Couleur.getCouleurLigne()==CouleurLigne.JAUNE)
+				gauche=true; //je bifurque tjrs vers la ligne de gauche
+		}else { //robot demarre coté porte
+			if (Couleur.getCouleurLigne()==CouleurLigne.ROUGE)
+				gauche=true; //je bifurque tjrs vers la ligne de gauche
+			else if(Couleur.getCouleurLigne()==CouleurLigne.NOIRE) {
+				milieu=true;
+			}
+			else if(Couleur.getCouleurLigne()==CouleurLigne.JAUNE)
+				droite=true; //je bifurque tjrs vers la ligne de droite
 		}
-		else if(Couleur.getCouleurLigne()==CouleurLigne.JAUNE)
-			gauche=true;
 		CouleurLigne couleur = Couleur.getCouleurLigne();
 		while((scoredPalets<nbPalets)||(lignesParcourues<3)) {
 			trio=0;
@@ -72,11 +81,8 @@ public class ModeSolo {
 						lignesParcourues++;
 						rien_trouve++;
 					}
-					else {
-						rien_trouve++;
-					}
-					
-					
+					else
+						rien_trouve++;	
 				}
 				MouvementsBasiques.tourner(180); //demi-tour
 				Pilote.seRedresserSurLigne(couleur, true, 45, 1000);
