@@ -93,21 +93,11 @@ public class ModeSolo {
 				MouvementsBasiques.tourner(-90); //tourne à droite de 90 degres
 				//se redresser sur ligne noire
 				if (lignesParcourues==1) {
-					try {
-						Pilote.seRedresserSurLigne(CouleurLigne.NOIRE,true,90,1500);
-					}
-					catch (Exception e) {
-						System.out.println("Prob pour seRedresserSurLigne");
-					}
+					Pilote.seRedresserSurLigne(CouleurLigne.NOIRE,true,90,1500);
 					couleur = CouleurLigne.NOIRE;
 				}
 				else if (lignesParcourues==2) {
-					try {
-						Pilote.seRedresserSurLigne(CouleurLigne.ROUGE,true,90,1500);
-					}
-					catch (Exception e) {
-						System.out.println("Prob pour seRedresserSurLigne");
-					}
+					Pilote.seRedresserSurLigne(CouleurLigne.ROUGE,true,90,1500);
 					couleur = CouleurLigne.ROUGE;
 				}
 			}
@@ -116,7 +106,7 @@ public class ModeSolo {
 				MouvementsBasiques.avancerTravel(vitesse,acceleration,50); //avance de 50 cm;
 				MouvementsBasiques.tourner(90); //tourne à gauche de 90 degres
 				if (lignesParcourues==1) {
-						Pilote.seRedresserSurLigne(CouleurLigne.NOIRE,true,90,1500);
+					Pilote.seRedresserSurLigne(CouleurLigne.NOIRE,true,90,1500);
 					couleur = CouleurLigne.NOIRE;
 				}
 				else if (lignesParcourues==2) {
