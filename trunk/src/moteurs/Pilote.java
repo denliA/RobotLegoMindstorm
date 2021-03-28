@@ -44,7 +44,10 @@ public class Pilote {
 	public static void vide() {
 		double acceleration = MouvementsBasiques.getAccelerationRobot()/5;
 		if(Couleur.getCouleurLigne()==CouleurLigne.VIDE) {
-			MouvementsBasiques.arreter();
+			if(MouvementsBasiques.isMovingPilot()) //si le robot bouge via MovePilot, on invoque la méthode stop de MovePilot qui perturbe les RegulatedMoteurs suivants
+				MouvementsBasiques.arreter();
+			else
+				MouvementsBasiques.arreterMoteurs(); //on met la vitesse des moteurs à zero si le robot utilise directement les moteurs
 			MouvementsBasiques.avancerTravel(acceleration,-5); //robot recule
 			MouvementsBasiques.tourner(180); //demi-tour
 		}
@@ -53,13 +56,13 @@ public class Pilote {
 	//Le robot doit etre posé et suivre une ligne de couleur donnée par l'utilisateur
 	public static void suivreLigne(CouleurLigne c) { //je mets en void car l'interface Deplacement n'est pas encore realisée. Je ne sais pas quoi retourner
 		seDeplace = true;
-		double def_acc=MouvementsBasiques.pilot.getLinearAcceleration();
+		double def_acc=MouvementsBasiques.getAccelerationRobot();
 		//MouvementsBasiques.changeVitesseRobot(0.5);
 		//MouvementsBasiques.pilot.setLinearAcceleration(def_acc/7);
 		MouvementsBasiques.setVitesseRobot(15);
 		MouvementsBasiques.setAccelerationRobot(20);
-		System.out.println("Linéar speed :"+MouvementsBasiques.pilot.getLinearSpeed());
-		System.out.println("Linear acceleration:"+MouvementsBasiques.pilot.getLinearAcceleration());
+		System.out.println("Linéar speed :"+MouvementsBasiques.getVitesseRobot());
+		System.out.println("Linear acceleration:"+MouvementsBasiques.getAccelerationRobot());
 		long debut;
 		long dureeRotation = 125; //millisecondes
 		int cycles = 0;
@@ -101,7 +104,7 @@ public class Pilote {
 				MouvementsBasiques.s1.release();
 				if(Couleur.getCouleurLigne()!=c && (cycles>= max_cycles) && seDeplace) {
 					//gestion d'erreur le robot n'a pas pu se redresser sur une ligne de couleur et il est perdu. Il faut arreter le mouvement
-					MouvementsBasiques.pilot.stop();
+					MouvementsBasiques.arreter();
 					try {
 						seRedresserSurLigne(c, true, 45,500);
 					}
@@ -118,8 +121,8 @@ public class Pilote {
 				cycles = 0;
 			}
 		}
-		MouvementsBasiques.pilot.setLinearAcceleration(def_acc);
-		if (MouvementsBasiques.pilot.isMoving())
+		MouvementsBasiques.setAccelerationRobot(def_acc);
+		if (MouvementsBasiques.isMovingPilot())
 			MouvementsBasiques.arreter(); //Le robot s'arrete
 		MouvementsBasiques.changeVitesseRobot(2);
 	}
@@ -134,12 +137,12 @@ public class Pilote {
 	
 	public static void seRedresserSurLigne(CouleurLigne c, boolean gauche_bouge, float max_angle, int temps) throws Exception {
 		boolean trouve;
-		System.out.println("Linéar speed :"+MouvementsBasiques.pilot.getLinearSpeed());
-		System.out.println("Linear acceleration:"+MouvementsBasiques.pilot.getLinearAcceleration());
-		double def_acc = MouvementsBasiques.pilot.getLinearAcceleration();
-		double def_speed = MouvementsBasiques.pilot.getLinearSpeed();
-		MouvementsBasiques.pilot.setLinearSpeed(10);
-		MouvementsBasiques.pilot.setLinearAcceleration(10);
+		System.out.println("Linéar speed :"+MouvementsBasiques.getVitesseRobot());
+		System.out.println("Linear acceleration:"+MouvementsBasiques.getAccelerationRobot());
+		double def_acc = MouvementsBasiques.getAccelerationRobot();
+		double def_speed = MouvementsBasiques.getVitesseRobot();
+		MouvementsBasiques.setVitesseRobot(10);
+		MouvementsBasiques.setAccelerationRobot(10);
 		int iterations = 0;
 		//float distance=0;
 		while(Couleur.getCouleurLigne() != c) {
@@ -164,7 +167,7 @@ public class Pilote {
 //			System.out.println("Trouvée! J'avance pour vérifier que c'est la bonne");
 //			System.out.println("Linéar speed :"+MouvementsBasiques.pilot.getLinearSpeed());
 			//Button.waitForAnyEvent();
-			MouvementsBasiques.pilot.travel(6);
+			MouvementsBasiques.avancerTravel(6);
 //			System.out.println("J'inverse les moteurs");
 			gauche_bouge = !gauche_bouge;
 			if (iterations%4==0) {
@@ -175,8 +178,8 @@ public class Pilote {
 //			System.out.println();
 			
 		}
-		MouvementsBasiques.pilot.setLinearSpeed(10);
-		MouvementsBasiques.pilot.setLinearAcceleration(10);
+		MouvementsBasiques.setVitesseRobot(10);
+		MouvementsBasiques.setAccelerationRobot(10);
 	}
 	
 	private static boolean tournerToCouleur(CouleurLigne c, boolean gauche_bouge, double angle, int timeOut) { //timeOut = timer qui indique la durée maximale de la rotation d'une roue

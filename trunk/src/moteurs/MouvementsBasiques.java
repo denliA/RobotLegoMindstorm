@@ -18,18 +18,21 @@ public class MouvementsBasiques {
 	static double rightWheelDiameter = DIAM_ROUE_INCH;
 	public static Semaphore s1 = new Semaphore(1);
 	
-	public static MovePilot pilot = new MovePilot (new WheeledChassis(
+	private static MovePilot pilot = new MovePilot (new WheeledChassis(
 			new WheeledChassis.Modeler[] { 
 				WheeledChassis.modelWheel(Moteur.MOTEUR_GAUCHE, leftWheelDiameter).offset(trackWidth / 2).invert(false),
 				WheeledChassis.modelWheel(Moteur.MOTEUR_DROIT, rightWheelDiameter).offset(-trackWidth / 2).invert(false) },
 			WheeledChassis.TYPE_DIFFERENTIAL));
+	
+	public static boolean isMovingPilot() {
+		return pilot.isMoving();
+	}
 	
 	public static double getVitesseRobot() {
 		return pilot.getLinearSpeed(); //Vitesse de déplacement du robot lors d'un forward ou backward ou travel. Toutes les méthodes du MovePilot
 	}
 	
 	public static double getAccelerationRobot() {
-		System.out.println(pilot.getLinearAcceleration());
 		return pilot.getLinearAcceleration(); //Acceleration du robot
 	}
 	
@@ -55,6 +58,19 @@ public class MouvementsBasiques {
 	
 	public static void arreter() {
 		pilot.stop();
+	}
+	
+	//pas de freinage brusque
+	public static void arreterMoteurs() {
+		try {
+			s1.acquire();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		Moteur.MOTEUR_GAUCHE.setSpeed(0);
+		Moteur.MOTEUR_DROIT.setSpeed(0);
+		s1.release();
 	}
 	
 	//le mouvement peut etre interrompu par un autre mouvement si immediateReturn==true
