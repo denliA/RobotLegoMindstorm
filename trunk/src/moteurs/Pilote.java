@@ -71,7 +71,7 @@ public class Pilote {
 		System.out.println("Linéar speed :"+MouvementsBasiques.getVitesseRobot());
 		System.out.println("Linear acceleration:"+MouvementsBasiques.getAccelerationRobot());
 		long debut;
-		long dureeRotation = 125; //millisecondes
+		long dureeRotation = 175; //millisecondes
 		int cycles = 0;
 		final int max_cycles = 4;
 		Couleur.startScanAtRate(0); //Lance immediatement le timer qui execute update() toutes les 0.1 secondes. C'est une méthode qui scanne la couleur et met à jour les attrubuts statiques de la classe Couleur 
@@ -153,36 +153,44 @@ public class Pilote {
 		int iterations = 0;
 		//float distance=0;
 		while(Couleur.getCouleurLigne() != c) {
-//			System.out.println("Itération "+ ++iterations + (gauche_bouge ? "Gauche Bouge":"DroiteBouge"));
-//			System.out.println("Je tourne");
+			System.out.println("Itération "+ ++iterations + (gauche_bouge ? "Gauche Bouge":"DroiteBouge"));
+			System.out.println("Je tourne");
 			trouve = tournerToCouleur(c, gauche_bouge, max_angle, temps);
+			Button.waitForAnyEvent();
+			System.out.println();
 			if (!trouve) {
-				//System.out.println("Pas trouvé,("+ Couleur.getCouleurLigne() + ") je m'apprête à tourner en sens inverse");
-				//Button.waitForAnyEvent();
+				System.out.println("	IF1 Pas trouvé,("+ Couleur.getCouleurLigne() + ") je m'apprête à tourner en sens inverse");
+				System.out.println("	IF1 revenir");
+				Button.waitForAnyEvent();
 				tournerToCouleur(c, gauche_bouge, -max_angle, temps);
-				
 				gauche_bouge = !gauche_bouge;
+				System.out.println("\n");
+				System.out.println("	IF1 partir dans l'autre sens");
 				tournerToCouleur(c, gauche_bouge, max_angle, temps);
+				System.out.println("	IF1 Fin redress init");
+				Button.waitForAnyEvent();
 			}
 			if (Couleur.getCouleurLigne()!=c) {
-//				System.out.println("Toujours pas la bonne couleur ("+ Couleur.getCouleurLigne() + ") je m'apprête à faire une marche arrière");
-				//Button.waitForAnyEvent();
-				tournerToCouleur(c, gauche_bouge, trouve? -20 : max_angle/4, temps*2);
+				System.out.println("	IF2 Toujours pas la bonne couleur ("+ Couleur.getCouleurLigne() + ") je m'apprête à tourner pour la retrouver");
+				System.out.println("	IF2 trouvé="+trouve);
+				Button.waitForAnyEvent();
+				tournerToCouleur(c, gauche_bouge, trouve? -40 : max_angle/2, temps);
+				System.out.println("	IF2 Fin de tounage, couleur actuelle:"+Couleur.getCouleurLigne());
 				if (Couleur.getCouleurLigne() != c)
-					throw new Exception();
+					throw new exceptions.EchecGarageException();
 			}
-//			System.out.println("Trouvée! J'avance pour vérifier que c'est la bonne");
-//			System.out.println("Linéar speed :"+MouvementsBasiques.pilot.getLinearSpeed());
-			//Button.waitForAnyEvent();
+			System.out.println("Trouvée! J'avance pour vérifier que c'est la bonne");
+			Button.waitForAnyEvent();
 			MouvementsBasiques.avancerTravel(6);
-//			System.out.println("J'inverse les moteurs");
+			System.out.println("J'inverse les moteurs");
 			gauche_bouge = !gauche_bouge;
-			if (iterations%4==0) {
+			if (iterations%4==3) {
 				max_angle = max_angle/1.5f;
 				temps = (int) (temps/1.5);
 			}
-//			System.out.println(Couleur.getCouleurLigne());
-//			System.out.println();
+			System.out.print("m'apprête à sortir...");
+			System.out.println(Couleur.getCouleurLigne());
+			System.out.println("\n\n\n\n");
 			
 		}
 		MouvementsBasiques.setVitesseRobot(def_speed);
@@ -193,16 +201,24 @@ public class Pilote {
 		MouvementsBasiques.tourner(angle, timeOut, gauche_bouge);
 		Vector<CouleurLigne> couleurs = new Vector<>();
 		CouleurLigne t;
+		int def_acc = Moteur.MOTEUR_GAUCHE.getAcceleration();
 		long debut = System.currentTimeMillis(); //temps reel à l'instant ou cette instruction est executée
 		while((t=Couleur.getCouleurLigne()) != c && System.currentTimeMillis()-debut<timeOut)//On sort du while si le robot s'est redressé sur la bonne couleur ou si le temps est ecoulé.
 			couleurs.add(t);
+		long diff = System.currentTimeMillis()-debut;
+		couleurs.add(t);
 		Moteur.MOTEUR_GAUCHE.setAcceleration(7000);
 		Moteur.MOTEUR_DROIT.setAcceleration(7000);
 		Moteur.MOTEUR_GAUCHE.startSynchronization();
 			Moteur.MOTEUR_DROIT.stop();
 			Moteur.MOTEUR_GAUCHE.stop();
 		Moteur.MOTEUR_GAUCHE.endSynchronization();
-		return System.currentTimeMillis()-debut<timeOut;//retourne la durée du déplacement de la roue
+		Moteur.MOTEUR_DROIT.setAcceleration(def_acc);
+		Moteur.MOTEUR_GAUCHE.setAcceleration(def_acc);
+		System.out.println("diff = "+diff+", timeOut= "+timeOut+". Couleurs trouvées en torunant:"+couleurs);
+		Button.waitForAnyEvent();
+		//return diff<timeOut;//retourne la durée du déplacement de la roue
+		return couleurs.contains(c);
 	}
 	
 	/*
