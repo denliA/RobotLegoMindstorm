@@ -61,7 +61,8 @@ public class ModeSolo {
 					}
 				} );
 
-				while((tient_palet || Toucher.getTouche()==false)&&(Couleur.getCouleurLigne()!=CouleurLigne.BLANCHEP)&&(Couleur.getCouleurLigne()!=CouleurLigne.BLANCHEF)); //on ne fait rien
+				while((tient_palet || Toucher.getTouche()==false)&&(Couleur.getCouleurLigne()!=CouleurLigne.BLANCHEP)&&(Couleur.getCouleurLigne()!=CouleurLigne.BLANCHEF))
+					System.out.print(milieu);; //on ne fait rien
 				Pilote.SetSeDeplace(false); //arrete le suivi de ligne
 				if(Toucher.getTouche()) {
 					tient_palet=true;

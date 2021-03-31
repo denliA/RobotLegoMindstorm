@@ -42,13 +42,20 @@ public class Pilote {
 	}
 	
 	public static void vide() {
-		double acceleration = MouvementsBasiques.getAccelerationRobot()/5;
-		if(Couleur.getCouleurLigne()==CouleurLigne.VIDE) {
-			if(MouvementsBasiques.isMovingPilot()) //si le robot bouge via MovePilot, on invoque la méthode stop de MovePilot qui perturbe les RegulatedMoteurs suivants
+		double acceleration = MouvementsBasiques.getAccelerationRobot();
+		float[] RGB = Couleur.getRGB();
+		if(RGB[0] < 2 &&RGB[1] < 2 &&RGB[2] < 2) {
+			if(MouvementsBasiques.isMovingPilot()) { //si le robot bouge via MovePilot, on invoque la méthode stop de MovePilot qui perturbe les RegulatedMoteurs suivants
+				MouvementsBasiques.setAccelerationRobot(150);
 				MouvementsBasiques.arreter();
-			else
+				Sound.twoBeeps();
+			}else {
+				Moteur.MOTEUR_DROIT.setAcceleration(10000);
+				Moteur.MOTEUR_GAUCHE.setAcceleration(10000);
 				MouvementsBasiques.arreterMoteurs(); //on met la vitesse des moteurs à zero si le robot utilise directement les moteurs
-			MouvementsBasiques.avancerTravel(acceleration,-5); //robot recule
+				Sound.beep();
+			}
+			MouvementsBasiques.avancerTravel(acceleration,-15); //robot recule
 			MouvementsBasiques.tourner(180); //demi-tour
 		}
 	}
