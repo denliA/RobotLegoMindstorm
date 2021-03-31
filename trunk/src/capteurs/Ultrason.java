@@ -8,27 +8,27 @@ import lejos.utility.TimerListener;
 public class Ultrason {
 	
 	//Attributs 
-	//float car utilisé par leJOS
+	//float car utilisï¿½ par leJOS
 	private static float distance;
 	private static boolean bruitDetecte;
 	//pour savoir si le capteur est effectivement actif
 	private static boolean status;
 	
-	//Pour lancer des analyses de manière périodique
+	//Pour lancer des analyses de maniï¿½re pï¿½riodique
 		private static Timer lanceur = 
-			//création d'un objet Timer qui lancera les scans toutes les 100ms
+			//crï¿½ation d'un objet Timer qui lancera les scans toutes les 100ms
 			new Timer(100, new TimerListener() {
 				public void timedOut() {
-					//appel aux deux fonctions lançant les scans nécessaire à la classe
+					//appel aux deux fonctions lanï¿½ant les scans nï¿½cessaire ï¿½ la classe
 					setDistance();
 					setBruitDetecte();
 				}
 			}
 		);
 	
-	//Méthodes
+	//Mï¿½thodes
 		
-	//Lancent des scans périodiques avec lanceur et modifient status de manière adéquate
+	//Lancent des scans pï¿½riodiques avec lanceur et modifient status de maniï¿½re adï¿½quate
 	public static void startScan() {
 		//scan toutes les 50 ms
 		lanceur.setDelay(50);
@@ -45,9 +45,9 @@ public class Ultrason {
 		return status;
 	}
 	
-	//Gestion de la distance mesurée par le capteur
+	//Gestion de la distance mesurï¿½e par le capteur
 	public static void setDistance() {
-		//création du tableau qui stockera les valeurs renvoyées par le sampler
+		//crï¿½ation du tableau qui stockera les valeurs renvoyï¿½es par le sampler
 		float[] tabDistance = new float[Capteur.ULTRASON.sampleSize()];
 		//remplissage du tableau
 		Capteur.ULTRASON.fetchSample(tabDistance, 0);
@@ -58,11 +58,11 @@ public class Ultrason {
 		return distance;
 	}
 	
-	//Détection de la présence d'un autre robot
+	//Dï¿½tection de la prï¿½sence d'un autre robot
 	public static void setBruitDetecte() {
 		bruitDetecte=false;
 		
-		//le sampler contient normalement un seul élément : 1 si il y a un autre robot, 0 sinon
+		//le sampler contient normalement un seul ï¿½lï¿½ment : 1 si il y a un autre robot, 0 sinon
 		float[] autreRobot = new float[Capteur.ECOUTE.sampleSize()];
 		Capteur.ECOUTE.fetchSample(autreRobot, 0);
 		
@@ -71,6 +71,8 @@ public class Ultrason {
 	public static boolean getBruitDetecte() {
 		return bruitDetecte;
 	}
+	
+	
 	
 }
 

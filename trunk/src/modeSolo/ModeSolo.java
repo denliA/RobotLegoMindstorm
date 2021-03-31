@@ -14,9 +14,10 @@ import exceptions.OuvertureException;
 import lejos.hardware.Sound;
 import lejos.hardware.Button;
 import capteurs.Capteur;
+import exceptions.*;
 
 public class ModeSolo {
-	public static void ramasserPalet(int nbPalets,boolean rougeAgauche) throws Exception, InterruptedException {
+	public static void ramasserPalet(int nbPalets,boolean rougeAgauche) throws EchecGarageException, InterruptedException, OuvertureException {
 		new Capteur();
 		Executor executor = Executors.newSingleThreadExecutor();
 		double vitesse = MouvementsBasiques.getVitesseRobot();
@@ -86,7 +87,7 @@ public class ModeSolo {
 						rien_trouve++;	
 				}
 				MouvementsBasiques.tourner(180); //demi-tour
-				Pilote.seRedresserSurLigne(couleur, true, 45, 1000);
+				//Pilote.seRedresserSurLigne(couleur, true, 45, 1000);
 			}
 			if (gauche) {
 				MouvementsBasiques.tourner(90); //tourne à gauche de 90 degres

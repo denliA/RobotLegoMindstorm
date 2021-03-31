@@ -71,7 +71,7 @@ public class Pilote {
 		System.out.println("Linéar speed :"+MouvementsBasiques.getVitesseRobot());
 		System.out.println("Linear acceleration:"+MouvementsBasiques.getAccelerationRobot());
 		long debut;
-		long dureeRotation = 175; //millisecondes
+		long dureeRotation = 125; //millisecondes
 		int cycles = 0;
 		final int max_cycles = 4;
 		Couleur.startScanAtRate(0); //Lance immediatement le timer qui execute update() toutes les 0.1 secondes. C'est une méthode qui scanne la couleur et met à jour les attrubuts statiques de la classe Couleur 
@@ -142,7 +142,7 @@ public class Pilote {
 	}
 	
 	
-	public static void seRedresserSurLigne(CouleurLigne c, boolean gauche_bouge, float max_angle, int temps) throws Exception {
+	public static void seRedresserSurLigne(CouleurLigne c, boolean gauche_bouge, float max_angle, int temps) throws exceptions.EchecGarageException {
 		boolean trouve;
 		System.out.println("Linéar speed :"+MouvementsBasiques.getVitesseRobot());
 		System.out.println("Linear acceleration:"+MouvementsBasiques.getAccelerationRobot());
