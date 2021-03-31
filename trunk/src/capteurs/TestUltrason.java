@@ -30,7 +30,7 @@ public class TestUltrason {
 			if(b) LCD.drawString("Il y a un robot", 0, 2);
 			else LCD.drawString("Y a pas de robot", 0, 2);
 		}
-		
+		LCD.clear();
 		//on va attraper un palet, pinces ouvertes
 		moteurs.Pince.ouvrir();
 		
@@ -38,8 +38,9 @@ public class TestUltrason {
 		d = Ultrason.getDistance();
 		//tant qu'on capte le palet et qu'on ne le touche pas, on avance
 		moteurs.MouvementsBasiques.avancer();
-		//Delay.msDelay(2000);
-		LCD.clear();
+		while(d>0&&!Toucher.getTouche()) {
+			LCD.drawString("avance", 0, 0);
+		}
 		
 		if(d<0||Toucher.getTouche()) {
 			moteurs.MouvementsBasiques.arreter();
