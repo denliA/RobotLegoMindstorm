@@ -1,13 +1,31 @@
 package moteurs;
 
-public interface Deplacement {
+public abstract class Deplacement extends Thread {
 	
-	public void lancer(); //permet de lancer/demarrer le deplacement
+	public enum TypeDeplacement {EXCLUSIF, DEMON, AIDE}
+	public enum StatusDeplacement { PRET, ENCOURS, ENATTENTE, FINI }
 	
-	public boolean getStatus(); //permet de retourner si le deplacement est "active" ou non
+	protected ConditionArret condition;
+	protected  StatusDeplacement status;
+	protected TypeDeplacement type;
+	Thread verificateur;
 	
-	public void interrompre(); //permet de mettre pause au milieu du deplacement, il pourra etre repris, ou non, ensuite
+	public Deplacement(ConditionArret condition, TypeDeplacement type) {
+		
+	}
+	
+	public void lancer() {
+		
+	};
+	
+	public StatusDeplacement getStatus() {
+		return status;
+	}
+	
+	public String [] causesArret() {
+		return condition.getCausesArret();
+	}
 	
 	
-	public void arreter(); //permet d'arreter le deplacement, il ne pourra pas etre repris apres
+	
 }

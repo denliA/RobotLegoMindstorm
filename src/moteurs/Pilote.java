@@ -178,8 +178,8 @@ public class Pilote {
 //			System.out.println();
 			
 		}
-		MouvementsBasiques.setVitesseRobot(10);
-		MouvementsBasiques.setAccelerationRobot(10);
+		MouvementsBasiques.setVitesseRobot(def_speed);
+		MouvementsBasiques.setAccelerationRobot(def_acc);
 	}
 	
 	private static boolean tournerToCouleur(CouleurLigne c, boolean gauche_bouge, double angle, int timeOut) { //timeOut = timer qui indique la durée maximale de la rotation d'une roue
