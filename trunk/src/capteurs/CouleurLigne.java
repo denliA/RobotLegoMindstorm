@@ -50,7 +50,7 @@ public enum CouleurLigne {
 
 	
 	private CouleurLigne(float[] bc ,float[] br) {
-		this(bc, 1f, -.5f,  br, 1f, -.5f);
+		this(bc, 1f, -1f,  br, 1f, -1f);
 	}
 	
 	/**

@@ -186,7 +186,7 @@ public class Couleur {
 			}
 			
 			// On retourne la couleur trouvée, ou CouleurLigne.INCONNU si il n'y a aucun candidat.
-			//System.out.println(candidats);
+			System.out.println(candidats);
 			return cand==null?  CouleurLigne.INCONNU : cand;
 		}
 		
