@@ -18,9 +18,9 @@ public class TestGetCouleur {
 				System.out.println(Float.toString(res[0]));
 				System.out.println(Float.toString(res[1]));
 				System.out.println(Float.toString(res[2]));
-//				System.out.println(Float.toString(res2[0]));
-//				System.out.println(Float.toString(res2[1]));
-//				System.out.println(Float.toString(res2[2]));
+				System.out.println(Float.toString(res2[0]));
+				System.out.println(Float.toString(res2[1]));
+				System.out.println(Float.toString(res2[2]));
 				System.out.println();
 				System.out.println(couleur.toString()+"\n");
 			}
