@@ -2,7 +2,6 @@ package capteurs;
 
 import lejos.hardware.Button;
 import lejos.hardware.lcd.LCD;
-import lejos.utility.Delay;
 
 public class TestUltrason {
 	public static void main(String[] args) {
@@ -18,12 +17,15 @@ public class TestUltrason {
 			Ultrason.setDistance();
 			d = Ultrason.getDistance();
 			LCD.drawString("distance : "+d, 0, 0);
-			Delay.msDelay(1000);
+			Button.waitForAnyEvent();
+			System.out.println("d : "+d);
 			
 			Ultrason.setBruitDetecte();
 			boolean b = Ultrason.getBruitDetecte();
 			if(b) LCD.drawString("Il y a un robot", 0, 2);
 			else LCD.drawString("Y a pas de robot", 0, 2);
 		}
+		
+		
 	}
 }
