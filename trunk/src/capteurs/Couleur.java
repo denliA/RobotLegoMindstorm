@@ -1,5 +1,6 @@
 package capteurs;
 
+import lejos.hardware.Sound;
 import lejos.utility.Delay;
 import lejos.utility.Timer;
 import lejos.utility.TimerListener;
@@ -55,7 +56,14 @@ public class Couleur {
 			new TimerListener() {
 		public void timedOut() {
 			synchronized(lock) {
+				try{
 				update();
+				}catch(IllegalArgumentException e){
+					Sound.beepSequenceUp();
+					System.err.println(e.toString());
+					e.printStackTrace(System.err);
+					Capteur.ouvrirCapteurCouleur();
+				}
 			}
 		}
 	});
@@ -72,9 +80,7 @@ public class Couleur {
 	
 	//Avoir la valeur de la couleur suivant un encodage RGB
 	public static float[] getRGB() {
-		synchronized (lock) {
-			return(new float[] {rouge,vert,bleu});
-		}
+		return(new float[] {rouge,vert,bleu});
 	}
 	
 	//Ratios R/G, B/G et B/R
