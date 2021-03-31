@@ -38,14 +38,15 @@ public class TestUltrason {
 		d = Ultrason.getDistance();
 		//tant qu'on capte le palet et qu'on ne le touche pas, on avance
 		moteurs.MouvementsBasiques.avancer();
-		Delay.msDelay(2000);
-		while(d>0&&!Toucher.getTouche()) {
-		}
-		moteurs.MouvementsBasiques.arreter();
-		if(Toucher.getTouche()) {
+		//Delay.msDelay(2000);
+		LCD.clear();
+		
+		if(d<0||Toucher.getTouche()) {
+			moteurs.MouvementsBasiques.arreter();
 			moteurs.Pince.fermer();
 		}
 		else {
+			moteurs.MouvementsBasiques.arreter();
 			int angle = 0;
 			while(d>10&&angle<360) {
 				moteurs.MouvementsBasiques.tourner(10);
