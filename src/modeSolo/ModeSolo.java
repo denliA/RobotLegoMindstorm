@@ -62,13 +62,16 @@ public class ModeSolo {
 					}
 				} );
 
-				while((tient_palet || Toucher.getTouche()==false)&&(Couleur.getCouleurLigne()!=CouleurLigne.BLANCHEP)&&(Couleur.getCouleurLigne()!=CouleurLigne.BLANCHEF))
-					System.out.print(milieu);; //on ne fait rien
+				while((tient_palet || Toucher.getTouche()==false)&&(Couleur.getCouleurLigne()!=CouleurLigne.BLANCHE))
+					//System.out.print(milieu); //on ne fait rien
+					System.out.print("Dans le while\t");
 				Pilote.SetSeDeplace(false); //arrete le suivi de ligne
 				if(Toucher.getTouche()) {
+					System.out.println("Touché palet, on le prend");
 					tient_palet=true;
 					Pince.fermer();
 				}else if (tient_palet){ //si le robot a atteint sa ligne blanche d'en but et qu'il a ramassé un palet
+					System.out.println("tient palet et sur blanche, se retorune");
 					Pince.ouvrir();
 					scoredPalets++;
 					trio++;
@@ -87,7 +90,7 @@ public class ModeSolo {
 						rien_trouve++;	
 				}
 				MouvementsBasiques.tourner(180); //demi-tour
-				//Pilote.seRedresserSurLigne(couleur, true, 45, 1000);
+				Pilote.seRedresserSurLigne(couleur, true, 45, 750);
 			}
 			if (gauche) {
 				MouvementsBasiques.tourner(90); //tourne à gauche de 90 degres
