@@ -10,27 +10,30 @@ public class Capteur {
 	
 	//on initialise les objets Sensor de leJos en precisant le port de branchement
 	//ouverture des capteurs
-	private static EV3ColorSensor COLOR_SENSOR = new EV3ColorSensor(LocalEV3.get().getPort("S3")); // Port de branchement du capteur de couleurs
-	private static EV3TouchSensor TOUCH_SENSOR = new EV3TouchSensor(LocalEV3.get().getPort("S1"));
-	private static EV3UltrasonicSensor ULTRASONIC_SENSOR = new EV3UltrasonicSensor(LocalEV3.get().getPort("S2"));
+	private static EV3ColorSensor COLOR_SENSOR; // Port de branchement du capteur de couleurs
+	private static EV3TouchSensor TOUCH_SENSOR;
+	private static EV3UltrasonicSensor ULTRASONIC_SENSOR;
 	
 	/*Creation et initialisation des objets de type SampleProvider.
 	Ils permettent la recuperation des donnees des capteurs.
 	Ces objets sont utilises par les autres classes du package pour obtenir les valeurs mesurees*/
 	
 	//Capteur toucher pour la classe Toucher
-	public static SampleProvider TOUCHER = TOUCH_SENSOR.getTouchMode();
+	public static SampleProvider TOUCHER;
 	
 	//sample providers du capteur de couleur pour la classe Couleur
-	public static SampleProvider RGB = COLOR_SENSOR.getRGBMode();
-	public static SampleProvider LUMIERE_AMBIANTE = COLOR_SENSOR.getAmbientMode();
-	public static SampleProvider ID_COULEUR = COLOR_SENSOR.getColorIDMode();
-	public static SampleProvider ROUGE = COLOR_SENSOR.getRedMode();
+	public static SampleProvider RGB;
+	public static SampleProvider LUMIERE_AMBIANTE;
+	public static SampleProvider ID_COULEUR;
+	public static SampleProvider ROUGE;
 	
 	//sample providers pour la classe Ultrason
-	public static SampleProvider ULTRASON = ULTRASONIC_SENSOR.getDistanceMode();
-	public static SampleProvider ECOUTE = ULTRASONIC_SENSOR.getListenMode();
+	public static SampleProvider ULTRASON;
+	public static SampleProvider ECOUTE;
 	
+	static {
+		ouvrirCapteurCouleur();
+	}
 	//ouvrir capteur
 	public static void ouvrirCapteurCouleur() {
 		if (COLOR_SENSOR!=null) {
@@ -44,7 +47,7 @@ public class Capteur {
 		LUMIERE_AMBIANTE = COLOR_SENSOR.getAmbientMode();
 		ID_COULEUR = COLOR_SENSOR.getColorIDMode();
 		ROUGE = COLOR_SENSOR.getRedMode();
-		ULTRASONIC_SENSOR.getDistanceMode();
+		ULTRASON = ULTRASONIC_SENSOR.getDistanceMode();
 		ECOUTE = ULTRASONIC_SENSOR.getListenMode();
 		TOUCHER = TOUCH_SENSOR.getTouchMode();
 		}catch(IllegalArgumentException e){
