@@ -30,6 +30,7 @@ public class Couleur {
 	private static float IDCouleur;
 	private static float intensiteRouge;
 	private static CouleurLigne[] buffer = new CouleurLigne[15];
+	static { for (int i=0; i<15; i++) buffer[i] = CouleurLigne.INCONNU; }
 	private static int bufferIndex = 0;
 	
 	/**
@@ -197,7 +198,7 @@ public class Couleur {
 			// On retourne la couleur trouvée, ou CouleurLigne.INCONNU si il n'y a aucun candidat.
 			//System.out.println(candidats);
 			//return cand==null?  CouleurLigne.INCONNU : cand;
-			if (cand ==null)
+			if (cand !=null)
 				return cand;
 			candidats.clear();
 			for(CouleurLigne c : CouleurLigne.values()) {
