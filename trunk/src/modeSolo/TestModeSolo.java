@@ -10,7 +10,7 @@ public class TestModeSolo {
 		Toucher.startScan();
 		Ultrason.startScan();
 		try{  
-			ModeSolo.ramasserPalet(6,false); //attention le robot demarre coté armoire (ligneRouge à gauche)
+			ModeSolo.ramasserPalet(6,true); //attention le robot demarre coté armoire (ligneRouge à gauche)
 		}catch(InterruptedException e) {
 			System.out.println("Prob pour tourner le robot");
 		}catch(exceptions.EchecGarageException e){
