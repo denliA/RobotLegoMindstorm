@@ -33,6 +33,14 @@ public class Couleur {
 	static { for (int i=0; i<15; i++) buffer[i] = CouleurLigne.INCONNU; }
 	private static int bufferIndex = 0;
 	
+	
+	// Constantes pour le modeFlag
+	final static public byte REDMODE = 0b1;
+	final static public byte IDMODE = 0b10;
+	final static public byte RGBMODE = 0b100;
+	final static public byte LIGHTMODE = 0b1000;
+	final static public byte BUFFERING = 0b10000;
+	
 	/**
 	 * indicateur permettant de décider quelles mesures prendre et lesquelles ignorer.
 	 * <p>
@@ -44,14 +52,7 @@ public class Couleur {
 	 * <li> e1 pour le ColorID (algorithme par défaut de Lego)
 	 * <li> e0 pour le mode intensité du rouge 
 	 */
-	private static byte modeFlag;
-	
-	// Constantes pour le modeFlag
-	final static public byte REDMODE = 0b1;
-	final static public byte IDMODE = 0b10;
-	final static public byte RGBMODE = 0b100;
-	final static public byte LIGHTMODE = 0b1000;
-	final static public byte BUFFERING = 0b10000;
+	private static byte modeFlag = (byte) RGBMODE|BUFFERING;
 	
 	// Assure la synchronisation des opérations : si une mesure est en train d'être faite, on ne veut pas accéder aux vairables modifées par celle-ci  entre temps.
 	private final static Object lock = new Object();
@@ -62,7 +63,7 @@ public class Couleur {
 			new TimerListener() {
 		public void timedOut() {
 			update();
-			if ((modeFlag&BUFFERING)==1) {
+			if ((modeFlag&BUFFERING)!=0) {
 				CouleurLigne c = getCouleurLigne();
 				synchronized(buffer_lock) {
 					buffer[bufferIndex=((bufferIndex+1)%buffer.length)] = c;
@@ -171,15 +172,12 @@ public class Couleur {
 					if (couleur.IRGB.contains(RGB))
 						candidats.put(couleur, (val == null ? (val=couleur.pos_confiance_IRGB) : (val=val+couleur.pos_confiance_IRGB)));
 					else 
-						candidats.put(couleur, (val==null)? (val=couleur.neg_confiance_IRGB) : (val=val+couleur.neg_confiance_IRGB));
-					//if (couleur==CouleurLigne.BLANCHEF) System.out.println(couleur+" IRGB "+couleur.pos_confiance_IRGB+" "+couleur.neg_confiance_IRGB + " " + candidats.get(couleur));
-				}
+						candidats.put(couleur, (val==null)? (val=couleur.neg_confiance_IRGB) : (val=val+couleur.neg_confiance_IRGB));				}
 				if (couleur.IRatios!=null) {
 					if (couleur.IRatios.contains(ratios))
 						candidats.put(couleur, (val == null ? (val=couleur.pos_confiance_IRatios) : (val=val+couleur.pos_confiance_IRatios)));
 					else 
 						candidats.put(couleur, (val==null)? (val=couleur.neg_confiance_IRatios) : (val=val+couleur.neg_confiance_IRatios));
-					//System.out.println(couleur+" IRatios "+couleur.pos_confiance_IRatios+" "+couleur.neg_confiance_IRatios);
 				}
 			}
 			
@@ -196,27 +194,24 @@ public class Couleur {
 			}
 			
 			// On retourne la couleur trouvée, ou CouleurLigne.INCONNU si il n'y a aucun candidat.
-			//System.out.println(candidats);
-			//return cand==null?  CouleurLigne.INCONNU : cand;
 			if (cand !=null)
 				return cand;
+			
 			candidats.clear();
 			for(CouleurLigne c : CouleurLigne.values()) {
-				for(CouleurLigne intersect : c.intersetions) {
+				for(CouleurLigne intersect : c.intersections) {
 					Float val = candidats.get(intersect);
 					if (intersect.IRGB!=null) {
 						if (intersect.IRGB.contains(RGB))
 							candidats.put(intersect, (val == null ? (val=intersect.pos_confiance_IRGB) : (val=val+intersect.pos_confiance_IRGB)));
 						else 
 							candidats.put(intersect, (val==null)? (val=intersect.neg_confiance_IRGB) : (val=val+intersect.neg_confiance_IRGB));
-						//if (intersect==intersectLigne.BLANCHEF) System.out.println(intersect+" IRGB "+intersect.pos_confiance_IRGB+" "+intersect.neg_confiance_IRGB + " " + candidats.get(intersect));
 					}
 					if (intersect.IRatios!=null) {
 						if (intersect.IRatios.contains(ratios))
 							candidats.put(intersect, (val == null ? (val=intersect.pos_confiance_IRatios) : (val=val+intersect.pos_confiance_IRatios)));
 						else 
 							candidats.put(intersect, (val==null)? (val=intersect.neg_confiance_IRatios) : (val=val+intersect.neg_confiance_IRatios));
-						//System.out.println(intersect+" IRatios "+intersect.pos_confiance_IRatios+" "+intersect.neg_confiance_IRatios);
 					}
 				}
 			}

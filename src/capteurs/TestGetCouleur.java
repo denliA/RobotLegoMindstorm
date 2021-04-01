@@ -1,5 +1,7 @@
 package capteurs;
 
+import java.util.Arrays;
+
 import lejos.hardware.Button;
 public class TestGetCouleur {
 
@@ -11,6 +13,7 @@ public class TestGetCouleur {
 				testGetLastCouleur();
 			else 
 				testGetCouleurLigne();
+			buffer=!buffer;
 			button = Button.waitForAnyPress();
 		}
 
@@ -51,7 +54,7 @@ public class TestGetCouleur {
 			button = Button.waitForAnyPress();
 			if (button == Button.ID_ENTER) {
 				couleur = Couleur.getLastCouleur();
-				System.out.println("\n\n"+couleur+"\n\n");
+				System.out.println("\n\n"+couleur+Arrays.asList(Couleur.historiqueCouleurs(10))+"\n"+"\n");
 			}
 			Button.waitForAnyEvent();
 		}

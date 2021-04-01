@@ -36,25 +36,26 @@ public class Capteur {
 	}
 	//ouvrir capteur
 	public static void ouvrirCapteurCouleur() {
-		if (COLOR_SENSOR!=null) {
-			COLOR_SENSOR.close();
-		}
-		try {
-		COLOR_SENSOR = new EV3ColorSensor(LocalEV3.get().getPort("S3"));
-		TOUCH_SENSOR = new EV3TouchSensor(LocalEV3.get().getPort("S1"));
-		ULTRASONIC_SENSOR = new EV3UltrasonicSensor(LocalEV3.get().getPort("S2"));
-		RGB = COLOR_SENSOR.getRGBMode();
-		LUMIERE_AMBIANTE = COLOR_SENSOR.getAmbientMode();
-		ID_COULEUR = COLOR_SENSOR.getColorIDMode();
-		ROUGE = COLOR_SENSOR.getRedMode();
-		ULTRASON = ULTRASONIC_SENSOR.getDistanceMode();
-		ECOUTE = ULTRASONIC_SENSOR.getListenMode();
-		TOUCHER = TOUCH_SENSOR.getTouchMode();
-		}catch(IllegalArgumentException e){
-			Sound.beepSequenceUp();
-			System.err.println(e.toString());
-			e.printStackTrace(System.err);
-			Capteur.ouvrirCapteurCouleur();
+		while (COLOR_SENSOR==null || TOUCH_SENSOR==null || ULTRASONIC_SENSOR==null) {
+			try {
+			if (COLOR_SENSOR==null) COLOR_SENSOR = new EV3ColorSensor(LocalEV3.get().getPort("S3"));
+			if (TOUCH_SENSOR==null)  TOUCH_SENSOR = new EV3TouchSensor(LocalEV3.get().getPort("S1"));
+			if (ULTRASONIC_SENSOR==null)  ULTRASONIC_SENSOR = new EV3UltrasonicSensor(LocalEV3.get().getPort("S2"));
+			RGB = COLOR_SENSOR.getRGBMode();
+			LUMIERE_AMBIANTE = COLOR_SENSOR.getAmbientMode();
+			ID_COULEUR = COLOR_SENSOR.getColorIDMode();
+			ROUGE = COLOR_SENSOR.getRedMode();
+			ULTRASON = ULTRASONIC_SENSOR.getDistanceMode();
+			ECOUTE = ULTRASONIC_SENSOR.getListenMode();
+			TOUCHER = TOUCH_SENSOR.getTouchMode();
+			}catch(IllegalArgumentException e){
+				System.err.println("C'est arrivé!");
+				Sound.beepSequenceUp();
+				System.err.println(e.toString());
+				e.printStackTrace(System.err);
+				Capteur.ouvrirCapteurCouleur();
+				System.err.println("L'occurence de l'erreur est finie !");
+			}
 		}
 	}
 	
