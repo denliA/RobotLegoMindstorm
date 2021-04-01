@@ -2,7 +2,6 @@ package moteurs;
 import java.util.Vector;
 
 import capteurs.*;
-import lejos.hardware.Button;
 import lejos.hardware.Sound;
 import lejos.robotics.RegulatedMotor;
 import lejos.utility.Delay;
@@ -68,17 +67,17 @@ public class Pilote {
 		//MouvementsBasiques.pilot.setLinearAcceleration(def_acc/7);
 		MouvementsBasiques.setVitesseRobot(15);
 		MouvementsBasiques.setAccelerationRobot(20);
-		System.out.println("Linéar speed :"+MouvementsBasiques.getVitesseRobot());
-		System.out.println("Linear acceleration:"+MouvementsBasiques.getAccelerationRobot());
+		//System.out.println("Linéar speed :"+MouvementsBasiques.getVitesseRobot());
+		//System.out.println("Linear acceleration:"+MouvementsBasiques.getAccelerationRobot());
 		long debut;
-		long dureeRotation = 125; //millisecondes
+		long dureeRotation = 100; //millisecondes
 		int cycles = 0;
-		final int max_cycles = 4;
-		Couleur.startScanAtRate(0); //Lance immediatement le timer qui execute update() toutes les 0.1 secondes. C'est une méthode qui scanne la couleur et met à jour les attrubuts statiques de la classe Couleur 
+		final int max_cycles = 3;
+		Couleur.startScanAtRate(5); //Lance immediatement le timer qui execute update() toutes les 0.1 secondes. C'est une méthode qui scanne la couleur et met à jour les attrubuts statiques de la classe Couleur 
 		MouvementsBasiques.avancer(); // Le robot commence à avancer tout droit sans arret
-		float defaultSpeed = Moteur.MOTEUR_DROIT.getSpeed();
+		float defaultSpeed = Moteur.MOTEUR_GAUCHE.getSpeed();
 		while(seDeplace) {
-			if (Couleur.getCouleurLigne()!=c && seDeplace) { //Retourne sur quelle couleur le robot est posé en fonction des attributs statiques de Couleur. C'est une aapproximation en fonction de probabilités.
+			if (Couleur.getLastCouleur()!=c && !c.intersections.contains(Couleur.getLastCouleur()) && seDeplace) { //Retourne sur quelle couleur le robot est posé en fonction des attributs statiques de Couleur. C'est une aapproximation en fonction de probabilités.
 				//arreter le timer lanceur
 				//restreindre l'acces a la ressource citique du moteur grace à la semaphore. Il ne faut pas que MovePilot et LargeRegulatedMotor accèdent au meme moteur en meme temps
 				//Sound.beep();
@@ -90,17 +89,17 @@ public class Pilote {
 				}
 				//tourner à gauche pendant dureeRotation
 				debut = System.currentTimeMillis();
-				Moteur.MOTEUR_DROIT.setSpeed(defaultSpeed*1.25f);
-				while((Couleur.getCouleurLigne()!=c)&&((System.currentTimeMillis() - debut) < dureeRotation) && seDeplace) {
+				Moteur.MOTEUR_DROIT.setSpeed(defaultSpeed*1.27f);
+				while(Couleur.getLastCouleur()!=c && !c.intersections.contains(Couleur.getLastCouleur())&&((System.currentTimeMillis() - debut) < dureeRotation) && seDeplace) {
 					;
 				}
-				Moteur.MOTEUR_DROIT.setSpeed(defaultSpeed);
+				Moteur.MOTEUR_DROIT.setSpeed(defaultSpeed*1.03f);
 				if (Couleur.getCouleurLigne()!=c) {
 					//Sound.beep();
 					//tourner à droite pendant dureeRotation*2
 					debut = System.currentTimeMillis();
 					Moteur.MOTEUR_GAUCHE.setSpeed(defaultSpeed*1.25f);
-					while((Couleur.getCouleurLigne()!=c)&&((System.currentTimeMillis() - debut) < (dureeRotation*2))&& seDeplace) {
+					while(Couleur.getLastCouleur()!=c && !c.intersections.contains(Couleur.getLastCouleur())&&((System.currentTimeMillis() - debut) < (dureeRotation*2))&& seDeplace) {
 						;
 					}
 					Moteur.MOTEUR_GAUCHE.setSpeed(defaultSpeed);
@@ -109,11 +108,11 @@ public class Pilote {
 					cycles=0;
 				//liberer la ressource critique
 				MouvementsBasiques.s1.release();
-				if(Couleur.getCouleurLigne()!=c && (cycles>= max_cycles) && seDeplace) {
+				if(Couleur.getLastCouleur()!=c && !c.intersections.contains(Couleur.getLastCouleur()) && (cycles>= max_cycles) && seDeplace) {
 					//gestion d'erreur le robot n'a pas pu se redresser sur une ligne de couleur et il est perdu. Il faut arreter le mouvement
 					MouvementsBasiques.arreter();
 					try {
-						seRedresserSurLigne(c, true, 45,500);
+						seRedresserSurLigne(c, true, 45,750);
 					}
 					catch (Exception e) {
 						break;
@@ -144,21 +143,24 @@ public class Pilote {
 	
 	public static void seRedresserSurLigne(CouleurLigne c, boolean gauche_bouge, float max_angle, int temps) throws exceptions.EchecGarageException {
 		boolean trouve;
-		System.out.println("Linéar speed :"+MouvementsBasiques.getVitesseRobot());
-		System.out.println("Linear acceleration:"+MouvementsBasiques.getAccelerationRobot());
+		//System.out.println("Linéar speed :"+MouvementsBasiques.getVitesseRobot());
+		//System.out.println("Linear acceleration:"+MouvementsBasiques.getAccelerationRobot());
 		double def_acc = MouvementsBasiques.getAccelerationRobot();
 		double def_speed = MouvementsBasiques.getVitesseRobot();
-		MouvementsBasiques.setVitesseRobot(10);
+		int def_acc_moteurs = Moteur.MOTEUR_DROIT.getAcceleration();
+		MouvementsBasiques.setVitesseRobot(15);
 		MouvementsBasiques.setAccelerationRobot(10);
+		seDeplace = true;
 		int iterations = 0;
 		//float distance=0;
-		while(Couleur.getCouleurLigne() != c && Couleur.getCouleurLigne()!=CouleurLigne.INCONNU) {
-			System.out.println("Itération "+ ++iterations + (gauche_bouge ? "Gauche Bouge":"DroiteBouge"));
-			System.out.println("Je tourne");
+		while(Couleur.getCouleurLigne() != c && seDeplace /*&& Couleur.getCouleurLigne()!=CouleurLigne.INCONNU*/) {
+//			System.out.println("Itération "+ ++iterations + (gauche_bouge ? "Gauche Bouge":"DroiteBouge"));
+//			System.out.println("Je tourne");
 			trouve = tournerToCouleur(c, gauche_bouge, max_angle, temps);
 //			Button.waitForAnyEvent();
 //			System.out.println();
-			if (!trouve) {
+			if (!trouve && seDeplace) {
+				if (c.intersections.contains(Couleur.getLastCouleur())) {Sound.beep();MouvementsBasiques.avancerTravel(5);continue;}
 //				System.out.println("	IF1 Pas trouvé,("+ Couleur.getCouleurLigne() + ") je m'apprête à tourner en sens inverse");
 //				System.out.println("	IF1 revenir");
 //				Button.waitForAnyEvent();
@@ -170,19 +172,21 @@ public class Pilote {
 //				System.out.println("	IF1 Fin redress init");
 //				Button.waitForAnyEvent();
 			}
-			if (Couleur.getCouleurLigne()!=c) {
+			if (Couleur.getCouleurLigne()!=c&&seDeplace) {
+				if (c.intersections.contains(Couleur.getLastCouleur())) {MouvementsBasiques.avancerTravel(5);continue;}
 //				System.out.println("	IF2 Toujours pas la bonne couleur ("+ Couleur.getCouleurLigne() + ") je m'apprête à tourner pour la retrouver");
 //				System.out.println("	IF2 trouvé="+trouve);
 //				Button.waitForAnyEvent();
 				tournerToCouleur(c, gauche_bouge, trouve? -40 : max_angle/2, temps);
 //				System.out.println("	IF2 Fin de tounage, couleur actuelle:"+Couleur.getCouleurLigne());
-				if (Couleur.getCouleurLigne() != c)
+				if (Couleur.getCouleurLigne() != c && iterations >4)
 					throw new exceptions.EchecGarageException();
 			}
 //			System.out.println("Trouvée! J'avance pour vérifier que c'est la bonne");
 //			Button.waitForAnyEvent();
-			MouvementsBasiques.avancerTravel(6);
-			System.out.println("J'inverse les moteurs");
+			if (seDeplace)
+				MouvementsBasiques.avancerTravel(6);
+//			System.out.println("J'inverse les moteurs");
 			gauche_bouge = !gauche_bouge;
 			if (iterations%4==3) {
 				max_angle = max_angle/1.5f;
@@ -192,88 +196,30 @@ public class Pilote {
 //			System.out.println(Couleur.getCouleurLigne());
 //			System.out.println("\n\n\n\n");
 //			Button.waitForAnyEvent();
+			iterations++;
 			
 		}
 		MouvementsBasiques.setVitesseRobot(def_speed);
 		MouvementsBasiques.setAccelerationRobot(def_acc);
+		Moteur.MOTEUR_DROIT.setAcceleration(def_acc_moteurs);
+		Moteur.MOTEUR_DROIT.setAcceleration(def_acc_moteurs);
 	}
 	
 	private static boolean tournerToCouleur(CouleurLigne c, boolean gauche_bouge, double angle, int timeOut) { //timeOut = timer qui indique la durée maximale de la rotation d'une roue
 		MouvementsBasiques.tourner(angle, timeOut, gauche_bouge);
-		Vector<CouleurLigne> couleurs = new Vector<>();
 		CouleurLigne t;
 		long debut = System.currentTimeMillis(); //temps reel à l'instant ou cette instruction est executée
-		while((t=Couleur.getCouleurLigne()) != c && System.currentTimeMillis()-debut<timeOut);//On sort du while si le robot s'est redressé sur la bonne couleur ou si le temps est ecoulé.
-			//couleurs.add(t);
-		//Sound.beep();
+		while((t=Couleur.getLastCouleur()) != c && !c.intersections.contains(t) && System.currentTimeMillis()-debut<timeOut);//On sort du while si le robot s'est redressé sur la bonne couleur ou si le temps est ecoulé.
 		
 		long diff = System.currentTimeMillis()-debut;
-		//couleurs.add(t);
 		Moteur.MOTEUR_GAUCHE.setAcceleration(7000);
 		Moteur.MOTEUR_DROIT.setAcceleration(7000);
 		Moteur.MOTEUR_GAUCHE.startSynchronization();
 			Moteur.MOTEUR_DROIT.stop();
 			Moteur.MOTEUR_GAUCHE.stop();
 		Moteur.MOTEUR_GAUCHE.endSynchronization();
-		//Moteur.MOTEUR_DROIT.setAcceleration(def_acc);
-		//Moteur.MOTEUR_GAUCHE.setAcceleration(def_acc);
 		//System.out.println("diff = "+diff+", timeOut= "+timeOut+". Couleurs trouvées en torunant:"+couleurs);
 		return diff<timeOut;//retourne la durée du déplacement de la roue
 		//return couleurs.contains(c);
 	}
 	
-	/*
-	public Deplacement versIntersection(Ligne ligne1, Ligne ligne2) {
-		//TO DO
-	}
-	
-	public Deplacement seRedresserSurLigne() {
-		//TO DO
-	}
-	
-	public Deplacement diagonale(Point arrivee) {
-		//TO DO
-	}
-	*/
-/*
-	Deplacement suivreLigne(ConditionArret condition) {
-		return new DeplacementSuivreLigne(condition);
-	}
-}
-
-
-
-
-class DeplacementSuivreLigne implements Deplacement {
-	boolean status;
-	ConditionArret condition_arret;
-	Thread action = new Thread(new Runnable() {
-		@Override
-		public void run() {
-			MouvementsBasiques.pilot.forward();
-		}
-	});
-	
-	public DeplacementSuivreLigne(ConditionArret c) {
-		condition_arret = c;
-		status = false;
-	}
-	public DeplacementSuivreLigne() {
-		this(new ConditionArret() { 
-				public boolean event() {
-					return false;}}); } 
-		
-	public void lancer() {
-		
-	}
-	public void interrompre() {
-		
-	}
-	public void arreter() {
-		
-	}
-	public boolean getStatus() {
-		return status;
-	}
- */
-}
