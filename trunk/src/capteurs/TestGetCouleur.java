@@ -5,11 +5,25 @@ public class TestGetCouleur {
 
 	public static void main(String[] args) {
 		int button = -1;
+		boolean buffer = false;
+		while(button != Button.ID_ESCAPE) {
+			if (buffer)
+				testGetLastCouleur();
+			else 
+				testGetCouleurLigne();
+			button = Button.waitForAnyPress();
+		}
+
+	}
+	
+	
+	public static void testGetCouleurLigne() {
+		int button = -1;
 		float[] res, res2;
 		CouleurLigne couleur;
 		Couleur.setScanMode(Couleur.RGBMODE);
 		Couleur.startScanAtRate(10);
-		while (button != Button.ID_ESCAPE) {
+		while (button != Button.ID_LEFT && button != Button.ID_RIGHT) {
 			button = Button.waitForAnyPress();
 			if (button == Button.ID_ENTER) {
 				couleur = Couleur.getCouleurLigne();
@@ -26,7 +40,22 @@ public class TestGetCouleur {
 			}
 			Button.waitForAnyEvent();
 		}
-
+	}
+	
+	public static void testGetLastCouleur() {
+		int button = -1;
+		CouleurLigne couleur;
+		Couleur.setScanMode((byte) (Couleur.BUFFERING|Couleur.RGBMODE));
+		Couleur.startScanAtRate(10);
+		while (button != Button.ID_LEFT && button != Button.ID_RIGHT) {
+			button = Button.waitForAnyPress();
+			if (button == Button.ID_ENTER) {
+				couleur = Couleur.getLastCouleur();
+				System.out.println("\n\n"+couleur+"\n\n");
+			}
+			Button.waitForAnyEvent();
+		}
+		
 	}
 
 }
