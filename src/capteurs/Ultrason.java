@@ -1,7 +1,5 @@
 package capteurs;
 
-import lejos.hardware.Button;
-import lejos.hardware.lcd.LCD;
 import lejos.utility.Timer;
 import lejos.utility.TimerListener;
 
@@ -31,7 +29,7 @@ public class Ultrason {
 	//Lancent des scans p�riodiques avec lanceur et modifient status de mani�re ad�quate
 	public static void startScan() {
 		//scan toutes les 50 ms
-		lanceur.setDelay(50);
+		lanceur.setDelay(20);
 		lanceur.start();
 		status = true;
 	}
