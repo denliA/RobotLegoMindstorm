@@ -24,6 +24,7 @@ public class ModeSolo {
 		double acceleration = MouvementsBasiques.getAccelerationRobot()/5;
 		int scoredPalets=0;
 		int lignesParcourues=0;
+		int palets_par_ligne = 1;
 		int trio;
 		boolean tient_palet=false;
 		boolean droite=false;
@@ -52,11 +53,11 @@ public class ModeSolo {
 			else if(couleur==CouleurLigne.JAUNE)
 				droite=true; //je bifurque tjrs vers la ligne de droite
 		}
-		while((scoredPalets<nbPalets)||(lignesParcourues<3)) {
+		while((scoredPalets<nbPalets)&&(lignesParcourues<3)) {
 			System.out.println("Début de "+couleur);
 			trio=0;
 			rien_trouve = 0;
-			while(trio<3 && rien_trouve<2) { //pour rammasser les 3 palets sur une ligne de couleur
+			while(trio<palets_par_ligne && rien_trouve<2) { //pour rammasser les 3 palets sur une ligne de couleur
 				System.out.println("Itération "+trio+" de "+couleur);
 				if (Toucher.getStatus()==false)
 					Toucher.startScan();
@@ -80,7 +81,7 @@ public class ModeSolo {
 					scoredPalets++;
 					trio++;
 					tient_palet = false;
-					if(trio<3) {
+					if(trio<palets_par_ligne) {
 						MouvementsBasiques.avancerTravel(vitesse,acceleration,-8); //robot recule
 
 					}else {
@@ -96,7 +97,7 @@ public class ModeSolo {
 						rien_trouve++;	
 				}
 				MouvementsBasiques.tourner(180); //demi-tour
-				if (trio<3) Pilote.seRedresserSurLigne(couleur, true, 45, 750);
+				if (trio<palets_par_ligne) Pilote.seRedresserSurLigne(couleur, true, 45, 750);
 			}
 			if (gauche) {
 				MouvementsBasiques.tourner(90); //tourne à gauche de 90 degres
@@ -108,8 +109,8 @@ public class ModeSolo {
 					couleur = CouleurLigne.NOIRE;
 				}
 				else if (lignesParcourues==2) {
-					Pilote.seRedresserSurLigne(CouleurLigne.ROUGE,true,90,1500);
-					couleur = CouleurLigne.ROUGE;
+					couleur = rougeAgauche? CouleurLigne.ROUGE : CouleurLigne.JAUNE;
+					Pilote.seRedresserSurLigne(couleur,true,90,1500);
 				}
 			}
 			if (droite) {
@@ -121,8 +122,8 @@ public class ModeSolo {
 					couleur = CouleurLigne.NOIRE;
 				}
 				else if (lignesParcourues==2) {
-					Pilote.seRedresserSurLigne(CouleurLigne.JAUNE,true,90,1500);
-					couleur = CouleurLigne.JAUNE;
+					couleur = rougeAgauche? CouleurLigne.JAUNE: CouleurLigne.ROUGE;
+					Pilote.seRedresserSurLigne(couleur,true,90,1500);
 				}		
 			}
 			if (milieu) {
@@ -130,12 +131,14 @@ public class ModeSolo {
 					MouvementsBasiques.tourner(90); //tourne à gauche de 90 degres
 					MouvementsBasiques.avancerTravel(vitesse,acceleration,50); //avance de 50 cm;
 					MouvementsBasiques.tourner(-90); //tourne à droite de 90 degres
-					Pilote.seRedresserSurLigne(CouleurLigne.ROUGE,true,90,1500);
+					couleur = rougeAgauche? CouleurLigne.ROUGE : CouleurLigne.JAUNE;
+					Pilote.seRedresserSurLigne(couleur,true,90,1500);
 				}else if(lignesParcourues==2) {
 					MouvementsBasiques.tourner(-90); //tourne à droite de 90 degres
 					MouvementsBasiques.avancerTravel(vitesse,acceleration,100); //avance de 100 cm;
 					MouvementsBasiques.tourner(90); //tourne à gauche de 90 degres
-					Pilote.seRedresserSurLigne(CouleurLigne.JAUNE,true,90,1500);
+					couleur = rougeAgauche? CouleurLigne.JAUNE : CouleurLigne.ROUGE;
+					Pilote.seRedresserSurLigne(couleur,true,90,1500);
 				}
 			}
 		}	
