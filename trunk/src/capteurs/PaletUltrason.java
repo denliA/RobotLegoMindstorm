@@ -14,11 +14,12 @@ public class PaletUltrason {
 		Ultrason.setDistance();
 		float d = Ultrason.getDistance();
 		
-		if(d<infini) {
+		if(d<infini&&!Toucher.getTouche()) {//on voit le palet sans le toucher
 			moteurs.MouvementsBasiques.avancer();
 		}
 		else {
 			if(Toucher.getTouche()) {
+				moteurs.MouvementsBasiques.arreter();
 				moteurs.Pince.fermer();
 			}
 			else {
