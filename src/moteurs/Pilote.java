@@ -222,4 +222,5 @@ public class Pilote {
 		return diff<timeOut;//retourne la durée du déplacement de la roue
 		//return couleurs.contains(c);
 	}
+}
 	
