@@ -18,7 +18,7 @@ public class Rectangle {
 		return(haut_droite);
 	}
 	
-	private boolean intersect(Rectangle A) {
+	boolean intersect(Rectangle A) {
 		boolean inter = false;
 		if(A.bas_gauche.getX()<=this.haut_droite.getX() && this.bas_gauche.getX()<=A.haut_droite.getX()) {
 			if(A.bas_gauche.getY()<=this.haut_droite.getY() && this.bas_gauche.getY()<=A.haut_droite.getY()) {inter = true;}
@@ -64,7 +64,7 @@ public class Rectangle {
 		return(supd);
 	}
 	
-	public Rectangle intersection(Rectangle A, Rectangle B) {
+	public Rectangle intersection(Rectangle A) {
 		Rectangle inter = null;
 		if(this.intersect(A)) {
 			inter = new Rectangle(this.INFG(A), this.SUPD(A));
@@ -72,5 +72,11 @@ public class Rectangle {
 		return(inter);
 	}
 	
+	void setPosition(float x, float y) {
+		this.bas_gauche.setX(x-((this.haut_droite.getX()-this.bas_gauche.getX())/2));
+		this.bas_gauche.setY(y-((this.haut_droite.getY()-this.bas_gauche.getY())/2));
+		this.haut_droite.setX(x+((this.haut_droite.getX()-this.bas_gauche.getX())/2));
+		this.haut_droite.setY(y+((this.haut_droite.getY()-this.bas_gauche.getY())/2));
+	}
 	
 }
