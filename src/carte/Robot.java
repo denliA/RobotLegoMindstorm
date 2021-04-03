@@ -35,6 +35,9 @@ public class Robot extends Rectangle {
 		this.position.setY(y);
 		this.getBasGauche().setX(x-8f);
 		this.getBasGauche().setY(y-14.5f);
+		this.roueGauche.setPosition(x-8f, y-7.5f);
+		this.roueDroite.setPosition(x+8f, y-7.5f);
+		this.capteurCouleur.setCentre(x, y+10.5f);
 		this.getHautDroite().setX(x+8);
 		this.getHautDroite().setY(y+14.5f);
 	}
