@@ -32,17 +32,19 @@ public class TestUltrason {
 		}
 		LCD.clear();
 		//on va attraper un palet, pinces ouvertes
-		moteurs.Pince.ouvrir();
-		
+		//moteurs.Pince.ouvrir();
+
 		Ultrason.setDistance();
 		d = Ultrason.getDistance();
+		
+		float infini = Float.POSITIVE_INFINITY;
 		//tant qu'on capte le palet et qu'on ne le touche pas, on avance
 		moteurs.MouvementsBasiques.avancer();
-		while(d>0&&!Toucher.getTouche()) {
+		while(d<infini&&d>0&&!Toucher.getTouche()) {
 			LCD.drawString("avance", 0, 0);
 		}
 		
-		if(d<0||Toucher.getTouche()) {
+		if(Toucher.getTouche()) {
 			moteurs.MouvementsBasiques.arreter();
 			moteurs.Pince.fermer();
 		}
