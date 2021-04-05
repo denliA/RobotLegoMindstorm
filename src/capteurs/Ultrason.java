@@ -19,7 +19,7 @@ public class Ultrason {
 				public void timedOut() {
 					//appel aux deux fonctions lan�ant les scans n�cessaire � la classe
 					setDistance();
-					setBruitDetecte();
+					//setBruitDetecte(); Est très lent, on en a pas besoin pour le moment 
 				}
 			}
 		);
@@ -28,8 +28,8 @@ public class Ultrason {
 		
 	//Lancent des scans p�riodiques avec lanceur et modifient status de mani�re ad�quate
 	public static void startScan() {
-		//scan toutes les 50 ms
-		lanceur.setDelay(20);
+		//scan toutes les 20 ms
+		lanceur.setDelay(0);
 		lanceur.start();
 		status = true;
 	}
@@ -46,7 +46,7 @@ public class Ultrason {
 	//Gestion de la distance mesur�e par le capteur
 	public static void setDistance() {
 		//cr�ation du tableau qui stockera les valeurs renvoy�es par le sampler
-		float[] tabDistance = new float[Capteur.ULTRASON.sampleSize()];
+		float[] tabDistance = new float[1];
 		//remplissage du tableau
 		Capteur.ULTRASON.fetchSample(tabDistance, 0);
 		distance = tabDistance[0];
@@ -61,7 +61,7 @@ public class Ultrason {
 		bruitDetecte=false;
 		
 		//le sampler contient normalement un seul �l�ment : 1 si il y a un autre robot, 0 sinon
-		float[] autreRobot = new float[Capteur.ECOUTE.sampleSize()];
+		float[] autreRobot = new float[1];
 		Capteur.ECOUTE.fetchSample(autreRobot, 0);
 		
 		if(autreRobot[0]==1) {bruitDetecte=true;}
