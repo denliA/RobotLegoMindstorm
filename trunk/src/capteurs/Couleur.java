@@ -1,6 +1,5 @@
 package capteurs;
 
-import lejos.hardware.Sound;
 import lejos.utility.Delay;
 import lejos.utility.Timer;
 import lejos.utility.TimerListener;
@@ -22,6 +21,11 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class Couleur {
 	
+	public Couleur() {
+		update();
+		buffer.save(CouleurLigne.INCONNU);
+	}
+	
 	//Attributs de la classe Couleur
 	private static float rouge;
 	private static float vert;
@@ -29,9 +33,7 @@ public class Couleur {
 	private static float lumiere;
 	private static float IDCouleur;
 	private static float intensiteRouge;
-	private static CouleurLigne[] buffer = new CouleurLigne[15];
-	static { for (int i=0; i<15; i++) buffer[i] = CouleurLigne.INCONNU; }
-	private static int bufferIndex = 0;
+	static BufferCouleurs buffer = new BufferCouleurs(50);
 	
 	
 	// Constantes pour le modeFlag
@@ -54,6 +56,103 @@ public class Couleur {
 	 */
 	private static byte modeFlag = (byte) RGBMODE|BUFFERING;
 	
+	
+	
+	static class BufferContexte {
+		CouleurLigne couleur_x;
+		long temps_x;
+		float rouge_x, vert_x, bleu_x, rg_x, bg_x, br_x;
+		CouleurLigne intersection_x=null;
+		
+		public BufferContexte(CouleurLigne couleur_x, long temps_x, float rouge_x, float vert_x, float bleu_x,
+				float rg_x, float bg_x, float br_x) {
+			this.couleur_x = couleur_x;
+			this.temps_x = temps_x;
+			this.rouge_x = rouge_x;
+			this.vert_x = vert_x;
+			this.bleu_x = bleu_x;
+			this.rg_x = rg_x;
+			this.bg_x = bg_x;
+			this.br_x = br_x;
+		}
+		
+		
+		public BufferContexte(CouleurLigne couleur_x, long temps_x, float rouge_x, float vert_x, float bleu_x,
+				float rg_x, float bg_x, float br_x, CouleurLigne intersection_x) {
+			this(couleur_x, temps_x, rouge_x, vert_x, bleu_x, rg_x, bg_x, br_x);
+			this.intersection_x = intersection_x;
+			
+		}
+		
+		public BufferContexte() {}
+		
+		public String toString() {
+			return "Couleur: "+couleur_x+". "+"temps:"+temps_x+"RGB:"+rouge+"/"+vert+"/"+bleu+". R/G/B:"+"";
+		}
+		
+	}
+	static class BufferCouleurs {
+		
+		final static int COULEUR = 0;
+		final static int TEMPS = 1;
+		final static int ROUGE = 2;
+		final static int VERT = 3;
+		final static int BLEU = 4;
+		final static int R_G = 5;
+		final static int B_G = 6;
+		final static int B_R = 7;
+		
+		private BufferContexte[] buffer;
+		private int index;
+		public int taille;
+		
+		public BufferCouleurs(int taille) {
+			index = -1;
+			this.taille = taille;
+			buffer = new BufferContexte[taille];
+			for (int i = 0; i<taille; i++)
+				buffer[i] = new BufferContexte();
+		}
+
+		
+		public void save(CouleurLigne c) {
+			synchronized(buffer_lock) {
+				BufferContexte x  = buffer[index=((index+1)%taille)];
+				x.couleur_x = c;
+				x.temps_x = System.currentTimeMillis();
+				x.rouge_x = Couleur.rouge; x.vert_x = Couleur.vert; x.bleu_x=Couleur.bleu;
+				x.rg_x = Couleur.rouge/Couleur.vert; x.bg_x = Couleur.bleu/Couleur.vert; x.br_x = Couleur.bleu/Couleur.rouge;
+			}
+		}
+		
+		public void save(CouleurLigne couleur, CouleurLigne intersection) {
+			save(couleur);
+			buffer[index].intersection_x = intersection;
+		}
+
+		
+		public BufferContexte getLast() {
+			return buffer[index];
+		}
+		
+		public BufferContexte[] historique(int nombre) {
+			BufferContexte[] hist = new BufferContexte[nombre];
+			int n = 0;
+			synchronized(buffer_lock) {
+				for (int i=index; i>=0&&n<nombre; i--, n++) {
+					hist[n] = buffer[i];
+				}
+				for (int i=taille-1; i>index&&n<nombre; i--, n++) {
+					hist[n] = buffer[i];
+				}
+			}
+			return hist;
+		}
+
+
+
+		}
+	
 	// Assure la synchronisation des opérations : si une mesure est en train d'être faite, on ne veut pas accéder aux vairables modifées par celle-ci  entre temps.
 	private final static Object lock = new Object();
 	private final static Object buffer_lock = new Object();
@@ -65,9 +164,15 @@ public class Couleur {
 			update();
 			if ((modeFlag&BUFFERING)!=0) {
 				CouleurLigne c = getCouleurLigne();
-				synchronized(buffer_lock) {
-					buffer[bufferIndex=((bufferIndex+1)%buffer.length)] = c;
+				if (c==CouleurLigne.INCONNU) {
+					CouleurLigne[] cs = getCouleurMoitie();
+					if (cs==null)
+						buffer.save(CouleurLigne.INCONNU);
+					else
+						buffer.save(cs[0], cs[1]);
 				}
+				else
+					buffer.save(c);
 			}
 		}
 	});
@@ -151,7 +256,7 @@ public class Couleur {
 	 * 
 	 * @return la couleur trouvée par l'algorithme, ou CouleurLigne.INCONNUE sinon.
 	 */
-	public static CouleurLigne getCouleurLigne() {
+	private static CouleurLigne getCouleurLigne() {
 		float[] RGB, ratios;
 		setScanMode((byte) (getScanMode() | RGBMODE)); // On s'assure que l'on scanne les valeurs RGB 
 		Delay.msDelay(10);
@@ -196,57 +301,43 @@ public class Couleur {
 			// On retourne la couleur trouvée, ou CouleurLigne.INCONNU si il n'y a aucun candidat.
 			if (cand !=null)
 				return cand;
-			
-			candidats.clear();
-			for(CouleurLigne c : CouleurLigne.values()) {
-				for(CouleurLigne intersect : c.intersections) {
-					Float val = candidats.get(intersect);
-					if (intersect.IRGB!=null) {
-						if (intersect.IRGB.contains(RGB))
-							candidats.put(intersect, (val == null ? (val=intersect.pos_confiance_IRGB) : (val=val+intersect.pos_confiance_IRGB)));
-						else 
-							candidats.put(intersect, (val==null)? (val=intersect.neg_confiance_IRGB) : (val=val+intersect.neg_confiance_IRGB));
-					}
-					if (intersect.IRatios!=null) {
-						if (intersect.IRatios.contains(ratios))
-							candidats.put(intersect, (val == null ? (val=intersect.pos_confiance_IRatios) : (val=val+intersect.pos_confiance_IRatios)));
-						else 
-							candidats.put(intersect, (val==null)? (val=intersect.neg_confiance_IRatios) : (val=val+intersect.neg_confiance_IRatios));
-					}
-				}
+			return CouleurLigne.INCONNU;
+		
+	}
+	
+	private static CouleurLigne[] getCouleurMoitie() {
+		BufferContexte contexte = buffer.getLast();
+		float[] RGB = getRGB(), ratios = getRatios();
+		if (contexte.intersection_x != null && contexte.couleur_x.estEntreDeux(contexte.intersection_x, RGB, ratios)) {
+			return new CouleurLigne[] {contexte.couleur_x, contexte.intersection_x};
+		}
+		if (contexte.couleur_x!=CouleurLigne.INCONNU) {
+			if (contexte.couleur_x.estEntreDeux(CouleurLigne.GRIS, RGB, ratios))
+				return new CouleurLigne[] {contexte.couleur_x, CouleurLigne.GRIS};
+			for (CouleurLigne intersection : contexte.couleur_x.intersections.keySet()) {
+				if(contexte.couleur_x.estEntreDeux(CouleurLigne.GRIS, RGB, ratios))
+					return new CouleurLigne[] {contexte.couleur_x, intersection };
 			}
-			cand=null;
-			max = 0;
-			for (CouleurLigne c : CouleurLigne.values()) {
-				if (candidats.get(c)!= null &&  candidats.get(c)>max) {
-					cand = c;
-					max = candidats.get(c);
-				}
+		}
+		for (CouleurLigne c: CouleurLigne.principales) {
+			if (c==CouleurLigne.GRIS) continue;
+			for(CouleurLigne cc : CouleurLigne.principales) {
+				if (cc==c) continue;
+				if (c.estEntreDeux(cc, RGB, ratios))
+					return new CouleurLigne[] {c, cc};
 			}
-			return cand==null?  CouleurLigne.INCONNU : cand;
+		}
+		return null;
 		
 	}
 	
 	
 	public static CouleurLigne getLastCouleur() {
 		synchronized(buffer_lock) {
-			return buffer[bufferIndex];
+			return buffer.getLast().couleur_x;
 		}
 	}
-	
-	public static CouleurLigne[] historiqueCouleurs(int nb) {
-		CouleurLigne[] hist = new CouleurLigne[nb];
-		int n = 0;
-		synchronized(buffer) {
-			for (int i=bufferIndex; i>=0&&n<nb; i--, n++) {
-				hist[n] = buffer[i];
-			}
-			for (int i=14; i>bufferIndex&&n<nb; i--, n++) {
-				hist[n] = buffer[i];
-			}
-		}
-		return hist;
-	}
+
 	
 	
 	private static void update() {
@@ -266,8 +357,8 @@ public class Couleur {
 			Capteur.LUMIERE_AMBIANTE.fetchSample(ambiantLight, 0);
 			synchronized(lock) { lumiere = ambiantLight[0]; }
 		}
-		Delay.msDelay(delai);
 		if((modeFlag & RGBMODE) != 0) {
+			Delay.msDelay(delai);
 			float[] couleurRGB = new float[Capteur.RGB.sampleSize()];
 			Capteur.RGB.fetchSample(couleurRGB, 0);
 			synchronized(lock) {
@@ -276,20 +367,33 @@ public class Couleur {
 				bleu = 255*couleurRGB[2];
 			}
 		}
-		Delay.msDelay(delai);
 		if((modeFlag & IDMODE)!=0) {
+			Delay.msDelay(delai);
 			float[] couleur_id = new float[Capteur.ID_COULEUR.sampleSize()];
 			Capteur.ID_COULEUR.fetchSample(couleur_id, 0);
 			synchronized(lock) {
 				IDCouleur = couleur_id[0];
 			}
 		}
-		Delay.msDelay(delai);
 		if((modeFlag & REDMODE)!=0) {
+			Delay.msDelay(delai);
 			float[] rouge = new float[1];
 			Capteur.ROUGE.fetchSample(rouge, 0);
 			synchronized(lock) {intensiteRouge = rouge[0];}
 		}
 	}
+	
+	public static boolean estSurLigne(CouleurLigne c, char strict) {
+		BufferContexte cont = buffer.getLast();
+		if(strict == 'i')
+			return cont.couleur_x==c || cont.intersection_x==c;
+		if(strict == 'm')
+			return cont.couleur_x==c && (cont.intersection_x==null || cont.intersection_x==CouleurLigne.GRIS);
+		else
+			return cont.couleur_x==c&&cont.intersection_x==null;
+	}
+	
 }
+
+
 
