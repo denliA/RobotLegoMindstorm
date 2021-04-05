@@ -9,6 +9,7 @@ import lejos.utility.Delay;
 
 public class TestPilote {
 	public static void main(String args[]) throws Exception {
+		MouvementsBasiques.tourner(360);
 		try{
 			new capteurs.Capteur();
 			}catch(IllegalArgumentException e){
