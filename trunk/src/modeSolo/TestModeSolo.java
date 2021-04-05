@@ -2,15 +2,19 @@ package modeSolo;
 
 import capteurs.*;
 import exceptions.OuvertureException;
+import lejos.utility.Delay;
+import moteurs.Pilote;
 
 public class TestModeSolo {
 
 	public static void main(String[] args){
-		Couleur.startScanAtRate(0);
 		Toucher.startScan();
 		Ultrason.startScan();
+		new Couleur();
+		Couleur.startScanAtRate(0);
+		///Pilote.startVideAtRate(10);
 		try{  
-			ModeSolo.ramasserPalet(6,true); //attention le robot demarre coté armoire (ligneRouge à gauche)
+			ModeSolo.ramasserPalet(9,false); //attention le robot demarre coté armoire (ligneRouge à gauche)
 		}catch(InterruptedException e) {
 			System.out.println("Prob pour tourner le robot");
 		}catch(exceptions.EchecGarageException e){
@@ -19,5 +23,8 @@ public class TestModeSolo {
 			System.out.println("Prob pour ouvrir pince");
 			e.printStackTrace();
 		}
+		Toucher.stopScan();
+		Ultrason.stopScan();
+		Couleur.stopScan();
 	}
 }

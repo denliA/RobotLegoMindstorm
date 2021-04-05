@@ -393,6 +393,15 @@ public class Couleur {
 			return cont.couleur_x==c&&cont.intersection_x==null;
 	}
 	
+	public static boolean aRecemmentVu(CouleurLigne c, int n) {
+		BufferContexte[] historique = buffer.historique(n);
+		for (int i=0; i<n; i++) {
+			if (historique[i].couleur_x==c)
+				return true;
+		}
+		return false;
+	}
+	
 }
 
 

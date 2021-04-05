@@ -24,7 +24,7 @@ public class ModeSolo {
 		double acceleration = MouvementsBasiques.getAccelerationRobot()/5;
 		int scoredPalets=0;
 		int lignesParcourues=0;
-		int palets_par_ligne = 1;
+		int palets_par_ligne = 3;
 		int trio;
 		boolean tient_palet=false;
 		boolean droite=false;
@@ -75,11 +75,13 @@ public class ModeSolo {
 					System.out.println("Touché palet, on le prend");
 					tient_palet=true;
 					Pince.fermer();
+					MouvementsBasiques.tourner(180); //demi-tour
 				}else if (tient_palet){ //si le robot a atteint sa ligne blanche d'en but et qu'il a ramassé un palet
 					System.out.println("tient palet et sur blanche, se retorune");
-					Pince.ouvrir();
-					scoredPalets++;
 					trio++;
+					scoredPalets++;
+					MouvementsBasiques.avancerTravel((3-trio)*10);
+					Pince.ouvrir();
 					tient_palet = false;
 					if(trio<palets_par_ligne) {
 						MouvementsBasiques.avancerTravel(vitesse,acceleration,-8); //robot recule
@@ -88,6 +90,8 @@ public class ModeSolo {
 						MouvementsBasiques.avancerTravel(vitesse,acceleration,-8);
 						lignesParcourues++;
 					}
+					MouvementsBasiques.tourner(180); //demi-tour
+					MouvementsBasiques.avancerTravel((3-trio)*10);
 				}else { //si le robot a atteint la ligne blanche de l'adversaire sans ramasser de palets
 					if (rien_trouve==1) {
 						lignesParcourues++;
@@ -95,10 +99,12 @@ public class ModeSolo {
 					}
 					else
 						rien_trouve++;	
+					MouvementsBasiques.tourner(180); //demi-tour
 				}
-				MouvementsBasiques.tourner(180); //demi-tour
-				if (trio<palets_par_ligne) Pilote.seRedresserSurLigne(couleur, true, 45, 750);
+				if (trio<palets_par_ligne) Pilote.seRedresserSurLigne(couleur, Couleur.aRecemmentVu(couleur, 10), 30, 400);
 			}
+			if (lignesParcourues>=3)
+				break;
 			if (gauche) {
 				MouvementsBasiques.tourner(90); //tourne à gauche de 90 degres
 				MouvementsBasiques.avancerTravel(vitesse,acceleration,50); //avance de 50 cm;
