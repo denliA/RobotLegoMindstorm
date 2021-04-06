@@ -48,14 +48,16 @@ public class TestGetCouleur {
 	public static void testGetLastCouleur() {
 		int button = -1;
 		CouleurLigne couleur;
+		Couleur.BufferContexte contexte;
 		Couleur.setScanMode((byte) (Couleur.BUFFERING|Couleur.RGBMODE));
 		Couleur.startScanAtRate(10);
 		while (button != Button.ID_LEFT && button != Button.ID_RIGHT) {
 			button = Button.waitForAnyPress();
 			if (button == Button.ID_ENTER) {
 				couleur = Couleur.getLastCouleur();
-				System.out.println("\n\\nn"+couleur);
-				System.out.println(Arrays.asList(Couleur.buffer.historique(10)));
+				contexte = Couleur.buffer.getLast();
+				System.out.println("Couleurs touchées: " + contexte.couleur_x + (contexte.intersection_x == null ? "" : contexte.intersection_x) + "\n");
+				//System.out.println(Arrays.asList(Couleur.buffer.historique(10)));
 			}
 			Button.waitForAnyEvent();
 		}
