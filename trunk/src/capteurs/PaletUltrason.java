@@ -1,7 +1,7 @@
 package capteurs;
 
 import exceptions.OuvertureException;
-//import lejos.utility.Delay;
+import lejos.utility.Delay;
 import moteurs.Pince;
 import moteurs.MouvementsBasiques;
 import lejos.hardware.Button;
@@ -14,7 +14,7 @@ public class PaletUltrason {
 		//Ultrason.startScan();
 		Toucher.startScan();
 		//initialiser l'infini
-		//float infini = Float.POSITIVE_INFINITY;
+		float infini = Float.POSITIVE_INFINITY;
 		//initialiser d
 		Ultrason.setDistance();
 		float d = Ultrason.getDistance();
@@ -47,9 +47,12 @@ public class PaletUltrason {
 			System.out.println("dDepart vaut : "+dDepart);
 			
 			//on a repere le palet, on va affiner la direction du robot
+			//on se met au milieu de notre fenetre de captage de palet
+			MouvementsBasiques.tourner(5);
 			
 			//But : trouver l'angle pour lequel la distance est la plus courte, puis avancer de cette distance
-			float[] distances = new float[9];
+			
+			float[] distances = new float[10];
 			
 			//Mesure de la premiere valeur du tableau
 			MouvementsBasiques.tourner(-8);
@@ -58,22 +61,28 @@ public class PaletUltrason {
 			//les valeurs suivantes mesurees tous les deux degres
 			//recherche du min simultanee
 			int indiceMin = 0;
-			for(int i =1;i<9;i++) {
+			for(int i =1;i<10;i++) {
 				MouvementsBasiques.tourner(2);
 				Ultrason.setDistance();
 				float distance = Ultrason.getDistance();
 				distances[i]=distance;
-				if(distance<distances[indiceMin]) {
+				System.out.println("indice "+i+" Distance "+distance);
+				if(distance<=distances[indiceMin]) {
 					indiceMin=i;
 				}
+			}
+			if(distances[indiceMin]==infini) {
+				break;
 			}
 			//on se dirige avec l'angle correspondant à minIndice
 			MouvementsBasiques.tourner(-2*(8-indiceMin));
 			//on avance de la distance
-			MouvementsBasiques.avancerTravel(distances[indiceMin]);
-
+			System.out.println(indiceMin+"\n"+distances[indiceMin]);
+			//*100 parce que le capteur mesure en m et que la fonction prend en cm
+			MouvementsBasiques.avancerTravel(distances[indiceMin]*100);
+			
 			Pince.fermer();
-				
+			
 		}
 		
 		
