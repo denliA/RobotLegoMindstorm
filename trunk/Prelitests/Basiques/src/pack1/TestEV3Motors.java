@@ -11,7 +11,7 @@ import lejos.hardware.Button;
 import lejos.hardware.lcd.LCD;
 
 public class TestEV3Motors {
-	static EV3LargeRegulatedMotor moteur_gauche = new EV3LargeRegulatedMotor(MotorPort.B);
+  	static EV3LargeRegulatedMotor moteur_gauche = new EV3LargeRegulatedMotor(MotorPort.B);
 	static EV3LargeRegulatedMotor moteur_droite = new EV3LargeRegulatedMotor(MotorPort.A);
 	static EV3MediumRegulatedMotor moteur_pince = new EV3MediumRegulatedMotor(MotorPort.C);
 	final static double DIST_ROUES_INCH = 12.280002254568; // Pour le DifferentialPilot, mesure approximative 
@@ -180,7 +180,7 @@ public class TestEV3Motors {
 //					moteur_droite.setSpeed(0);
 //					moteur_gauche.endSynchronization();
 //					
-				pilot.forward(60);
+				pilot.travel(60);
 				}
 				else {
 					moteur_gauche.startSynchronization();

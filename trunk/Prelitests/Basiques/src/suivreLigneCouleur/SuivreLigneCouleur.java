@@ -34,7 +34,7 @@ public class SuivreLigneCouleur {
     final static float targetLigneRougeR = 1.45f;
     //26f pour entre deux rouge inteval// a mesurer le rgb sur bord ligne
 	final static float KP = 1f; //if small, robot smooth turns
-	final static float KI = 1f;
+	final static float KI = 0.5f;
 	final static float KD = 1f;
 	static float DEFAULT_SPEED = Droit.D.getSpeed();
 	static float MAX_SPEED = Droit.D.getMaxSpeed();
@@ -133,7 +133,7 @@ public class SuivreLigneCouleur {
         }
 	}
 	
-	public static void Ligne_PID() {
+	public static void Ligne_PID(float target, float DEFAULT_SPEED) {
 		float error = 0f;
 		float previousError = 0f;
 		float integral = 0f;
@@ -141,7 +141,7 @@ public class SuivreLigneCouleur {
 		float correction = 0f;
 		do {
 			RGB.fetchSample(value, 0); //input de la couleur mesurée
-			error = (targetLigneRougeR - (value[0]/value[1]));
+			error = (target - (value[0]/value[1]));
 			if (Math.abs(error)>ERROR_MARGIN) { //on ne fait rien si l'erreur est negligeable
 				integral += error;
 				derivative = error - previousError;
@@ -155,14 +155,6 @@ public class SuivreLigneCouleur {
 				// tourner robot
 				Droit.G.setSpeed(DEFAULT_SPEED+correction);
 				Droit.D.setSpeed(DEFAULT_SPEED-correction);
-//				if (error<0) { // robot sur ligne rouge
-//					Droit.G.setSpeed(DEFAULT_SPEED+correction);
-//					Droit.D.setSpeed(DEFAULT_SPEED-correction);
-//				}
-//				else if (error>0) { // robot sur zone grise
-//					Droit.D.setSpeed(DEFAULT_SPEED+correction);
-//					Droit.G.setSpeed(DEFAULT_SPEED-correction);
-//				}
 			}
 		}while(Math.abs(error)>ERROR_MARGIN); // sortie de boucle quand robot s'est redressé sur l'entre ligne rouge-grise
 		//robot avance tout droit 

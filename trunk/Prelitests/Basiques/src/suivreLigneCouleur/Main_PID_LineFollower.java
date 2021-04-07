@@ -7,6 +7,8 @@ import java.util.concurrent.TimeUnit;
 
 import deplacer.Droit;
 import lejos.hardware.Button;
+import lejos.utility.Delay;
+import moteurs.Moteur;
 import palet.DetecterPalet;
 
 public class Main_PID_LineFollower {
@@ -20,11 +22,15 @@ public class Main_PID_LineFollower {
 	public static void main(String[] args) {
 		
 		ScheduledExecutorService service = Executors.newScheduledThreadPool(3);
+		Droit.pilot.setLinearSpeed(20);
+		Droit.pilot.travel(0.1);
 		Future<?> suivre_couleur = service.scheduleWithFixedDelay(new TaskA(),0,1,TimeUnit.MILLISECONDS);
-		Future<?> ligne_blanche = service.scheduleWithFixedDelay(new TaskB(),0,100,TimeUnit.MILLISECONDS);
+		//Future<?> ligne_blanche = service.scheduleWithFixedDelay(new TaskB(),0,100,TimeUnit.MILLISECONDS);
 		//Future<?> palet = service.scheduleWithFixedDelay(new TaskC(),0,100,TimeUnit.MILLISECONDS);
 		
-		Droit.droitMoteur(acceleration, Droit.DEFAULT_SPEED);
+		//Droit.droitMoteur(acceleration, Droit.DEFAULT_SPEED*4);
+		Droit.pilot.forward();
+		Delay.msDelay(10000000);
 		while(!gotToWhite);
 		SuivreLigneCouleur.stopMesure(); // ferme port du capteur couleur
 		Droit.fermerMoteur(); // ferme port du moteur 
@@ -44,7 +50,8 @@ public class Main_PID_LineFollower {
 class TaskA implements Runnable{
 	
 	public void run() {
-		SuivreLigneCouleur.Ligne_PID();
+		//SuivreLigneCouleur.Ligne_PID(0.545f, Droit.D.getSpeed());
+		SuivreLigneCouleur.Ligne_PID(0.35f, Droit.D.getSpeed());
 	}
 }
 
