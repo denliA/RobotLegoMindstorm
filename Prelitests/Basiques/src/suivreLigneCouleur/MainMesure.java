@@ -13,7 +13,7 @@ public class MainMesure {
 		Date date = new Date() ;
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss") ;
 		SimpleDateFormat dateFormat2 = new SimpleDateFormat("yyyymmdd");
-		SuivreLigneCouleur.creerFichier("./Scans/20210320/LigneGrougeGGRDPF_"+dateFormat.format(date));
+		SuivreLigneCouleur.creerFichier("./Scans/20210403/LigneGriseGBleueD_"+dateFormat.format(date));
 		SuivreLigneCouleur.metadataFichier(vitesse, accel, delai, 56);
 		Droit.droitMoteur(accel, vitesse);
 		Timer timer = new Timer(delai, new task_write());

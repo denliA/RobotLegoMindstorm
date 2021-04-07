@@ -16,9 +16,9 @@ public class Droit {
 	final static double DIST_ROUES_INCH2 = 12.280002254568; // Pour le DifferentialPilot, mesure approximative 
     final static double DIAM_ROUE_INCH2 = 5.6;
 	static double trackWidth = DIST_ROUES_INCH2;
-	static double leftWheelDiameter = DIAM_ROUE_INCH2;
+	static double leftWheelDiameter = DIAM_ROUE_INCH2*1.0045;
 	static double rightWheelDiameter = DIAM_ROUE_INCH2;
-	static MovePilot pilot = new MovePilot (new WheeledChassis(
+	public static MovePilot pilot = new MovePilot (new WheeledChassis(
 			new WheeledChassis.Modeler[] { 
 				WheeledChassis.modelWheel(G, leftWheelDiameter).offset(trackWidth / 2).invert(false),
 				WheeledChassis.modelWheel(D, rightWheelDiameter).offset(-trackWidth / 2).invert(false) }, 
