@@ -31,43 +31,39 @@ public class Menu implements Lancable{
 		LCD.clear();
 		int button = -1;
 		int choix = 1;
-		char[][] buffer = new char[8][18];
+		char[][] buffer = new char[6][]; //represente la taille de la zone ou seront affiches les lancables
 		int i,j,k,l;
-		int fleche=0;
 		int debutColonne=0;
 		int debutLigne=0;
 		while(button != Button.ID_ESCAPE) {
 			LCD.clear(1,2, 100);
-			LCD.drawString("->", 1, choix+fleche+1);
+			LCD.drawString("->", 1, ((choix%6)==0?6:choix%6)+1);
 			LCD.drawString(titre, 3, 0);
 			for (i=debutLigne,l=0;i<tab.length-2;i++,l++) { //i=nombre de lignes
-				for (j=debutColonne, k=0;j<buffer[i].length;j++,k++) {
-					buffer[i]=tab[i].getTitre().toCharArray();
+				buffer[i]=tab[i].getTitre().toCharArray(); //taille variable du titre
+				for (j=debutColonne, k=0;j<buffer[i].length;j++,k++)
 					LCD.drawChar(buffer[i][j], 3+k, l+2);
-				}
 			}
 			button = Button.waitForAnyPress();
 			if (button == Button.ID_DOWN) {
-				if (tab.length>6&&choix>=6) {
+				choix = (choix%tab.length)+1;
+				if (tab.length>6&&choix>6) {
 					debutLigne = (debutLigne == tab.length-3)?0:++debutLigne;
 				}
-				choix = (choix%tab.length)+1;
-				fleche = (fleche == tab.length-3)?0:++fleche;
 				//lejos.hardware.Sound.beep();
 			}
 			else if (button == Button.ID_UP) {
-				if (tab.length>6&&choix>=6) {
+				choix = (choix == 1) ? tab.length :(choix-1);
+				if (tab.length>6&&choix>6) {
 					debutLigne = (debutLigne == 0)?tab.length-3:--debutLigne;
 				}
-				choix = (choix == 1) ? tab.length :(choix-1);
-				fleche = (fleche == 0)?tab.length-3:--fleche;
 			}
 			else if (button == Button.ID_ENTER) {
 				tab[choix-1].lancer();
 			}
 			else if (button == Button.ID_RIGHT) {
 				if (tab[choix-1].getTitre().length()>15) { //si le titre est trop grand pour l'ecran
-					debutColonne = (debutColonne == tab[choix-1].getTitre().length())?debutColonne:++debutColonne;
+					debutColonne = (debutColonne == tab[choix-1].getTitre().length()-1)?debutColonne:++debutColonne;
 				}
 			}
 			else if (button == Button.ID_LEFT) {
