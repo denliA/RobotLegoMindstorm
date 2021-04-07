@@ -158,6 +158,12 @@ public class Pilote {
 				tournerToCouleur(c, gauche_bouge, -max_angle, temps);
 				gauche_bouge = !gauche_bouge;
 				trouve = tournerToCouleur(c, gauche_bouge, max_angle, temps);
+				if (!trouve) {
+					tournerToCouleur(c, gauche_bouge, -max_angle, temps);
+					max_angle = max_angle * 1.5f;
+					gauche_bouge = !gauche_bouge;
+					continue;
+				}
 			}
 			if (Couleur.getLastCouleur()!=c&&seDeplace) {
 				//if (!Couleur.estSurLigne(c, 'm')) {MouvementsBasiques.avancerTravel(5);continue;}
@@ -167,6 +173,9 @@ public class Pilote {
 			}
 			if (seDeplace) {
 				MouvementsBasiques.avancerTravel(6);
+				if (Couleur.estSurLigne(c, 'm')) {
+					max_angle = 5;
+				}
 			}
 			gauche_bouge = !gauche_bouge;
 			iterations++;
