@@ -33,6 +33,7 @@ public class Couleur {
 	private static float lumiere;
 	private static float IDCouleur;
 	private static float intensiteRouge;
+	private static boolean scanning = false;
 	static BufferCouleurs buffer = new BufferCouleurs(50);
 	
 	
@@ -239,6 +240,13 @@ public class Couleur {
 	 * @param delay délai entre chaque mesure.
 	 */
 	public static void startScanAtRate(int delay) {
+		// Dans le cas ou on n'a pas fait de scan avant, on fait au moins un scan et une sauvegarde dans le buffer avant de rendre la main, pour
+		// que l'appelant ait au moins une valeur à exploiter juste après.
+		if (!scanning) {
+			update();
+			buffer.save(getCouleurLigne());
+			scanning = true;
+		}
 		lanceur.setDelay(delay);
 		lanceur.start();
 	}
