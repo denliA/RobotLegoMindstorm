@@ -4,8 +4,9 @@ import lejos.hardware.Sound;
 import lejos.utility.Delay;
 import lejos.utility.Timer;
 import lejos.utility.TimerListener;
-import projet.CouleurLigne;
-
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
 
 
@@ -37,7 +38,7 @@ public class Couleur {
 	private static float IDCouleur;
 	private static float intensiteRouge;
 	private static boolean scanning = false;
-	static BufferCouleurs buffer = new BufferCouleurs(50);
+	static BufferCouleurs buffer = new BufferCouleurs(5000);
 	
 	
 	// Constantes pour le modeFlag
@@ -62,7 +63,7 @@ public class Couleur {
 	
 	
 	
-	static class BufferContexte {
+	public static class BufferContexte {
 		CouleurLigne couleur_x;
 		long temps_x;
 		float [] rgb_x, ratios_x;
@@ -89,6 +90,11 @@ public class Couleur {
 		public String toString() {
 			return "Couleur: "+couleur_x+".\n"+"temps:"+temps_x+".\n "+"RGB:"+rgb_x[0]+"/"+rgb_x[1]+"/"+rgb_x[2]+". \nR/G/B:"+ratios_x[0]+"/"+ratios_x[1]+"/"+ratios_x[2]+(intersection_x !=null ? ("\nintersecte "+intersection_x):"");
 		}
+		
+		public String formatCSV() {
+			return rgb_x[0] + "\t" + rgb_x[1] + "\t" + rgb_x[2] + "\t" + ratios_x[0] + "\t" + ratios_x[1] + "\t" + ratios_x[2] + "\t" + temps_x + "\t" + (couleur_x != null? couleur_x : "RIENG") + "\t" + (intersection_x != null ? intersection_x : "RIENG");
+		}
+		
 		
 	}
 	static class BufferCouleurs {
@@ -149,6 +155,20 @@ public class Couleur {
 			return hist;
 		}
 
+		public void toCSV(String savePath) {
+			BufferContexte[] h = historique(taille);
+			try {
+				FileWriter writer = new FileWriter(new File(savePath));
+				writer.write("Vitesse : " + moteurs.MouvementsBasiques.getVitesseRobot() + "\t Accélération :" + moteurs.MouvementsBasiques.pilot.getAngularSpeed() + "\n");
+				writer.write("R\tG\tB\tR/G\tB/G\tB/R\tTemps\tCouleur\tIntersection\n");
+				for (int i=h.length-1; i>=0 ; i--) {
+					writer.write(h[i].formatCSV()+"\n");
+				}
+				writer.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 
 
 		}

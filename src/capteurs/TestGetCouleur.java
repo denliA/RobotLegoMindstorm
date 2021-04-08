@@ -1,8 +1,11 @@
 package capteurs;
 
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Date;
 
 import lejos.hardware.Button;
+import moteurs.MouvementsBasiques;
 public class TestGetCouleur {
 
 	public static void main(String[] args) {
@@ -12,7 +15,7 @@ public class TestGetCouleur {
 			if (buffer)
 				testGetLastCouleur();
 			else 
-				testGetCouleurLigne();
+				collectionnerDonnees("./Scans/20210408/AvancerJaune_", false);
 			buffer=!buffer;
 			button = Button.waitForAnyPress();
 		}
@@ -56,13 +59,26 @@ public class TestGetCouleur {
 			if (button == Button.ID_ENTER) {
 				couleur = Couleur.getLastCouleur();
 				contexte = Couleur.buffer.getLast();
-				System.out.println(contexte+ "\n" + CouleurLigne.JAUNE.estEntreDeux(CouleurLigne.GRIS, new float [] {contexte.rouge_x, contexte.vert_x, contexte.bleu_x}, new float[] {contexte.rg_x, contexte.bg_x, contexte.br_x}));
+				System.out.println(contexte+ "\n" + CouleurLigne.JAUNE.estEntreDeux(CouleurLigne.GRIS, contexte.rgb_x, contexte.ratios_x));
 				//System.out.println("Couleurs touchées: " + contexte.couleur_x + (contexte.intersection_x == null ? "" : contexte.intersection_x) + "\n");
 				//System.out.println(Arrays.asList(Couleur.buffer.historique(10)));
 			}
 			Button.waitForAnyEvent();
 		}
-		
+	}
+	
+	public static void collectionnerDonnees(String prefixeFichier, boolean tourner) {
+		Date date = new Date() ;
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss") ;
+		//SimpleDateFormat dateFormat2 = new SimpleDateFormat("yyyymmdd");
+		if(tourner)
+			MouvementsBasiques.tourner(400, true);
+		else
+			MouvementsBasiques.avancer();
+		while(Button.ENTER.isUp())
+			;
+		MouvementsBasiques.arreter();
+		Couleur.buffer.toCSV(prefixeFichier+dateFormat.format(date));
 	}
 
 }
