@@ -1,15 +1,28 @@
 package interfaceEmbarquee;
 
+import java.io.File;
+
 import exceptions.EchecGarageException;
 import exceptions.OuvertureException;
+import lejos.hardware.Sound;
 
 
 public class InterfaceTextuelle {
 	
 	public static void main(String[] args) {
-		Picker strategies = new Picker("Strategies",Configurations.strategieSolo);
-		Lancable lancer = new Lancable() {
+		Picker strategieSolo = new Picker("Strategies",Configurations.strategieSolo);
+		Picker strategieDuo = new Picker("Strategies",Configurations.strategieDuo);
+		Picker basiques = new Picker("Basiques",Scenarios.basiques);
+		Picker avances = new Picker("Avances",Scenarios.avances);
+		Picker optionnels = new Picker("Optionnels",Scenarios.optionnels);
+		Picker bruitages = new Picker("Bruitages",Bruitages.undertale);
+		Picker visages = new Picker("Visages",Visages.content);
+		
+		Lancable lancerSolo = new Lancable() {
 							public void lancer() {
+								if(Bruitages.undertale.getVal().equals("megalovania")) {
+									Sound.playSample(new File("MEGALOVANIA3.wav"), Sound.VOL_MAX);
+								}
 								if(Configurations.strategieSolo.getVal().equals("ramasserPalets")) {
 									try {
 										modeSolo.ModeSolo.ramasserPalet(1, false);
@@ -30,18 +43,41 @@ public class InterfaceTextuelle {
 								return "Lancer";
 							}
 		};
-		Menu modeSolo = new Menu("Mode Solo",new Lancable[] {lancer,strategies});
-		Menu modeCompetition = new Menu("Mode Competition");
-		Menu scenarios = new Menu("Scenarios");
-		Menu statistiques = new Menu("Statistiques");
-		Menu reglages = new Menu("Reglages");
-		Menu A = new Menu("A");
-		Menu B = new Menu("B");
-		Menu C = new Menu("C");
-		Menu D = new Menu("D");
-		Menu E = new Menu("E");
-		Menu menuPrincipal = new Menu("Menu Principal",new Lancable[] {modeSolo,modeCompetition,scenarios,statistiques,reglages,A,B,C,D,E});
+		Lancable lancerDuo = new Lancable() {
+			public void lancer() {
+				if(Configurations.strategieDuo.getVal().equals("ramasserPaletsDuo")) {
+					//fonction a coder
+				}
+			}
+			
+			public String getTitre() {
+				return "Lancer";
+			}
+		};
+		Lancable lancerReglages = new Lancable() {
+			public void lancer() {
+				if(Bruitages.undertale.getVal().equals("megalovania")) {
+					Sound.playSample(new File("MEGALOVANIA3.wav"), Sound.VOL_MAX);
+				}
+				else if(Bruitages.chill.getVal().equals("glitzAtTheRitz")) {
+					Sound.playSample(new File("glitzAtTheRitz.wav"), Sound.VOL_MAX);
+				}
+				
+				//expressions des visages pas encore codees
+			}
+
+			public String getTitre() {
+				return "Lancer";
+			}
+		};
 		
+		Menu modeSolo = new Menu("Mode Solo",new Lancable[] {lancerSolo,strategieSolo});
+		Menu modeCompetition = new Menu("Mode Competition",new Lancable[] {lancerDuo,strategieDuo});
+		Menu scenarios = new Menu("Scenarios",new Lancable[] {basiques,avances,optionnels});
+		Menu statistiques = new Menu("Statistiques"); //pas le temps de les faire?
+		Menu reglages = new Menu("Reglages",new Lancable[] {lancerReglages,bruitages,visages});
+		
+		Menu menuPrincipal = new Menu("Menu Principal",new Lancable[] {modeSolo,modeCompetition,scenarios,statistiques,reglages});
 		menuPrincipal.lancer();
 
 	}

@@ -3,14 +3,14 @@ package interfaceEmbarquee;
 import java.util.Arrays;
 import java.util.Vector;
 
-public enum Configurations implements Selection{
-	strategieSolo("ramasserPalets",new String[] {"ramasserPalets","test"}),
-	strategieDuo("ramasserPaletsDuo",new String[] {"ramasserPaletsDuo"});
+public enum Visages implements Selection {
+	content("sourire",new String[] {"sourire"}),
+	triste("larmes",new String[] {"larmes"});
 	
 	private String val; //valeur selectionnée
 	public Vector <String> s;
 	
-	private Configurations(String val,String[] s) {
+	private Visages(String val,String[] s) {
 		this.val = val;
 		this.s = new Vector<>(Arrays.asList(s));
 	}
@@ -26,5 +26,3 @@ public enum Configurations implements Selection{
 		return val;
 	}
 }
-
-

@@ -6,12 +6,41 @@ import lejos.hardware.lcd.LCD;
 public class Picker implements Lancable{
 	String titre;
 	Configurations configuration;
-	int choix;
+	Scenarios scenarios;
+	Bruitages bruitages;
+	Visages visages;
 	
 	
 	public Picker(String titre, Configurations c) {
 		this.titre=titre;
 		this.configuration=c;
+		this.scenarios=null;
+		this.bruitages=null;
+		this.visages=null;
+	}
+	
+	public Picker(String titre, Scenarios c) {
+		this.titre=titre;
+		this.configuration=null;
+		this.scenarios=c;
+		this.bruitages=null;
+		this.visages=null;
+	}
+	
+	public Picker(String titre, Bruitages c) {
+		this.titre=titre;
+		this.configuration=null;
+		this.scenarios=null;
+		this.bruitages=c;
+		this.visages=null;
+	}
+	
+	public Picker(String titre, Visages c) {
+		this.titre=titre;
+		this.configuration=null;
+		this.scenarios=null;
+		this.bruitages=null;
+		this.visages=c;
 	}
 	
 	public void lancer() {
