@@ -9,15 +9,10 @@ import lejos.utility.Delay;
 
 public class TestPilote {
 	public static void main(String args[]) throws Exception {
-		MouvementsBasiques.tourner(360);
-		try{
-			new capteurs.Capteur();
-			}catch(IllegalArgumentException e){
-				Sound.beepSequenceUp();
-				System.err.println(e.toString());
-				e.printStackTrace(System.err);
-				Capteur.ouvrirCapteurCouleur();
-			}
+//		MouvementsBasiques.pilot.arc(6.24, 360);
+//		if(true)
+//			return;
+		new Capteur();
 		Couleur.setScanMode((byte) (Couleur.RGBMODE|Couleur.BUFFERING)); //precise que les scans de la couleur se feront en mode RGB
 		Couleur.startScanAtRate(0); //commence le scan de la couleur immediatement. Quand une tache est finie, une autre est relancée sans délai.
 //		Pilote.startVideAtRate(0); //commence de tester si le robot detecte du vide. Quand une tache est finie, une autre est relancée sans délai.
@@ -29,10 +24,11 @@ public class TestPilote {
 		//il faut que le robot rencontre du vide
 		
 		
-		MouvementsBasiques.setAccelerationRobot(MouvementsBasiques.getAccelerationRobot()/5);
-		MouvementsBasiques.setVitesseRobot(MouvementsBasiques.getVitesseRobot()/2);
+		//MouvementsBasiques.setAccelerationRobot(MouvementsBasiques.getAccelerationRobot()/5);
+		//MouvementsBasiques.setVitesseRobot(MouvementsBasiques.getVitesseRobot()/2);
 		testSeRedresserSurLigne(CouleurLigne.JAUNE) ;
 		//testSuivreLigne();
+		//testPID(CouleurLigne.JAUNE, 25);
 	}
 	
 	public static void testSeRedresserSurLigne(CouleurLigne ligne) {
@@ -47,6 +43,14 @@ public class TestPilote {
 				}
 			}
 		}
+	}
+	
+	public static void testPID(final CouleurLigne c, final float vitesse) {
+		new Thread(new Runnable() { public void run() {Pilote.suivreLignePID(c, vitesse);}}).run();
+		long debut = System.currentTimeMillis();
+		while(System.currentTimeMillis() - debut < 5000 && Button.ENTER.isUp());
+		Pilote.SetSeDeplace(false);
+		MouvementsBasiques.pilot.stop();
 	}
 	
 	public static void testSuivreLigne() {
