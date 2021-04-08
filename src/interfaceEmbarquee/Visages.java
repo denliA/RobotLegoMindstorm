@@ -19,7 +19,7 @@ public enum Visages implements Selection {
 		if (s.contains(val))
 			this.val = val;
 		else
-			System.err.println("val n'est pas dans le tableau");
+			System.err.println(val+ " n'est pas dans le tableau");
 	}
 	
 	public String getVal() {
