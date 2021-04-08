@@ -56,7 +56,8 @@ public class TestGetCouleur {
 			if (button == Button.ID_ENTER) {
 				couleur = Couleur.getLastCouleur();
 				contexte = Couleur.buffer.getLast();
-				System.out.println("Couleurs touchées: " + contexte.couleur_x + (contexte.intersection_x == null ? "" : contexte.intersection_x) + "\n");
+				System.out.println(contexte+ "\n" + CouleurLigne.JAUNE.estEntreDeux(CouleurLigne.GRIS, new float [] {contexte.rouge_x, contexte.vert_x, contexte.bleu_x}, new float[] {contexte.rg_x, contexte.bg_x, contexte.br_x}));
+				//System.out.println("Couleurs touchées: " + contexte.couleur_x + (contexte.intersection_x == null ? "" : contexte.intersection_x) + "\n");
 				//System.out.println(Arrays.asList(Couleur.buffer.historique(10)));
 			}
 			Button.waitForAnyEvent();

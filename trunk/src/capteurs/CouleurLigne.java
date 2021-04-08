@@ -44,12 +44,12 @@ public enum CouleurLigne {
 	Intervalle IRGB;
 	float pos_confiance_IRGB;
 	float neg_confiance_IRGB;
-	Intervalle IRatios;
+	public Intervalle IRatios;
 	float pos_confiance_IRatios;
 	float neg_confiance_IRatios;
 	boolean forcerIRGB = false;
-	float[] contexteGris;
-	public HashMap<CouleurLigne, float[]> intersections = new HashMap<>(0);
+	public ContextePID contexteGris;
+	public HashMap<CouleurLigne, ContextePID> intersections = new HashMap<>(0);
 
 	static {
 		for (CouleurLigne c : principales) {
@@ -95,7 +95,7 @@ public enum CouleurLigne {
 		this(bc, pos_confiance_bc, neg_confiance_bc, br, pos_confiance_br, neg_confiance_br);
 		this.forcerIRGB = forcerIRGB;
 		for (CouleurLigne c : intersections) {
-			float [] contexte = construireContexte(c);
+			ContextePID contexte = construireContexte(c);
 			this.intersections.put(c, contexte);
 		}
 	}
@@ -106,26 +106,27 @@ public enum CouleurLigne {
 		this.forcerIRGB=forcerIRGB;
 	}
 	
-	private float[] construireContexte(CouleurLigne c) {
-		int mode, composante;
+	private ContextePID construireContexte(CouleurLigne c) {
+		int composante;
+		boolean mode;
 		float target;
 		float dists[];
 		Intervalle intervalle_this, intervalle_c;
 		if(!forcerIRGB && !c.forcerIRGB) {
-			mode = 1;
+			mode = false;
 			dists = IRatios.distance(c.IRatios);
 			intervalle_this = IRatios;
 			intervalle_c = c.IRatios;
 		}
 		else {
-			mode = 0;
+			mode = true;
 			dists = IRGB.distance(c.IRGB);
 			intervalle_this = IRGB;
 			intervalle_c = c.IRGB;
 		}
 		composante = dists[0] > dists[1] ? (dists[0]>dists[2] ? 0 : 2) : (dists[1] > dists[2] ? 1 : 2);
 		target = (intervalle_this.max[composante]+intervalle_this.min[composante]+intervalle_c.max[composante]+intervalle_c.min[composante])/4;
-		return new float[] {mode, composante, target};
+		return new ContextePID(mode, composante, target);
 	}
 	
 	public boolean estEntreDeux(CouleurLigne c, float[] pointRGB, float[] pointRatio) {
@@ -137,7 +138,20 @@ public enum CouleurLigne {
 	}
 	
 	
-
+	public class ContextePID {
+		public boolean mode_rgb; // 0 pour le mode RGB et 1 pour le mode Ratios
+		public int indice;
+		public float target;
+		protected ContextePID(boolean mode_rgb, int indice, float target) {
+			this.mode_rgb = mode_rgb; 
+			this.indice = indice;
+			this.target = target;
+		}
+		
+		public String toString() {
+			return "PID en mode " + (mode_rgb? "RGB. " : "Ratios. ") + "Indice " + indice + ". Target : "+ target;
+		}
+	}
 	
 }
 
@@ -285,7 +299,8 @@ class Intervalle {
 		Intervalle intersection = intersection(I);
 		for(int i=0;i<taille; i++) {
 			if(entre_deux.max[i]==-1) {
-				if (!intersection.containsTerme(p[i],i))
+				//if (!intersection.containsTerme(p[i],i))
+				if (false && !intersection.containsTerme(p[i],i))
 					return false;
 			}
 			else if (!entre_deux.containsTerme(p[i],i))
@@ -310,5 +325,7 @@ class Intervalle {
 		res.append(')');
 		return res.toString();
 	}
-		
+	
 }
+
+
