@@ -1,8 +1,11 @@
 package capteurs;
 
+import lejos.hardware.Sound;
 import lejos.utility.Delay;
 import lejos.utility.Timer;
 import lejos.utility.TimerListener;
+import projet.CouleurLigne;
+
 import java.util.concurrent.ConcurrentHashMap;
 
 
@@ -62,19 +65,15 @@ public class Couleur {
 	static class BufferContexte {
 		CouleurLigne couleur_x;
 		long temps_x;
-		float rouge_x, vert_x, bleu_x, rg_x, bg_x, br_x;
+		float [] rgb_x, ratios_x;
 		CouleurLigne intersection_x=null;
 		
 		public BufferContexte(CouleurLigne couleur_x, long temps_x, float rouge_x, float vert_x, float bleu_x,
 				float rg_x, float bg_x, float br_x) {
 			this.couleur_x = couleur_x;
 			this.temps_x = temps_x;
-			this.rouge_x = rouge_x;
-			this.vert_x = vert_x;
-			this.bleu_x = bleu_x;
-			this.rg_x = rg_x;
-			this.bg_x = bg_x;
-			this.br_x = br_x;
+			this.rgb_x = new float[] {rouge_x, vert_x, bleu_x};
+			this.ratios_x = new float[] {rg_x, bg_x, br_x};
 		}
 		
 		
@@ -88,7 +87,7 @@ public class Couleur {
 		public BufferContexte() {}
 		
 		public String toString() {
-			return "Couleur: "+couleur_x+". "+"temps:"+temps_x+"RGB:"+rouge+"/"+vert+"/"+bleu+". R/G/B:"+"";
+			return "Couleur: "+couleur_x+".\n"+"temps:"+temps_x+".\n "+"RGB:"+rgb_x[0]+"/"+rgb_x[1]+"/"+rgb_x[2]+". \nR/G/B:"+ratios_x[0]+"/"+ratios_x[1]+"/"+ratios_x[2]+(intersection_x !=null ? ("\nintersecte "+intersection_x):"");
 		}
 		
 	}
@@ -121,8 +120,8 @@ public class Couleur {
 				BufferContexte x  = buffer[index=((index+1)%taille)];
 				x.couleur_x = c;
 				x.temps_x = System.currentTimeMillis();
-				x.rouge_x = Couleur.rouge; x.vert_x = Couleur.vert; x.bleu_x=Couleur.bleu;
-				x.rg_x = Couleur.rouge/Couleur.vert; x.bg_x = Couleur.bleu/Couleur.vert; x.br_x = Couleur.bleu/Couleur.rouge;
+				x.rgb_x = getRGB();
+				x.ratios_x = getRatios();
 			}
 		}
 		
@@ -314,9 +313,11 @@ public class Couleur {
 	}
 	
 	private static CouleurLigne[] getCouleurMoitie() {
+		if (true)
+			return null;
 		BufferContexte contexte = buffer.getLast();
 		float[] RGB = getRGB(), ratios = getRatios();
-		if (contexte.intersection_x != null && contexte.couleur_x.estEntreDeux(contexte.intersection_x, RGB, ratios)) {
+		if (contexte.intersection_x != null && contexte.couleur_x!=CouleurLigne.INCONNU &&  contexte.couleur_x.estEntreDeux(contexte.intersection_x, RGB, ratios)) {
 			return new CouleurLigne[] {contexte.couleur_x, contexte.intersection_x};
 		}
 		if (contexte.couleur_x!=CouleurLigne.INCONNU) {
