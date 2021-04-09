@@ -14,7 +14,7 @@ public class TestModeSolo {
 		Couleur.startScanAtRate(0);
 		///Pilote.startVideAtRate(10);
 		try{  
-			ModeSolo.ramasserPalet(9,true); //attention le robot demarre coté armoire (ligneRouge à gauche)
+			ModeSolo.ramasserPalet(2,true); //attention le robot demarre coté armoire (ligneRouge à gauche)
 		}catch(InterruptedException e) {
 			System.out.println("Prob pour tourner le robot");
 		}catch(exceptions.EchecGarageException e){

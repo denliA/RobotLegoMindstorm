@@ -17,7 +17,7 @@ public class ModeSolo {
 	public static void ramasserPalet(int nbPalets,boolean rougeAgauche) throws EchecGarageException, InterruptedException, OuvertureException {
 		new Capteur();
 		Executor executor = Executors.newSingleThreadExecutor();
-		final double vitesse = 20;
+		final double vitesse = 40;
 		final double acceleration = 15;
 		double acceleration_angulaire = MouvementsBasiques.pilot.getAngularSpeed();
 		MouvementsBasiques.pilot.setAngularSpeed(acceleration_angulaire);
@@ -25,7 +25,7 @@ public class ModeSolo {
 		MouvementsBasiques.pilot.setLinearAcceleration(acceleration);
 		int scoredPalets=0;
 		int lignesParcourues=0;
-		int palets_par_ligne = 2;
+		int palets_par_ligne = 1;
 		int trio;
 		boolean tient_palet=false;
 		boolean droite=false;
@@ -61,22 +61,28 @@ public class ModeSolo {
 			trio=0;
 			rien_trouve = 0;
 			while(trio<palets_par_ligne && rien_trouve<2) { //pour rammasser les 3 palets sur une ligne de couleur
-				//System.out.println("Itération "+trio+" de "+couleur);
-				if (Toucher.getStatus()==false)
-					Toucher.startScan();
-				executor.execute(new Runnable() {
-					public void run() {
-						Pilote.suivreLigne();
-					}
-				} );
+				System.out.println("Itération "+trio+" de "+couleur);
+
+				
+				if (tient_palet) {
+					executor.execute(new ArgRunnable(couleur) {
+						public void run() {
+							Pilote.suivreLigne((CouleurLigne) truc);
+						}
+					} );
+				} else {
+					MouvementsBasiques.pilot.forward();
+				}
 
 				while((tient_palet || Toucher.getTouche()==false)&&(Couleur.getLastCouleur()!=CouleurLigne.BLANCHE))
 					; //on ne fait rien
 					//System.out.print("Dans le while\t");
+				
 				Pilote.SetSeDeplace(false); //arrete le suivi de ligne
+				if (!tient_palet)
+					MouvementsBasiques.pilot.stop();
 
 				if (tient_palet){ //si le robot a atteint sa ligne blanche d'en but et qu'il a ramassé un palet
-					System.out.println("tient palet et sur blanche, se retorune");
 					trio++;
 					scoredPalets++;
 					MouvementsBasiques.pilot.travel((3-trio)*7.5);
@@ -92,7 +98,6 @@ public class ModeSolo {
 					MouvementsBasiques.pilot.rotate(180); //demi-tour
 				}
 				else if(Toucher.getTouche()) {
-					System.out.println("Touché palet, on le prend");
 					tient_palet=true;
 					Pince.fermer();
 					MouvementsBasiques.pilot.rotate(180); //demi-tour
@@ -106,7 +111,7 @@ public class ModeSolo {
 						rien_trouve++;	
 					MouvementsBasiques.pilot.rotate(180); //demi-tour
 				}
-				if (trio<palets_par_ligne) Pilote.seRedresserSurLigne(couleur, Couleur.aRecemmentVu(couleur, 30), 40, 80);
+				Pilote.seRedresserSurLigne(couleur, Couleur.aRecemmentVu(couleur, 30), 40, 40);
 			}
 			if (lignesParcourues>=3)
 				break;
@@ -116,12 +121,12 @@ public class ModeSolo {
 				MouvementsBasiques.pilot.rotate(-90); //tourne à droite de 90 degres
 				//se redresser sur ligne noire
 				if (lignesParcourues==1) {
-					Pilote.seRedresserSurLigne(CouleurLigne.NOIRE,true,40,1500);
+					Pilote.seRedresserSurLigne(CouleurLigne.NOIRE,true,40,40);
 					couleur = CouleurLigne.NOIRE;
 				}
 				else if (lignesParcourues==2) {
 					couleur = rougeAgauche? CouleurLigne.ROUGE : CouleurLigne.JAUNE;
-					Pilote.seRedresserSurLigne(couleur,true,40,1500);
+					Pilote.seRedresserSurLigne(couleur,true,40,40);
 				}
 			}
 			if (droite) {
@@ -129,12 +134,12 @@ public class ModeSolo {
 				MouvementsBasiques.pilot.travel(50); //avance de 50 cm;
 				MouvementsBasiques.pilot.rotate(90); //tourne à gauche de 90 degres
 				if (lignesParcourues==1) {
-					Pilote.seRedresserSurLigne(CouleurLigne.NOIRE,true,90,80);
+					Pilote.seRedresserSurLigne(CouleurLigne.NOIRE,true,90,90);
 					couleur = CouleurLigne.NOIRE;
 				}
 				else if (lignesParcourues==2) {
 					couleur = rougeAgauche? CouleurLigne.JAUNE: CouleurLigne.ROUGE;
-					Pilote.seRedresserSurLigne(couleur,true,90,1500);
+					Pilote.seRedresserSurLigne(couleur,true,90,90);
 				}		
 			}
 			if (milieu) {
@@ -157,3 +162,9 @@ public class ModeSolo {
 }
 	
 
+abstract class ArgRunnable implements Runnable {
+	Object truc;
+	public ArgRunnable(Object truc) {
+		this.truc = truc;
+	}
+}

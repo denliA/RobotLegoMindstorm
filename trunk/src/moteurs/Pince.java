@@ -55,7 +55,7 @@ public class Pince {
 			ouvert = true;
 			saveState();
 			Delay.msDelay(OUVERTURE);
-			Moteur.MOTEUR_PINCE.stop();
+			Moteur.MOTEUR_PINCE.stop(true);
 		}
 	}
 	
@@ -71,7 +71,7 @@ public class Pince {
 			ouvert = false;
 			saveState();
 			Delay.msDelay((long)(OUVERTURE*1.5));
-			Moteur.MOTEUR_PINCE.stop();
+			Moteur.MOTEUR_PINCE.stop(true);
 			
 		}
 	}
