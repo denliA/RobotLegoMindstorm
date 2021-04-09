@@ -69,7 +69,9 @@ public class Pilote {
 	
 	//Le robot doit etre posé et suivre une ligne de couleur donnée par l'utilisateur
 	public static void suivreLigne(CouleurLigne c) { //je mets en void car l'interface Deplacement n'est pas encore realisée. Je ne sais pas quoi retourner
-	
+		
+		System.out.println("DEBUT DE SUIVRE LIGNE");
+		
 		seDeplace = true;
 		double def_acc=MouvementsBasiques.pilot.getLinearAcceleration();
 		double def_speed = MouvementsBasiques.pilot.getLinearSpeed();
@@ -83,13 +85,13 @@ public class Pilote {
 		float defaultSpeedGauche = Moteur.MOTEUR_GAUCHE.getSpeed();
 		float defaultSpeedDroit = Moteur.MOTEUR_DROIT.getSpeed();
 
-		Couleur.startScanAtRate(5);
+		Couleur.startScanAtRate(1);
 		MouvementsBasiques.pilot.forward(); // Le robot commence à avancer tout droit sans arret
 		
 		
-		ContextePID infos_gris = c.contexteGris;
-		BufferContexte last, previous;
-		float[] signes = c.dominations(CouleurLigne.GRIS, seDeplace)
+		//ContextePID infos_gris = c.contexteGris;
+		BufferContexte last, previous=null;
+		//float[] signes = c.dominations(CouleurLigne.GRIS, seDeplace);
 		
 		
 		while(seDeplace) {
@@ -98,42 +100,33 @@ public class Pilote {
 			if ((last=Couleur.buffer.getLast()).couleur_x!=c && seDeplace) {
 				//tourner à gauche pendant dureeRotation
 				debut = System.currentTimeMillis();
+				float first_distance=c.distanceDe(last.rgb_x, true), distance;
 				Moteur.MOTEUR_DROIT.setSpeed(defaultSpeedDroit*1.27f); //TODO utiliser le repport des vitesses gauche et droit par défaut au lieu d'un 1.27/1.25?
 				while((last=Couleur.buffer.getLast()).couleur_x!=c && ((System.currentTimeMillis() - debut) < dureeRotation) && seDeplace) {
-					if (System.currentTimeMillis() - debut > 50 && !c.intersections.containsKey(last.couleur_x)) {
-						float diff = last.ratios_x[infos_gris.indice] - previous.ratios_x[infos_gris.indice];
-						if(diff!=0 && Math.signum(diff)!=signes[infos_gris.indice] )
-							break;
-						
-					}
-					previous = last;
+					distance = c.distanceDe(last.rgb_x, true);
+					if (distance > first_distance - 5 || c.intersections.containsKey(last.couleur_x)) //TODO expérimentale
+						break;
 				}
 				Moteur.MOTEUR_DROIT.setSpeed(defaultSpeedDroit);
-				if (Couleur.getLastCouleur()!=c) {
-					//Sound.beep();
+				if ((last=Couleur.buffer.getLast()).couleur_x!=c) {
 					//tourner à droite pendant dureeRotation*2
 					debut = System.currentTimeMillis();
 					Moteur.MOTEUR_GAUCHE.setSpeed(defaultSpeedGauche*1.25f);
-					while((last=Couleur.buffer.getLast()).couleur_x!=c && /*!Couleur.estSurLigne(c, 'm')&&*/((System.currentTimeMillis() - debut) < (dureeRotation*2))&& seDeplace) {
-						if (System.currentTimeMillis() - debut > 50 && !c.intersections.containsKey(last.couleur_x)) {
-							float diff = last.ratios_x[infos_gris.indice] - previous.ratios_x[infos_gris.indice];
-							if(diff!=0 && Math.signum(diff)!=signes[infos_gris.indice] )
-								break;
-							
-						}
-						previous = last;
+					first_distance=c.distanceDe(last.rgb_x, true);
+					while((last=Couleur.buffer.getLast()).couleur_x!=c &&((System.currentTimeMillis() - debut) < (dureeRotation*2))&& seDeplace) {
+						distance = c.distanceDe(last.rgb_x, true);
+						if (distance > first_distance - 5 || c.intersections.containsKey(last.couleur_x)) //TODO expérimentale
+							break;
 					}
 					Moteur.MOTEUR_GAUCHE.setSpeed(defaultSpeedGauche);
 				}
 				else 
 					cycles=0;
-				//liberer la ressource critique
-				MouvementsBasiques.s1.release();
 				if(Couleur.getLastCouleur()!=c && (cycles>= max_cycles) && seDeplace) {
 					//gestion d'erreur le robot n'a pas pu se redresser sur une ligne de couleur et il est perdu. Il faut arreter le mouvement
 					MouvementsBasiques.pilot.stop();
 					try {
-						seRedresserSurLigne(c, true, 45,60); // TODO à calibrer
+						seRedresserSurLigne(c, true, 45,45); // TODO à calibrer
 					}
 					catch (Exception e) {
 						break;
@@ -149,9 +142,10 @@ public class Pilote {
 			}
 		}
 		MouvementsBasiques.pilot.setLinearAcceleration(def_acc);
-		if (MouvementsBasiques.isMovingPilot())
-			MouvementsBasiques.arreter(); //Le robot s'arrete
+		MouvementsBasiques.pilot.stop(); //Le robot s'arrete
 		MouvementsBasiques.pilot.setLinearSpeed(def_speed);
+		
+		System.out.println("FIN DE SUIVRE LIGNE");
 	}
 	
 	//Le robot doit etre posé sur une ligne à suivre
@@ -173,6 +167,7 @@ public class Pilote {
 	public static boolean seRedresserSurLigne(CouleurLigne c, boolean gauche_bouge, double max_angle, double vitesse_angulaire, int max_iterations) {
 		boolean trouve;
 		
+		System.out.println("	ENTREE DANS SE REDRESSER");
 		// On garde les vitesses angulaires d'avant l'appel de cette fonction
 		double def_acc = MouvementsBasiques.pilot.getLinearAcceleration();
 		double def_speed = MouvementsBasiques.pilot.getLinearSpeed();
@@ -205,7 +200,7 @@ public class Pilote {
 				tournerToCouleur(c, gauche_bouge, -20);
 				MouvementsBasiques.pilot.setAngularSpeed(vitesse_angulaire);
 			}
-			if (seDeplace && iterations == 0) {
+			if (seDeplace && iterations == max_iterations-1) {
 				MouvementsBasiques.pilot.travel(6);
 			}
 			gauche_bouge = !gauche_bouge;
@@ -218,12 +213,16 @@ public class Pilote {
 		MouvementsBasiques.pilot.setLinearSpeed(def_speed);
 		MouvementsBasiques.pilot.setLinearAcceleration(def_acc);
 		MouvementsBasiques.pilot.setAngularSpeed(def_speed_angulaire);
+		
+		System.out.println("	SORTIE DE SE REDRESSER");
+		
 		return true;
 		
 	}
 	
 
 	private static boolean tournerToCouleur(CouleurLigne c, boolean gauche_bouge, double angle) {
+		System.out.println("		Entrée dans tournertoCouleur");
 		float coef = gauche_bouge ? -1 : 1;
 		double def_angular_acceleration = MouvementsBasiques.pilot.getAngularAcceleration();
 		CouleurLigne t;
@@ -232,12 +231,13 @@ public class Pilote {
 		MouvementsBasiques.pilot.arc(coef*6.24, angle, true);
 		while((t=Couleur.getLastCouleur()) != c && seDeplace && MouvementsBasiques.pilot.isMoving() )
 			;//On sort du while si le robot s'est redressé sur la bonne couleur ou si le temps est ecoulé.
+		System.out.println("    		Sortie du while");
 		
 		MouvementsBasiques.pilot.setAngularAcceleration(1000);
 		MouvementsBasiques.pilot.stop();
 		MouvementsBasiques.pilot.setAngularAcceleration(def_angular_acceleration);
 		
-		
+		System.out.println("		Sortie de tournertoCouleur");
 		return (t==c);
 	}
 	

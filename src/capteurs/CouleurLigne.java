@@ -2,6 +2,7 @@ package capteurs;
 import java.util.HashMap;
 
 
+
 /**
  * CouleurLigne est une énumération modélisant les différentes couleurs du terrain.
  * <p>
@@ -29,10 +30,10 @@ import java.util.HashMap;
 public enum CouleurLigne { 
 	
 	
-	GRIS(new float[] {15f, 35f, 15f, 40f, 10f, 25f}, new float[] {.69f, .78f, 0.5f, 0.6f, .67f, .82f},false), // {.69, .78, 0.5f, 0.6f, .67f, .82f} TOTEST
+	GRIS(new float[] {20f, 29f, 27.5f, 37f, 15f, 22f}, new float[] {.69f, .78f, 0.5f, 0.6f, .67f, .82f},true), // {.69, .78, 0.5f, 0.6f, .67f, .82f} TOTEST
 	VERTE (new float[] {8f, 16f, 28.5f, 42f, 4.5f, 11f}, 0, -1,  new float[] {0.30f, 0.40f, 0.20f, 0.25f, 0.58f, 0.70f},1,-1),
-	BLEUE (new float[] {4.5f, 10f, 27f , 40f , 17.75f, 29.25f}, 0, -1, new float[] {0.17f, 0.27f, 0.61f, 0.78f, 2.50f, 4.00f},1,-1),
-	NOIRE(new float[] {2,12,2,12,2,12 }, 1,-1, new float[] {0.60f, 1f, 0.40f, 0.62f, 0.40f, 0.90f}, 0, -.5f, new CouleurLigne[] {BLEUE, VERTE}, true),
+	BLEUE (new float[] {4.5f, 10f, 27f , 40f , 17.75f, 29.25f}, 0, -1, new float[] {0.17f, 0.28f, 0.61f, 0.78f, 2.50f, 4.00f},1,-1),
+	NOIRE(new float[] {2,12,2,12,2,12 }, 1,-1, new float[] {0.55f, 1f, 0.40f, 0.67f, 0.40f, 0.98f}, 0, -.5f, new CouleurLigne[] {BLEUE, VERTE}, true),
 	ROUGE ( new float[] {22.5f, 36f, 5.75f, 13.5f, 2f, 11.25f}, 0, -1, new float[] {2.80f, 3.80f, 0.45f, 0.60f, 0.10f, 0.20f}, 1,-1, new CouleurLigne[] {BLEUE, NOIRE, VERTE}, false), 
 	BLANCHE (new float[] {40f, 255f, 60f, 255f, 30f, 255f}, new float[] {0.63f, 0.77f, 0.52f, 0.65f, 0.67f, 0.95f}, true), 
 	JAUNE (new float[] {38f, 58f, 50f, 71.5f, 7.5f, 13f}, 0, -1, new float[] {0.75f, 0.83f, 0.15f, 0.20f, 0.18f, 0.26f},1,-1, new CouleurLigne[] {BLEUE, NOIRE, VERTE}, false),
@@ -137,6 +138,21 @@ public enum CouleurLigne {
 		return i_this.estEntreDeux(i_c, point);
 	}
 	
+	public float distanceDe(float[] point, boolean irgb) {
+		Intervalle I = irgb? IRGB : IRatios;
+		float[] dists = I.distance(point);
+		return (float) Math.pow(dists[0]*dists[0]+dists[1]*dists[1]+dists[2]*dists[2], .5f);
+	}
+	
+	public float[] dominations(CouleurLigne c, boolean irgb) {
+		float[] diffs;
+		if (irgb)
+			diffs = IRGB.distance(IRGB, true);
+		else
+			diffs = IRatios.distance(IRGB, true);
+		return new float [] {Math.signum(diffs[0]),Math.signum(diffs[1]),Math.signum(diffs[2]) };
+	}
+	
 	
 	public class ContextePID {
 		public boolean mode_rgb; // 0 pour le mode RGB et 1 pour le mode Ratios
@@ -152,6 +168,8 @@ public enum CouleurLigne {
 			return "PID en mode " + (mode_rgb? "RGB. " : "Ratios. ") + "Indice " + indice + ". Target : "+ target;
 		}
 	}
+	
+	
 	
 }
 
@@ -170,6 +188,7 @@ public enum CouleurLigne {
 class Intervalle {
 	float[] min;
 	float[] max;
+	float[] longueurs;
 	int taille;
 	
 	/**
@@ -193,6 +212,9 @@ class Intervalle {
 		taille = min.length;
 		this.min = min;
 		this.max = max;
+		longueurs = new float[taille];
+		for (int i=0; i<taille; i++)
+			longueurs[i] = max[i]-min[i];
 	}
 	
 	/**
@@ -226,7 +248,10 @@ class Intervalle {
 		assert (indice <= taille);
 		return (point<=max[indice] && point>=min[indice]);
 	}
-		
+	
+	
+	
+	
 	public Intervalle intersection(Intervalle I) {
 		assert I.taille == this.taille : "Intervalles incompatibles";
 		float [] minimum = new float[taille];
@@ -266,15 +291,21 @@ class Intervalle {
 		return new Intervalle(minimum, maximum);
 	}
 	
+	
 	float[] distance(Intervalle I) {
+		return distance(I, false);
+	}
+	
+	float[] distance(Intervalle I, boolean signee) {
 		assert I.taille == taille : "Intervalles incompatibles";
 		Intervalle difference = entreDeux(I);
 		float [] res = new float[taille];
 		for (int i=0; i<taille;i++) {
+			int coef = (signee && max[i] < I.min[i]) ? -1 : 1;
 			if (difference.min[i]==-1)
 				res[i]=0;
 			else
-				res[i] = difference.max[i]-difference.min[i];
+				res[i] = coef*(difference.max[i]-difference.min[i]);
 		}
 		return res;
 	}
@@ -286,25 +317,47 @@ class Intervalle {
 			if (point[i]>max[i])
 				res[i] = point[i]-max[i];
 			else if (point[i]<min[i])
-				res[i] = min[i] - max[i];
+				res[i] = min[i] - point[i];
 			else
 				res[i]=0;
 		}
 		return res;
 	}
 	
-	boolean estEntreDeux(Intervalle I, float[] p) {
+	
+	float distanceAt(float scalaire, int indice) {
+		if(scalaire > max[indice])
+			return scalaire - max[indice];
+		if(scalaire < min[indice])
+			return min[indice] - scalaire;
+		else
+			return 0;
+	}
+	
+	public boolean estEntreDeux(Intervalle I, float[] p) {
+		float precision[] = new float[taille];
+		for (int i=0;i<taille;i++) 
+			precision[i] = Math.min(longueurs[i], I.longueurs[i])/4;
+		return estEntreDeux(I, p, precision);
+	}
+	
+	public boolean estEntreDeux(Intervalle I, float[] p, float[] precision ) {
 		
 		Intervalle entre_deux = entreDeux(I);
-		Intervalle intersection = intersection(I);
+		float[] distances = distance(I);
+		int meilleur_indice = (distances[0] > distances[1] ? (distances[0]>distances[2] ? 0 : 2) : (distances[1]>distances[2]? 1 : 2));
 		for(int i=0;i<taille; i++) {
 			if(entre_deux.max[i]==-1) {
-				//if (!intersection.containsTerme(p[i],i))
-				if (false && !intersection.containsTerme(p[i],i))
+				if ( !(containsTerme(p[i], i) || I.containsTerme(p[i], i)))
 					return false;
 			}
-			else if (!entre_deux.containsTerme(p[i],i))
+			else if (distances[i] < precision[i] || i!=meilleur_indice){
+				if(  !(containsTerme(p[i], i) || I.containsTerme(p[i], i) || entre_deux.containsTerme(p[i], i)) )
+					return false;
+			}
+			else if (!entre_deux.containsTerme(p[i],i)) {
 				return false;
+			}
 		}
 		return true;
 	}
@@ -327,5 +380,3 @@ class Intervalle {
 	}
 	
 }
-
-

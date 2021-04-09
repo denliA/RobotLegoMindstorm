@@ -38,8 +38,8 @@ public class Couleur {
 	private static float IDCouleur;
 	private static float intensiteRouge;
 	private static boolean scanning = false;
-	static BufferContexte dummy = new BufferContexte();
-	static BufferCouleurs buffer = new BufferCouleurs(5000);
+	static BufferContexte last = new BufferContexte();
+	public static BufferCouleurs buffer = new BufferCouleurs(5000);
 	
 	
 	// Constantes pour le modeFlag
@@ -64,11 +64,11 @@ public class Couleur {
 	
 	
 	
-	static class BufferContexte {
-		CouleurLigne couleur_x;
-		long temps_x;
-		float [] rgb_x, ratios_x;
-		CouleurLigne intersection_x=null;
+	public static class BufferContexte {
+		public CouleurLigne couleur_x;
+		public long temps_x;
+		public float [] rgb_x, ratios_x;
+		public CouleurLigne intersection_x=null;
 		
 		public BufferContexte(CouleurLigne couleur_x, long temps_x, float rouge_x, float vert_x, float bleu_x,
 				float rg_x, float bg_x, float br_x) {
@@ -106,7 +106,7 @@ public class Couleur {
 	}
 	
 	
-	static class BufferCouleurs {
+	public static class BufferCouleurs {
 		
 		final static int COULEUR = 0;
 		final static int TEMPS = 1;
@@ -147,7 +147,9 @@ public class Couleur {
 
 		
 		public BufferContexte getLast() {
-			return buffer[index];
+			synchronized(buffer_lock) {
+				return buffer[index];
+			}
 		}
 		
 		public BufferContexte[] historique(int nombre) {
@@ -379,6 +381,8 @@ public class Couleur {
 			return buffer.getLast().couleur_x;
 		}
 	}
+	
+	
 
 	
 	
