@@ -63,17 +63,18 @@ public class Pilote {
 	//Le robot doit etre posé et suivre une ligne de couleur donnée par l'utilisateur
 	public static void suivreLigne(CouleurLigne c) { //je mets en void car l'interface Deplacement n'est pas encore realisée. Je ne sais pas quoi retourner
 		seDeplace = true;
-		double def_acc=MouvementsBasiques.getAccelerationRobot();
+		double def_acc=MouvementsBasiques.pilot.getLinearAcceleration();
+		double def_speed = MouvementsBasiques.pilot.getLinearSpeed();
 		//MouvementsBasiques.changeVitesseRobot(0.5);
 		//MouvementsBasiques.pilot.setLinearAcceleration(def_acc/7);
-		MouvementsBasiques.setVitesseRobot(15);
-		MouvementsBasiques.setAccelerationRobot(20);
+		MouvementsBasiques.pilot.setLinearSpeed(15);
+		MouvementsBasiques.pilot.setLinearAcceleration(20);
 		//System.out.println("Linéar speed :"+MouvementsBasiques.getVitesseRobot());
 		//System.out.println("Linear acceleration:"+MouvementsBasiques.getAccelerationRobot());
 		long debut;
 		long dureeRotation = 150; //millisecondes
 		int cycles = 0;
-		final int max_cycles = 4;
+		final int max_cycles =3;
 		Couleur.startScanAtRate(5); //Lance immediatement le timer qui execute update() toutes les 0.1 secondes. C'est une méthode qui scanne la couleur et met à jour les attrubuts statiques de la classe Couleur 
 		MouvementsBasiques.avancer(); // Le robot commence à avancer tout droit sans arret
 		float defaultSpeed = Moteur.MOTEUR_GAUCHE.getSpeed();
@@ -128,10 +129,10 @@ public class Pilote {
 				cycles = 0;
 			}
 		}
-		MouvementsBasiques.setAccelerationRobot(def_acc);
+		MouvementsBasiques.pilot.setLinearAcceleration(def_acc);
 		if (MouvementsBasiques.isMovingPilot())
 			MouvementsBasiques.arreter(); //Le robot s'arrete
-		MouvementsBasiques.changeVitesseRobot(2);
+		MouvementsBasiques.pilot.setLinearSpeed(def_speed);
 	}
 	
 
@@ -144,12 +145,14 @@ public class Pilote {
 	
 	public static void seRedresserSurLigne(CouleurLigne c, boolean gauche_bouge, float max_angle, int temps) throws exceptions.EchecGarageException {
 		boolean trouve;
-		double def_acc = MouvementsBasiques.getAccelerationRobot();
-		double def_speed = MouvementsBasiques.getVitesseRobot();
-		int def_acc_moteurs = Moteur.MOTEUR_DROIT.getAcceleration();
-		MouvementsBasiques.setVitesseRobot(15);
-		MouvementsBasiques.setAccelerationRobot(10);
-		MouvementsBasiques.pilot.setAngularSpeed(45);
+		double def_acc = MouvementsBasiques.pilot.getLinearAcceleration();
+		double def_speed = MouvementsBasiques.pilot.getLinearSpeed();
+		double def_speed_angulaire = MouvementsBasiques.pilot.getAngularSpeed();
+		double def_acc_angulaire = MouvementsBasiques.pilot.getAngularAcceleration();
+		MouvementsBasiques.pilot.setAngularAcceleration(90);
+		MouvementsBasiques.pilot.setLinearSpeed(15);
+		double bonne_angulaire = max_angle/temps*1000;
+		MouvementsBasiques.pilot.setAngularSpeed(bonne_angulaire);
 		seDeplace = true;
 		int iterations = 0;
 		
@@ -174,13 +177,16 @@ public class Pilote {
 			if (Couleur.getLastCouleur()!=c&&seDeplace) {
 				//System.out.println("If 2 "+gauche_bouge);
 				//if (!Couleur.estSurLigne(c, 'm')) {MouvementsBasiques.avancerTravel(5);continue;}
+				MouvementsBasiques.pilot.setAngularSpeed(bonne_angulaire/4);
 				tournerToCouleur(c, gauche_bouge, -20, temps);
+				MouvementsBasiques.pilot.setAngularSpeed(bonne_angulaire);
+				
 				//if (Couleur.getLastCouleur() != c && iterations >4);
 					//throw new exceptions.EchecGarageException();
 			}
-			if (seDeplace) {
+			if (seDeplace && iterations == 0) {
 				//System.out.println("If 3 "+gauche_bouge);
-				MouvementsBasiques.avancerTravel(6);
+				MouvementsBasiques.pilot.travel(6);
 //				if (Couleur.estSurLigne(c, 'm')) {
 //					max_angle = 5;
 //				}
@@ -188,12 +194,11 @@ public class Pilote {
 			gauche_bouge = !gauche_bouge;
 			iterations++;
 			
-
 		}
-		Moteur.MOTEUR_DROIT.setAcceleration(def_acc_moteurs);
-		Moteur.MOTEUR_GAUCHE.setAcceleration(def_acc_moteurs);
-		MouvementsBasiques.setVitesseRobot(def_speed);
-		MouvementsBasiques.setAccelerationRobot(def_acc);
+		MouvementsBasiques.pilot.setAngularAcceleration(def_acc_angulaire);
+		MouvementsBasiques.pilot.setLinearSpeed(def_speed);
+		MouvementsBasiques.pilot.setLinearAcceleration(def_acc);
+		MouvementsBasiques.pilot.setAngularSpeed(def_speed_angulaire);
 	}
 	
 	private static boolean tournerToCouleur(CouleurLigne c, boolean gauche_bouge, double angle, int timeOut) { //timeOut = timer qui indique la durée maximale de la rotation d'une roue
@@ -201,8 +206,8 @@ public class Pilote {
 		float coef = gauche_bouge ? -1 : 1;
 		CouleurLigne t;
 		long debut = System.currentTimeMillis(); //temps reel à l'instant ou cette instruction est executée
-		MouvementsBasiques.pilot.arc(6.24, coef*angle, true);
-		while((t=Couleur.getLastCouleur()) != c && seDeplace );//On sort du while si le robot s'est redressé sur la bonne couleur ou si le temps est ecoulé.
+		MouvementsBasiques.pilot.arc(coef*6.24, angle, true);
+		while((t=Couleur.getLastCouleur()) != c && seDeplace && MouvementsBasiques.pilot.isMoving() );//On sort du while si le robot s'est redressé sur la bonne couleur ou si le temps est ecoulé.
 		boolean found = t == c;
 		long diff = System.currentTimeMillis()-debut;
 //		RegulatedMotor moteur = (gauche_bouge? Moteur.MOTEUR_GAUCHE : Moteur.MOTEUR_DROIT);

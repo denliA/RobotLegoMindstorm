@@ -9,9 +9,7 @@ import lejos.utility.Delay;
 
 public class TestPilote {
 	public static void main(String args[]) throws Exception {
-//		MouvementsBasiques.pilot.arc(6.24, 360);
-//		if(true)
-//			return;
+		//MouvementsBasiques.pilot.arc(6.24, 360);
 		new Capteur();
 		Couleur.setScanMode((byte) (Couleur.RGBMODE|Couleur.BUFFERING)); //precise que les scans de la couleur se feront en mode RGB
 		Couleur.startScanAtRate(0); //commence le scan de la couleur immediatement. Quand une tache est finie, une autre est relancée sans délai.

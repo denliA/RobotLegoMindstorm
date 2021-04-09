@@ -3,9 +3,12 @@ package moteurs;
 import java.util.concurrent.Semaphore;
 
 import lejos.robotics.RegulatedMotor;
+import lejos.robotics.chassis.Chassis;
 import lejos.robotics.chassis.WheeledChassis;
 import lejos.robotics.navigation.MovePilot;
 import lejos.utility.Delay;
+
+
 
 public class MouvementsBasiques {
 	final static double DIST_ROUES_INCH = 12.280002254568; // Pour le MovePilot, mesure approximative 
@@ -178,3 +181,48 @@ public class MouvementsBasiques {
 		
 	}
 }
+
+class PiloteMouvementsBasiques extends MovePilot {
+	
+	
+	final static double DIST_ROUES_INCH = 12.280002254568; // Pour le MovePilot, mesure approximative 
+	final static double DIAM_ROUE_INCH = 5.6; 
+	static double leftWheelDiameter = DIAM_ROUE_INCH*1.0045; //1.0045 bon calibrage
+	static double rightWheelDiameter = DIAM_ROUE_INCH;
+	
+	static PiloteMouvementsBasiques pilote = new PiloteMouvementsBasiques(Moteur.MOTEUR_GAUCHE, leftWheelDiameter, DIST_ROUES_INCH/2, Moteur.MOTEUR_DROIT, rightWheelDiameter, DIST_ROUES_INCH/2);
+	
+	protected RegulatedMotor moteur_gauche;
+	protected RegulatedMotor moteur_droit;
+	protected Chassis chassis;
+	double trackWidth;
+	
+	
+	public PiloteMouvementsBasiques(RegulatedMotor moteur_gauche, double diametre_gauche, double offset_gauche, RegulatedMotor moteur_droit, double diametre_droit, double offset_droit) {
+		super(new WheeledChassis(
+				new WheeledChassis.Modeler[] { 
+						WheeledChassis.modelWheel(Moteur.MOTEUR_GAUCHE, diametre_gauche).offset(offset_gauche / 2).invert(false),
+						WheeledChassis.modelWheel(Moteur.MOTEUR_DROIT, diametre_droit).offset(-offset_droit / 2).invert(false) },
+				WheeledChassis.TYPE_DIFFERENTIAL));
+		this.moteur_gauche = moteur_gauche;
+		this.moteur_droit = moteur_droit;
+		trackWidth = offset_gauche+offset_droit;
+	}
+	
+	
+	public void rotateMonoRoue(double angle, int duree, boolean gauche_tourne) {
+		if (chassis.isMoving())
+			stop();
+		double vitesse = 2*trackWidth/DIAM_ROUE_INCH*angle/duree*1000;
+		RegulatedMotor moteur = (gauche_tourne ? moteur_gauche : moteur_droit);
+		moteur.setSpeed((int)vitesse);
+		if (vitesse >= 0)
+			moteur.forward(); //avancer
+		else
+			moteur.backward(); //reculer
+		//moteur.rotate((int) (2*trackWidth/DIAM_ROUE_INCH*angle), true);
+		
+	}
+}
+	
+	
