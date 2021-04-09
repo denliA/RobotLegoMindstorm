@@ -38,6 +38,7 @@ public class Couleur {
 	private static float IDCouleur;
 	private static float intensiteRouge;
 	private static boolean scanning = false;
+	static BufferContexte dummy = new BufferContexte();
 	static BufferCouleurs buffer = new BufferCouleurs(5000);
 	
 	
@@ -63,7 +64,7 @@ public class Couleur {
 	
 	
 	
-	public static class BufferContexte {
+	static class BufferContexte {
 		CouleurLigne couleur_x;
 		long temps_x;
 		float [] rgb_x, ratios_x;
@@ -87,16 +88,24 @@ public class Couleur {
 		
 		public BufferContexte() {}
 		
+		
+		public String formatCSV() {
+			if (rgb_x==null)
+				return "RIENG";
+			String e =  rgb_x[0] + ";" + rgb_x[1] + ";" + rgb_x[2] + ";" + ratios_x[0] + ";" + ratios_x[1] + ";" + ratios_x[2] + ";" + temps_x + ";";
+			if(couleur_x != null);
+				e+=couleur_x.toString();
+			return e;
+		}
 		public String toString() {
 			return "Couleur: "+couleur_x+".\n"+"temps:"+temps_x+".\n "+"RGB:"+rgb_x[0]+"/"+rgb_x[1]+"/"+rgb_x[2]+". \nR/G/B:"+ratios_x[0]+"/"+ratios_x[1]+"/"+ratios_x[2]+(intersection_x !=null ? ("\nintersecte "+intersection_x):"");
 		}
 		
-		public String formatCSV() {
-			return rgb_x[0] + "\t" + rgb_x[1] + "\t" + rgb_x[2] + "\t" + ratios_x[0] + "\t" + ratios_x[1] + "\t" + ratios_x[2] + "\t" + temps_x + "\t" + (couleur_x != null? couleur_x : "RIENG") + "\t" + (intersection_x != null ? intersection_x : "RIENG");
-		}
 		
 		
 	}
+	
+	
 	static class BufferCouleurs {
 		
 		final static int COULEUR = 0;
@@ -158,14 +167,18 @@ public class Couleur {
 		public void toCSV(String savePath) {
 			BufferContexte[] h = historique(taille);
 			try {
-				FileWriter writer = new FileWriter(new File(savePath));
+				File f=new File(savePath);
+				FileWriter writer = new FileWriter(f);
 				writer.write("Vitesse : " + moteurs.MouvementsBasiques.getVitesseRobot() + "\t Accélération :" + moteurs.MouvementsBasiques.pilot.getAngularSpeed() + "\n");
 				writer.write("R\tG\tB\tR/G\tB/G\tB/R\tTemps\tCouleur\tIntersection\n");
 				for (int i=h.length-1; i>=0 ; i--) {
-					writer.write(h[i].formatCSV()+"\n");
+					String s = h[i].formatCSV();
+					if (s!="RIENG")
+						writer.write(s+"\n");
 				}
 				writer.close();
 			} catch (IOException e) {
+				Sound.beep();
 				e.printStackTrace();
 			}
 		}

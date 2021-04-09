@@ -1,6 +1,4 @@
 package moteurs;
-import lejos.utility.Timer;
-import lejos.utility.TimerListener;
 
 public abstract class ConditionArret {
 

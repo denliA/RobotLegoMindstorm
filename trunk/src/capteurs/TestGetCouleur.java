@@ -15,7 +15,7 @@ public class TestGetCouleur {
 			if (buffer)
 				testGetLastCouleur();
 			else 
-				collectionnerDonnees("./Scans/20210408/AvancerJaune_", false);
+				collectionnerDonnees("./Scans/20210408/AvancerVerte_", false);
 			buffer=!buffer;
 			button = Button.waitForAnyPress();
 		}
@@ -71,6 +71,8 @@ public class TestGetCouleur {
 		Date date = new Date() ;
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss") ;
 		//SimpleDateFormat dateFormat2 = new SimpleDateFormat("yyyymmdd");
+		MouvementsBasiques.pilot.setLinearSpeed(10);
+		MouvementsBasiques.pilot.setAngularAcceleration(10);
 		if(tourner)
 			MouvementsBasiques.tourner(400, true);
 		else
