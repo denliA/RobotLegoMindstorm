@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.Vector;
 
 public enum Configurations{
-	strategieSolo("ramasserPalets",new String[] {"ramasserPalets","test"}),
+	strategieSolo("ramasserPalets",new String[] {"ramasserPalets","ABCDEFGHIJKLMNOPQRSTUVWXYZ"}),
 	strategieDuo("ramasserPaletsDuo",new String[] {"ramasserPaletsDuo"}),
 	
 	musique("megalovania",new String[] {"megalovania","glitzAtTheRitz"}),
