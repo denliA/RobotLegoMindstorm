@@ -12,23 +12,32 @@ import java.util.concurrent.ConcurrentHashMap;
 
 
 /**
- * Classe gérant toutes les mesures et les interprétations en rapport avec le capteur de couleurs.
- * <p>
- * Deux fonctions sont assurées ici:
+ * Couche d'abstraction pour la gestion du capteur de couleur. 
+ * Trois fonctions sont assurées ici:
  * <ul>
  * <li> La prise périodique de mesures.
- * <li> L'intérprétation de ces mesures.
+ * <li> La sauvegarde de ces mesures
+ * <li> L'intérprétation.
  * </ul>
+ * 
+ * La prise de mesures est conditionnée par des flags indiquant si un certain mode du capteur doit être mesuré ou non. Une prise de mesure particulière est indivisible, et
+ * aucune donnée partielle ne peut être accédée par un client avant la lecture et l'intérprétation de toutes les mesures demandées au capteur. Pour assurer cette indivisible,
+ * une mesure donnée est modélisée par un objet BufferContexte qui contient toutes les informations mesurées et interprétées à un instant t.
+ * <p>
+ * Cette classe est intrinsèquement liée à l'énumération CouleurLigne qui modélise la couleur d'une ligne. Les opérations qui impliquent des calculs sur une couleur précise et
+ * qui ne dépendent pas du temps (du changement de mesure) se trouveront plutôt dans CouleurLigne.
+ * <p>
+ * Cette classe fournit plusieurs méthodes d'intérprétation, dont certaines qui utilisent l'historique pour inférer comment le robot se déplace entre deux couleurs, mais ces 
+ * méthodes ne sont pas assez robustes pour être utilisées, et . La seule méthode robuste et utilisable fournie est la méthode (privée) getCouleurLigne, qui retourne un objet
+ * CouleurLigne qui représente la ligne sur laquelle se trouve le capteur, et qui marche sans faute tant que la surface mesurée est celle d'une seule couleur. De plus, le seul
+ * mode exploité pour le moment est le mode RGB du capteur, nous n'avons pas trouvé au moment de l'écriture de ce commentaire d'utilisation pertinente des modes lumière ambiante 
+ * et intensité du rouge.
  * 
  * @see CouleurLigne
  * @see Capteur
  */
 public class Couleur {
-	
-	public Couleur() {
-		update();
-		buffer.save(CouleurLigne.INCONNU);
-	}
+
 	
 	//Attributs de la classe Couleur
 	private static float rouge;
@@ -37,8 +46,8 @@ public class Couleur {
 	private static float lumiere;
 	private static float IDCouleur;
 	private static float intensiteRouge;
-	private static boolean scanning = false;
-	static BufferContexte last = new BufferContexte();
+	public static int scanRate=-1;
+	private static BufferContexte last = new BufferContexte();
 	public static BufferCouleurs buffer = new BufferCouleurs(5000);
 	
 	
@@ -48,6 +57,7 @@ public class Couleur {
 	final static public byte RGBMODE = 0b100;
 	final static public byte LIGHTMODE = 0b1000;
 	final static public byte BUFFERING = 0b10000;
+	final static public byte INTERPRETER = 0b10000;
 	
 	/**
 	 * indicateur permettant de décider quelles mesures prendre et lesquelles ignorer.
@@ -60,16 +70,33 @@ public class Couleur {
 	 * <li> e1 pour le ColorID (algorithme par défaut de Lego)
 	 * <li> e0 pour le mode intensité du rouge 
 	 */
-	private static byte modeFlag = (byte) RGBMODE|BUFFERING;
+	private static byte modeFlag = (byte) RGBMODE|INTERPRETER|BUFFERING;
 	
 	
-	
+	/**
+	 * Représente une mesure unitaire prise à un instant t. Continent toutes les composantes de la mesure.
+	 * 
+	 *
+	 */
 	public static class BufferContexte {
 		public CouleurLigne couleur_x;
 		public long temps_x;
 		public float [] rgb_x, ratios_x;
 		public CouleurLigne intersection_x=null;
 		
+		
+		/**
+		 * Constructeur d'une mesure
+		 * 
+		 * @param couleur_x   une couleurLigne trouvée par getCouleurLigne. Si l'intérprétation est désactivée, prend la valeur null. 
+		 * @param temps_x  l'instant auquel la mesure a été prise
+		 * @param rouge_x  composante rouge
+		 * @param vert_x   composante bleu
+		 * @param bleu_x   composante vert
+		 * @param rg_x	   ratio entre le composante rouge et verte
+		 * @param bg_x	   ratio entre la composante bleue et verte
+		 * @param br_x     ratio entre la composante bleue et rouge
+		 */
 		public BufferContexte(CouleurLigne couleur_x, long temps_x, float rouge_x, float vert_x, float bleu_x,
 				float rg_x, float bg_x, float br_x) {
 			this.couleur_x = couleur_x;
@@ -78,7 +105,11 @@ public class Couleur {
 			this.ratios_x = new float[] {rg_x, bg_x, br_x};
 		}
 		
-		
+		/**
+		 * Si on détecte que l'on est à une intersection donnée avec une autre couleur, <code>intersection_x</code> est initialisée à cette couleur
+		 * en plus du reste des composantes de la mesure.
+		 * @see #BufferContexte(CouleurLigne, long, float, float, float, float, float, float)
+		 */
 		public BufferContexte(CouleurLigne couleur_x, long temps_x, float rouge_x, float vert_x, float bleu_x,
 				float rg_x, float bg_x, float br_x, CouleurLigne intersection_x) {
 			this(couleur_x, temps_x, rouge_x, vert_x, bleu_x, rg_x, bg_x, br_x);
@@ -88,7 +119,10 @@ public class Couleur {
 		
 		public BufferContexte() {}
 		
-		
+		/**
+		 * utile pour enregistrer la mesure en tant que ligne d'un tableau csv
+		 * @return une chaîne de caractères représentant les colonnes de la ligne représentant la mesure au format R;G;B;ratioRG;ratioBG;ratioBR;temps;couleur
+		 */
 		public String formatCSV() {
 			if (rgb_x==null)
 				return "RIENG";
@@ -97,39 +131,55 @@ public class Couleur {
 				e+=couleur_x.toString();
 			return e;
 		}
+		
+		
 		public String toString() {
 			return "Couleur: "+couleur_x+".\n"+"temps:"+temps_x+".\n "+"RGB:"+rgb_x[0]+"/"+rgb_x[1]+"/"+rgb_x[2]+". \nR/G/B:"+ratios_x[0]+"/"+ratios_x[1]+"/"+ratios_x[2]+(intersection_x !=null ? ("\nintersecte "+intersection_x):"");
 		}
 		
 		
-		
 	}
 	
-	
+	/**
+	 * Représente l'historique des mesures. Est initialisé à une certaine taille n, et garde toujours les n dernières mesures effectuées.
+	 * Peut être utile pour les méthodes d'intérprétation se servant de la variation entre deux ou plusieurs mesures
+	 * <p>
+	 * Est implémenté dans un tableau comme ceci en situation générale {n-i, n-i+1, ...., n-1, n, n-taille+1, n-taille+1, ..., } avec n le numéro de la mesure
+	 * 
+	 */
 	public static class BufferCouleurs {
-		
-		final static int COULEUR = 0;
-		final static int TEMPS = 1;
-		final static int ROUGE = 2;
-		final static int VERT = 3;
-		final static int BLEU = 4;
-		final static int R_G = 5;
-		final static int B_G = 6;
-		final static int B_R = 7;
 		
 		private BufferContexte[] buffer;
 		private int index;
 		public int taille;
+		public int mesures_effectuees;
 		
 		public BufferCouleurs(int taille) {
 			index = -1;
 			this.taille = taille;
 			buffer = new BufferContexte[taille];
+			mesures_effectuees = 0;
 			for (int i = 0; i<taille; i++)
 				buffer[i] = new BufferContexte();
 		}
 
+		/**
+		 * Sauvegarde une nouvelle mesure dans le buffer
+		 * @param b mesure à sauvegarder
+		 */
+		public void save(BufferContexte b) {
+			synchronized(buffer_lock) {
+				buffer[index=((index+1)%taille)] = b;
+				mesures_effectuees++;
+			}
+		}
 		
+		
+		/**
+		 * @deprecated Moins adaptée que save(BufferContexte) car utilise les attributs de Couleur pour créer le contexte, et bloque tout le buffer pendant toute la durée de sauvegarde
+		 * @param c couleur intérprétée de la mesure.
+		 * @see #save(BufferContexte)
+		 */
 		public void save(CouleurLigne c) {
 			synchronized(buffer_lock) {
 				BufferContexte x  = buffer[index=((index+1)%taille)];
@@ -140,6 +190,11 @@ public class Couleur {
 			}
 		}
 		
+		/**
+		 * @deprecated utiliser {@link #save(BufferContexte)}
+		 * @param couleur
+		 * @param intersection
+		 */
 		public void save(CouleurLigne couleur, CouleurLigne intersection) {
 			save(couleur);
 			buffer[index].intersection_x = intersection;
@@ -152,6 +207,11 @@ public class Couleur {
 			}
 		}
 		
+		/**
+		 * Renvoie les <code>nombre</code> dernières mesures dans l'ordre
+		 * @param nombre nombre de mesures à prendre dans l'historique
+		 * @return tableau contenant les nombre dernières mesures
+		 */
 		public BufferContexte[] historique(int nombre) {
 			BufferContexte[] hist = new BufferContexte[nombre];
 			int n = 0;
@@ -166,6 +226,13 @@ public class Couleur {
 			return hist;
 		}
 
+		
+		
+		/**
+		 * Pour sauvegarder l'historique entier des mesures dans un fichier au format CSV
+		 * @param savePath chemin et nom du fichier contenant la sauvegarde
+		 * @see {@link BufferContexte#formatCSV()}
+		 */
 		public void toCSV(String savePath) {
 			BufferContexte[] h = historique(taille);
 			try {
@@ -188,6 +255,8 @@ public class Couleur {
 
 		}
 	
+	
+	
 	// Assure la synchronisation des opérations : si une mesure est en train d'être faite, on ne veut pas accéder aux vairables modifées par celle-ci  entre temps.
 	private final static Object lock = new Object();
 	private final static Object buffer_lock = new Object();
@@ -196,19 +265,11 @@ public class Couleur {
 	private static Timer lanceur = new Timer(100, 
 			new TimerListener() {
 		public void timedOut() {
-			update();
-			if ((modeFlag&BUFFERING)!=0) {
-				CouleurLigne c = getCouleurLigne();
-				if (c==CouleurLigne.INCONNU) {
-					CouleurLigne[] cs = getCouleurMoitie();
-					if (cs==null)
-						buffer.save(CouleurLigne.INCONNU);
-					else
-						buffer.save(cs[0], cs[1]);
-				}
-				else
-					buffer.save(c);
-			}
+			update(); // On prend toutes les mesures avec le capteur
+			// On met le dernier bloc de mesure dans last, et on sauvegarde ce dernier dans buffer. La dernière valeur se trouve toujours en doublon, mais 
+			// avoir la dernière mesure hors du buffer est un gain de temps autant pour le buffer que pour le client
+			last = new BufferContexte(((INTERPRETER&modeFlag)!=0?getCouleurLigne():null), System.currentTimeMillis(), rouge, vert, bleu, rouge/vert, bleu/vert, bleu/rouge);
+			buffer.save(last);
 		}
 	});
 	
@@ -276,10 +337,10 @@ public class Couleur {
 	public static void startScanAtRate(int delay) {
 		// Dans le cas ou on n'a pas fait de scan avant, on fait au moins un scan et une sauvegarde dans le buffer avant de rendre la main, pour
 		// que l'appelant ait au moins une valeur à exploiter juste après.
-		if (!scanning) {
+		if (! (scanRate<0)) {
 			update();
 			buffer.save(getCouleurLigne());
-			scanning = true;
+			scanRate = delay;
 		}
 		lanceur.setDelay(delay);
 		lanceur.start();
@@ -290,6 +351,7 @@ public class Couleur {
 	 */
 	public static void stopScan() {
 		lanceur.stop();
+		scanRate = -1;
 	}
 	
 	/**
@@ -312,6 +374,7 @@ public class Couleur {
 			/*
 			 * Pour chaque couleur, on vérifie si elle définit un intervalle de valeurs directes (resp de rapports),
 			 * et si c'est le cas on regarde si notre mesure appartient à cet intervalle.
+			 * Selon le résultat, on ajoute la valeur de probabilité associée au couple (intervalle, résultat) à la probabilité totale de cette couleur
 			 */
 			for (CouleurLigne couleur : CouleurLigne.principales) {
 				Float val = candidats.get(couleur);
@@ -343,49 +406,28 @@ public class Couleur {
 			// On retourne la couleur trouvée, ou CouleurLigne.INCONNU si il n'y a aucun candidat.
 			if (cand !=null)
 				return cand;
+			
+			// Si aucune couleur n'a une probabilité >0, on dit qu'on ne sait pas quelle couleur c'est
 			return CouleurLigne.INCONNU;
 		
 	}
 	
-	private static CouleurLigne[] getCouleurMoitie() {
-		if (true)
-			return null;
-		BufferContexte contexte = buffer.getLast();
-		float[] RGB = getRGB(), ratios = getRatios();
-		if (contexte.intersection_x != null && contexte.couleur_x!=CouleurLigne.INCONNU &&  contexte.couleur_x.estEntreDeux(contexte.intersection_x, RGB, ratios)) {
-			return new CouleurLigne[] {contexte.couleur_x, contexte.intersection_x};
-		}
-		if (contexte.couleur_x!=CouleurLigne.INCONNU) {
-			if (contexte.couleur_x.estEntreDeux(CouleurLigne.GRIS, RGB, ratios))
-				return new CouleurLigne[] {contexte.couleur_x, CouleurLigne.GRIS};
-			for (CouleurLigne intersection : contexte.couleur_x.intersections.keySet()) {
-				if(contexte.couleur_x.estEntreDeux(CouleurLigne.GRIS, RGB, ratios))
-					return new CouleurLigne[] {contexte.couleur_x, intersection };
-			}
-		}
-		for (CouleurLigne c: CouleurLigne.principales) {
-			if (c==CouleurLigne.GRIS) continue;
-			for(CouleurLigne cc : CouleurLigne.principales) {
-				if (cc==c) continue;
-				if (c.estEntreDeux(cc, RGB, ratios))
-					return new CouleurLigne[] {c, cc};
-			}
-		}
-		return null;
-		
-	}
+
 	
-	
+	/**
+	 * Renvoie la dernière couleur sur laquelle on est passé
+	 * @return couleurLigne représentant 
+	 */
 	public static CouleurLigne getLastCouleur() {
-		synchronized(buffer_lock) {
-			return buffer.getLast().couleur_x;
-		}
+		return last.couleur_x;
 	}
 	
 	
 
 	
-	
+	/**
+	 * @see #update(int)
+	 */
 	private static void update() {
 		update(0);
 	}
@@ -398,6 +440,12 @@ public class Couleur {
 	 * @see lejos.robotics.SampleProvider
 	 */
 	private static void update(int delai) {
+		
+		/*
+		 * Chaque mode possède un flag qui détermine si on effectue la mesure pour ce dernier. 
+		 * Entre chaque mode mesuré, on attend <code>delai</code> secondes pour éviter d'éventuelles erreurs.
+		 */
+		
 		if((modeFlag & LIGHTMODE)!=0) {
 			float[] ambiantLight = new float [Capteur.LUMIERE_AMBIANTE.sampleSize()];
 			Capteur.LUMIERE_AMBIANTE.fetchSample(ambiantLight, 0);
@@ -429,22 +477,23 @@ public class Couleur {
 		}
 	}
 	
-	public static boolean estSurLigne(CouleurLigne c, char strict) {
-		BufferContexte cont = buffer.getLast();
-		if(strict == 'i')
-			return cont.couleur_x==c || cont.intersection_x==c;
-		if(strict == 'm')
-			return cont.couleur_x==c && (cont.intersection_x==null || cont.intersection_x==CouleurLigne.GRIS);
-		else
-			return cont.couleur_x==c&&cont.intersection_x==null;
-	}
 	
+
+	
+	
+	/**
+	 * Utilise l'historique pour savoir si l'on est passé par une ligne dans les n dernières mesures
+	 * @param c couleur par laquelle on veut savoir si l'on est passé
+	 * @param n nombre de mesures consécutives sur lesquelles on vérifie
+	 * @return true ssi on est passé par la couleur dans les dernières n mesures.
+	 */
 	public static boolean aRecemmentVu(CouleurLigne c, int n) {
-		BufferContexte[] historique = buffer.historique(n);
+		BufferContexte[] historique = buffer.historique(n); // On prend les n dernières mesures
 		for (int i=0; i<n; i++) {
-			if (historique[i].couleur_x==c)
+			if (historique[i].couleur_x==c) // dès qu'on a trouvé la couleur, on retourne
 				return true;
 		}
+		// Si on n'a pas encore retourné, c'est qu'on a pas trouvé la couleur
 		return false;
 	}
 	
