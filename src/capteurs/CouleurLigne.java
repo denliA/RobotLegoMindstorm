@@ -38,8 +38,11 @@ public enum CouleurLigne {
 	BLANCHE (new float[] {40f, 255f, 60f, 255f, 30f, 255f}, new float[] {0.63f, 0.77f, 0.52f, 0.65f, 0.67f, 0.95f}, true), 
 	JAUNE (new float[] {38f, 58f, 50f, 71.5f, 7.5f, 13f}, 0, -1, new float[] {0.75f, 0.83f, 0.15f, 0.20f, 0.18f, 0.26f},1,-1, new CouleurLigne[] {BLEUE, NOIRE, VERTE}, false),
 	VIDE(new float[] {0,1,0,1,0,1 },null),
-	INCONNU(null, null);
-	
+	INCONNU(null, null),
+	NOIREH(null,null),
+	NOIREV(null,null),
+	BLANCHE_BLEUE(null,null),
+	BLANCHE_VERTE(null,null);
 	static CouleurLigne[] principales = new CouleurLigne[] {ROUGE, VERTE, BLEUE, BLANCHE, NOIRE, JAUNE, GRIS};
 	
 	Intervalle IRGB;
