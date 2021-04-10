@@ -3,9 +3,12 @@ package interfaceEmbarquee;
 import java.util.Arrays;
 import java.util.Vector;
 
-public enum Configurations implements Selection{
+public enum Configurations{
 	strategieSolo("ramasserPalets",new String[] {"ramasserPalets","test"}),
-	strategieDuo("ramasserPaletsDuo",new String[] {"ramasserPaletsDuo"});
+	strategieDuo("ramasserPaletsDuo",new String[] {"ramasserPaletsDuo"}),
+	
+	musique("megalovania",new String[] {"megalovania","glitzAtTheRitz"}),
+	expression("sourire",new String[] {"sourire","larmes"});
 	
 	private String val; //valeur selectionnée
 	public Vector <String> s;
