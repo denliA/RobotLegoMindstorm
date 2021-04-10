@@ -1,26 +1,173 @@
 package interfaceEmbarquee;
 
 import java.io.File;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 import exceptions.EchecGarageException;
 import exceptions.OuvertureException;
+import lejos.hardware.Button;
 import lejos.hardware.Sound;
-
+import lejos.hardware.lcd.LCD;
+import lejos.utility.Delay;
+import moteurs.Pilote;
 
 public class InterfaceTextuelle {
 	
 	public static void main(String[] args) {
 		Picker strategieSolo = new Picker("Strategies",Configurations.strategieSolo);
 		Picker strategieDuo = new Picker("Strategies",Configurations.strategieDuo);
-		Picker basiques = new Picker("Basiques",Scenarios.basiques);
-		Picker avances = new Picker("Avances",Scenarios.avances);
-		Picker optionnels = new Picker("Optionnels",Scenarios.optionnels);
-		Picker bruitages = new Picker("Bruitages",Bruitages.undertale);
-		Picker visages = new Picker("Visages",Visages.content);
+		Menu basiques = new Menu("Basiques",new Lancable[] {
+				new Lancable() {
+					public void lancer() {}
+					public String getTitre() {
+						return "NFBM1 - Reconnaitre couleur";
+				
+					}
+				},
+				new Lancable() {
+					public void lancer() {}
+					public String getTitre() {
+						return "NFBA1 - Avancer tout droit";
+					}
+				},
+				new Lancable() {
+					public void lancer() {}
+					public String getTitre() {
+						return "NFBA2 - Faire angle droit";
+					}
+				},
+				new Lancable() {
+					public void lancer() {}
+					public String getTitre() {
+						return "NFBM2 - Reconnaître intersections";
+					}
+				},
+				new Lancable() {
+					public void lancer() {}
+					public String getTitre() {
+						return "NFBM3 - Détecter palet";
+					}
+				},
+				new Lancable() {
+					public void lancer() {}
+					public String getTitre() {
+						return "NFBA3 - Ramener palet";
+					}
+				},
+				new Lancable() {
+					public void lancer() {}
+					public String getTitre() {
+						return "NFBM4 - Detecter vide";
+					}
+				},
+				new Lancable() {
+					public void lancer() {}
+					public String getTitre() {
+						return "NFBM5 - Arret apres 5 min";
+					}
+				},
+				new Lancable() {
+					public void lancer() {}
+					public String getTitre() {
+						return "NFBM6 - Capteur ultrason";
+					}
+				}		
+		});
+		
+		Menu avances = new Menu("Avances",new Lancable[] {
+				new Lancable() {
+					public void lancer() {}
+					public String getTitre() {
+						return "NFA0 - Ligne blanche adverse";
+				
+					}
+				},
+				new Lancable() {
+					public void lancer() {}
+					public String getTitre() {
+						return "NFA1 - Rectangle";
+					}
+				},
+				new Lancable() {
+					public void lancer() {}
+					public String getTitre() {
+						return "NFA2 - Creneau";
+					}
+				},
+				new Lancable() {
+					public void lancer() {}
+					public String getTitre() {
+						return "NFA3 - Intersection ligne";
+					}
+				},
+				new Lancable() {
+					public void lancer() {}
+					public String getTitre() {
+						return "NFA4 - Intersection partout";
+					}
+				},
+				new Lancable() {
+					public void lancer() {}
+					public String getTitre() {
+						return "NFA5 - Ramener palet position connue";
+					}
+				},
+				new Lancable() {
+					public void lancer() {}
+					public String getTitre() {
+						return "NFA6 - Ramener palet ultrason";
+					}
+				},
+				new Lancable() {
+					public void lancer() {}
+					public String getTitre() {
+						return "NFA7 - Chemin predefini 9 palets";
+					}
+				}		
+		});
+		
+		Menu optionnels = new Menu("Optionnels",new Lancable[] {
+				new Lancable() {
+					public void lancer() {}
+					public String getTitre() {
+						return "OFBA1 - Angles et distances";
+				
+					}
+				},
+				new Lancable() {
+					public void lancer() {}
+					public String getTitre() {
+						return "OFA1 - Carte virtuelle";
+					}
+				},
+				new Lancable() {
+					public void lancer() {}
+					public String getTitre() {
+						return "OFA2 - Diagonales";
+					}
+				},
+				new Lancable() {
+					public void lancer() {}
+					public String getTitre() {
+						return "IF1 - Strategies victoire";
+					}
+				},
+				new Lancable() {
+					public void lancer() {}
+					public String getTitre() {
+						return "IF2 - Sabotage";
+					}
+				}		
+		});
+		
+		
+		Picker bruitages = new Picker("Bruitages",Configurations.musique);
+		Picker visages = new Picker("Visages",Configurations.expression);
 		
 		Lancable lancerSolo = new Lancable() {
 							public void lancer() {
-								if(Bruitages.undertale.getVal().equals("megalovania")) {
+								if(Configurations.musique.getVal().equals("megalovania")) {
 									Sound.playSample(new File("MEGALOVANIA3.wav"), Sound.VOL_MAX);
 								}
 								if(Configurations.strategieSolo.getVal().equals("ramasserPalets")) {
@@ -55,21 +202,32 @@ public class InterfaceTextuelle {
 			}
 		};
 		Lancable lancerReglages = new Lancable() {
+			//les fichiers.waw doivent etre mono,8000Hz et unsigned 8 bit
 			public void lancer() {
-				if(Bruitages.undertale.getVal().equals("megalovania")) {
-					Sound.playSample(new File("MEGALOVANIA3.wav"), Sound.VOL_MAX);
-				}
-				else if(Bruitages.chill.getVal().equals("glitzAtTheRitz")) {
-					Sound.playSample(new File("glitzAtTheRitz.wav"), Sound.VOL_MAX);
-				}
-				
-				//expressions des visages pas encore codees
+				int button = -1;
+				Thread d = new Thread(new Runnable(){
+		            public void run() {
+		                while(!Thread.currentThread().isInterrupted()){
+		                	try {
+								Musique.startMusic("megalovania","MEGALOVANIA.wav");
+							} catch (InterruptedException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							} 
+		                }   
+		            }});
+				Delay.msDelay(1000);
+				LCD.clear();
+				LCD.drawString("arreter?", 3, 5);
+				while(button != Button.ID_ENTER);//je ne fais rien
+				Musique.setRunning(false);	
 			}
 
 			public String getTitre() {
 				return "Lancer";
 			}
 		};
+		
 		
 		Menu modeSolo = new Menu("Mode Solo",new Lancable[] {lancerSolo,strategieSolo});
 		Menu modeCompetition = new Menu("Mode Competition",new Lancable[] {lancerDuo,strategieDuo});
