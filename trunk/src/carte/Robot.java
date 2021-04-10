@@ -9,14 +9,16 @@ public class Robot extends Rectangle {
 	private Rectangle roueGauche;  //on pourra faire tourner les roue pour toujours savoir ou est quel élément, mais en vrai elles ne me semble pas indispensable
 	private Cercle capteurCouleur;
 	
-	public Robot(Point position) {
+	public Robot(Point position, float direction) {
 		super(new Point(position.getX()-8f, position.getY()-14.5f), new Point(position.getX()+8f, position.getY()+14.5f));
 		this.position = position;
-		this.direction = 0f;
+		this.direction = direction;
 		this.roueDroite = new Rectangle(new Point(position.getX()+6.6f,position.getY()-10.3f),new Point(position.getX()+9.4f,position.getY()-4.7f));
 		this.roueGauche = new Rectangle(new Point(position.getX()-9.4f,position.getY()-10.3f),new Point(position.getX()+6.6f,position.getY()-4.7f));
 		this.capteurCouleur = new Cercle(new Point(position.getX(), position.getY()+10.5f), 0.5f);
 	}
+	
+	static Robot robotUsuel = new Robot(new Point(Float.NaN,Float.NaN), Float.NaN);
 	
 	public Point getPosition() {
 		return(this.position);
@@ -30,7 +32,7 @@ public class Robot extends Rectangle {
 		return(this.capteurCouleur);
 	}
 	
-	void setPosition(float x, float y) {
+	public void setPosition(float x, float y) {
 		this.position.setX(x);
 		this.position.setY(y);
 		this.getBasGauche().setX(x-8f);
@@ -42,9 +44,12 @@ public class Robot extends Rectangle {
 		this.getHautDroite().setY(y+14.5f);
 	}
 	
+	public void setDirection(float angle) {
+		this.direction = angle;
+	}
+	
 	private void tourner(float angle) {
-		this.direction += angle;
-		
+		this.direction = (direction + angle)%360;
 	}
 	
 	private void avancer(float distance) {
