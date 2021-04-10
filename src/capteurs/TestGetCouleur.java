@@ -53,11 +53,10 @@ public class TestGetCouleur {
 		CouleurLigne couleur;
 		Couleur.BufferContexte contexte;
 		Couleur.setScanMode((byte) (Couleur.BUFFERING|Couleur.RGBMODE));
-		Couleur.startScanAtRate(10);
+		Couleur.startScanAtRate(0);
 		while (button != Button.ID_LEFT && button != Button.ID_RIGHT) {
 			button = Button.waitForAnyPress();
 			if (button == Button.ID_ENTER) {
-				couleur = Couleur.getLastCouleur();
 				contexte = Couleur.buffer.getLast();
 				System.out.println(contexte+ "\n" + CouleurLigne.JAUNE.estEntreDeux(CouleurLigne.GRIS, contexte.rgb_x, contexte.ratios_x));
 				//System.out.println("Couleurs touchées: " + contexte.couleur_x + (contexte.intersection_x == null ? "" : contexte.intersection_x) + "\n");
