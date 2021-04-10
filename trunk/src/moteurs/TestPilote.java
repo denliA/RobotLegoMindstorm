@@ -24,8 +24,8 @@ public class TestPilote {
 		
 		//MouvementsBasiques.setAccelerationRobot(MouvementsBasiques.getAccelerationRobot()/5);
 		//MouvementsBasiques.setVitesseRobot(MouvementsBasiques.getVitesseRobot()/2);
-		testSeRedresserSurLigne(CouleurLigne.JAUNE) ;
-		//testSuivreLigne();
+		//testSeRedresserSurLigne(CouleurLigne.JAUNE) ;
+		testSuivreLigne(CouleurLigne.JAUNE);
 		//testPID(CouleurLigne.JAUNE, 25);
 	}
 	
@@ -34,7 +34,7 @@ public class TestPilote {
 			int button = Button.waitForAnyPress();
 			if (button == Button.ID_LEFT || button == Button.ID_RIGHT) {
 				try {
-					Pilote.seRedresserSurLigne(ligne, button==Button.ID_LEFT, 90, 1500);
+					Pilote.seRedresserSurLigne(ligne, button==Button.ID_LEFT, 90, 90);
 				}
 				catch (Exception e) {
 					Sound.beep();
@@ -51,7 +51,7 @@ public class TestPilote {
 		MouvementsBasiques.pilot.stop();
 	}
 	
-	public static void testSuivreLigne() {
-		Pilote.suivreLigne();
+	public static void testSuivreLigne(CouleurLigne c) {
+		Pilote.suivreLigne(c);
 	}
 }
