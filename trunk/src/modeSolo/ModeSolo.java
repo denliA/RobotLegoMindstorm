@@ -3,7 +3,7 @@ import moteurs.MouvementsBasiques;
 import moteurs.Pince;
 import moteurs.Pilote;
 
-import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import capteurs.Capteur;
@@ -11,16 +11,24 @@ import capteurs.Couleur;
 import capteurs.CouleurLigne;
 import capteurs.Toucher;
 import capteurs.Ultrason;
-import exceptions.OuvertureException;
 import exceptions.*;
 
 public class ModeSolo {
+	//methode classique pour le ModeSolo
 	public static void ramasserPalet(int nbPalets,boolean rougeAgauche) throws EchecGarageException, InterruptedException, OuvertureException {
+		ramasserPalet(nbPalets,3,0,rougeAgauche);
+	}
+	
+	//surcharge pour indiquer dans le ModeCompetition si une ligne a deja été parcourue
+	public static void ramasserPalet(int nbPalets,int palets_par_ligne, int lignesParcourues,boolean rougeAgauche) throws EchecGarageException, InterruptedException, OuvertureException {
+		//Ne pas rouvrir les capteurs si ils ont deja ete ouverts dans le modeCompetition
+		if (lignesParcourues!=1) {
 		new Capteur();
 		Toucher.startScan();
 		Ultrason.startScan();
 		Couleur.startScanAtRate(0);
-		Executor executor = Executors.newSingleThreadExecutor();
+		}
+		ExecutorService executor = Executors.newSingleThreadExecutor();
 		final double vitesse = 25;
 		final double acceleration = 30;
 		final double vitesse_angulaire = 180;
@@ -29,8 +37,6 @@ public class ModeSolo {
 		MouvementsBasiques.chassis.setLinearSpeed(vitesse);
 		MouvementsBasiques.chassis.setLinearAcceleration(acceleration);
 		int scoredPalets=0;
-		int lignesParcourues=0;
-		int palets_par_ligne = 3;
 		int trio;
 		boolean tient_palet=false;
 		boolean droite=false;
@@ -99,7 +105,7 @@ public class ModeSolo {
 					}
 					MouvementsBasiques.chassis.arc(0,180); MouvementsBasiques.chassis.waitComplete(); //demi-tour
 				}
-				else if(touche) {
+				else if(touche) { //si le robot vient de toucher un palet
 					tient_palet=true;
 					Pince.fermer();
 					MouvementsBasiques.chassis.arc(0,185); MouvementsBasiques.chassis.waitComplete();  //demi-tour
@@ -136,7 +142,7 @@ public class ModeSolo {
 				MouvementsBasiques.chassis.travel(50);  MouvementsBasiques.chassis.waitComplete(); //avance de 50 cm;
 				MouvementsBasiques.chassis.arc(0,90); MouvementsBasiques.chassis.waitComplete();  //tourne à gauche de 90 degres
 				if (lignesParcourues==1) {
-					couleur = CouleurLigne.NOIRE;
+					couleur = CouleurLigne.NOIRE; //bizare demander a wassim pour le Couleur.aRecemmentVu
 					Pilote.seRedresserSurLigne(CouleurLigne.NOIRE,Couleur.aRecemmentVu(couleur, 10),90,90);
 				}
 				else if (lignesParcourues==2) {
@@ -163,6 +169,7 @@ public class ModeSolo {
 		Toucher.stopScan();
 		Ultrason.stopScan();
 		Couleur.stopScan();
+		executor.shutdown();
 	}
 }
 	
