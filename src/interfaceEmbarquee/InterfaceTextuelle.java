@@ -205,22 +205,16 @@ public class InterfaceTextuelle {
 			//les fichiers.waw doivent etre mono,8000Hz et unsigned 8 bit
 			public void lancer() {
 				int button = -1;
-				Thread d = new Thread(new Runnable(){
-		            public void run() {
-		                while(!Thread.currentThread().isInterrupted()){
-		                	try {
-								Musique.startMusic("megalovania","MEGALOVANIA.wav");
-							} catch (InterruptedException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							} 
-		                }   
-		            }});
-				Delay.msDelay(1000);
+				try {
+					Musique.startMusic("megalovania","MEGALOVANIA.wav");
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} //lance la musique dans un executor
 				LCD.clear();
 				LCD.drawString("arreter?", 3, 5);
 				while(button != Button.ID_ENTER);//je ne fais rien
-				Musique.setRunning(false);	
+				Musique.stopMusic();	
 			}
 
 			public String getTitre() {
