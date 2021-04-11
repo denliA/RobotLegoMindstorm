@@ -1,4 +1,4 @@
-package modeSolo;
+ package modeSolo;
 
 import capteurs.*;
 import exceptions.OuvertureException;
@@ -10,7 +10,6 @@ public class TestModeSolo {
 	public static void main(String[] args){
 		Toucher.startScan();
 		Ultrason.startScan();
-		new Couleur();
 		Couleur.startScanAtRate(0);
 		///Pilote.startVideAtRate(10);
 		try{  
