@@ -4,7 +4,7 @@ import java.util.HashMap;
 
 
 /**
- * CouleurLigne est une énumération modélisant les différentes couleurs du terrain.
+ * CouleurLigne est une énumération modélisant les différentes couleurs du terrain, et permettant de confronter une mesure donnée à chaque couleur par différents moyens.
  * <p>
  * Chaque couleur énumérée est caractérisée par deux groupes d'intervalles :
  * <ul>
@@ -22,6 +22,16 @@ import java.util.HashMap;
  * <p>
  * Pour indiquer qu'un certain groupe d'intervalles n'est pas pertinent pour une certaine couleur, 
  * il est mis à null.
+ * <p>
+ * De plus, à chaque intervalle d'une couleur, on peut associer deux valeurs indiquant la fiabilité de l'information obtenue si une mesure appartient ou pas à l'intervalle. 
+ * Par exemple:
+ * <ul>
+ * <li> Si le couple (1,0) est associé, alors le fait qu'une mesure soit dans l'intervalle nous dit avec une forte assurance que l'on est sur cette couleur, mais si une mesure
+ * est hors de l'intervalle, ce n'est pas un indicateur fort que l'on n'est pas dans cette couleur 
+ * <li> Si le couple (0, -1) est associé, alors le fait qu'une mesure soit dans l'intervalle ne nous donne pas d'information forte sur notre présence ou pas sur la couleur, 
+ * mais si la mesure n'y est pas, ça nous dit avec une forte assurance que l'on est pas sur cette couleur.
+ * </ul>
+ * Cette énumération fournit (notamment grâce à la classe locale Intervalle) plusieurs méthodes de comparaisons entre deux couleurs, ou entre une couleur et une mesure.
  * 
  * @see Intervalle
  * @see Couleur
@@ -30,7 +40,7 @@ import java.util.HashMap;
 public enum CouleurLigne { 
 	
 	
-	GRIS(new float[] {20f, 29f, 27.5f, 37f, 15f, 22f}, new float[] {.69f, .78f, 0.5f, 0.6f, .67f, .82f},true), // {.69, .78, 0.5f, 0.6f, .67f, .82f} TOTEST
+	GRIS(new float[] {20f, 29f, 27.5f, 37f, 15f, 22f}, new float[] {.69f, .78f, 0.5f, 0.6f, .67f, .82f},true),
 	VERTE (new float[] {8f, 16f, 28.5f, 42f, 4.5f, 11f}, 1, -.75f,  new float[] {0.30f, 0.40f, 0.20f, 0.25f, 0.58f, 0.70f},1,-.75f),
 	BLEUE (new float[] {4.5f, 10f, 27f , 40f , 17.75f, 29.25f}, 1,-.75f, new float[] {0.17f, 0.28f, 0.61f, 0.78f, 2.50f, 4.00f},1,-.75f),
 	NOIRE(new float[] {2,12,2,12,2,12 }, 1,-1, new float[] {0.55f, 1f, 0.40f, 0.67f, 0.40f, 0.98f}, 0, -.5f, new CouleurLigne[] {BLEUE, VERTE}, true),
@@ -52,17 +62,35 @@ public enum CouleurLigne {
 	float pos_confiance_IRatios;
 	float neg_confiance_IRatios;
 	boolean forcerIRGB = false;
+	/**
+	 * Même chose que dans <code>intersections</code> mais pour la couelur spéciale qu'est le gris
+	 * @see #intersections
+	 */
 	public ContextePID contexteGris;
+	/**
+	 * Dictionnaire associant à chaque intersection d'une couleur donnée un contextePID précisant quelle composante de quel intervalle est la plus différente
+	 * entre les deux couleurs, et quelle est la moyenne des deux intensités pour cette composante
+	 * <p>Par exemple, entre les lignes ROUGE et BLEUE, la composante avec le plus de différence entre les deux est la composante Rouge qui est très forte pour la ligne
+	 * rouge et très faible pour la ligne bleue. 
+	 */
 	public HashMap<CouleurLigne, ContextePID> intersections = new HashMap<>(0);
 
 	static {
+		/*
+		 * On construit le contexte avec le gris pour chaque autre couleur. Impossible de le faire dans le construceur car ça implique la CouleurLigne GRIS. On le fait donc en
+		 * static.
+		 */
 		for (CouleurLigne c : principales) {
 			c.contexteGris = c.construireContexte(CouleurLigne.GRIS);
 		}
 	}
 	
 
-	
+	/**
+	 * Constructeur sans préciser les valeurs de confiance pour chaque intervalle, elles sont mises à (1,-1) pour les deux intervalles
+	 * @param bc intervalle des composantes RGB
+	 * @param br intervalle des ratios
+	 */
 	private CouleurLigne(float[] bc ,float[] br) {
 		this(bc, 1f, -1f,  br, 1f, -1f);
 	}
@@ -95,6 +123,12 @@ public enum CouleurLigne {
 		
 	}
 	
+	/**
+	 * Constructeur permettant d'associer en plus à une couleur un ensemble d'intersections (qui sont aussi des couleurs)
+	 * @param intersections Liste des intersections possibles de cette couleur
+	 * @param forcerIRGB booléen permettant de signaler si pour certaines opérations de comparaison (ex: {@link #distanceDe(float[], boolean)}) il vaut mieux utiliser l'intervalle d'IRGB
+	 * @see #CouleurLigne(float[], float, float, float[], float, float)
+	 */
 	private CouleurLigne(float[] bc, float pos_confiance_bc, float neg_confiance_bc,  float[] br, float pos_confiance_br, float neg_confiance_br, CouleurLigne[] intersections, boolean forcerIRGB) {
 		this(bc, pos_confiance_bc, neg_confiance_bc, br, pos_confiance_br, neg_confiance_br);
 		this.forcerIRGB = forcerIRGB;
@@ -104,35 +138,54 @@ public enum CouleurLigne {
 		}
 	}
 
-	
+
 	private CouleurLigne(float[] bc, float[] br, boolean forcerIRGB) {
 		this(bc,br);
 		this.forcerIRGB=forcerIRGB;
 	}
 	
+	
+	/**
+	 * Calcule la composante avec le plus de différence entre les deux couleurs, celle-ci sera la plus pertinente pour 
+	 * 
+	 * @param c couleurLigne avec laquelle on veut construire le contexte
+	 * @return le contexte entre les deux couleurs
+	 * 
+	 * @see #ContextePID
+	 */
 	private ContextePID construireContexte(CouleurLigne c) {
-		int composante;
-		boolean mode;
-		float target;
-		float dists[];
+		int composante; // Indice de la composante la plus pertinente dans l'intervalle choisi
+		boolean mode; // Lequel des deux intervalles est utilisé? à false pour IRatios, et true pour IRGB
+		float target; // Valeur moyenne de l'intesité de la composante entre les deux couleurs
+		float dists[];  // distance entre les deux intervalles pour chaque composante
 		Intervalle intervalle_this, intervalle_c;
-		if(!forcerIRGB && !c.forcerIRGB) {
+		if(!forcerIRGB && !c.forcerIRGB) { // Si aucune deux couleurs n'indique qu'il faut utiliser l'intervalle RGB, on calcule les distances pour les IRatios
 			mode = false;
-			dists = IRatios.distance(c.IRatios);
-			intervalle_this = IRatios;
+			dists = IRatios.distance(c.IRatios); //Distance entre les deux intervalles
+			intervalle_this = IRatios; 
 			intervalle_c = c.IRatios;
 		}
-		else {
+		else { // Sinon, on fait la même chose mais pour les intervalles IRGB
 			mode = true;
 			dists = IRGB.distance(c.IRGB);
 			intervalle_this = IRGB;
 			intervalle_c = c.IRGB;
 		}
-		composante = dists[0] > dists[1] ? (dists[0]>dists[2] ? 0 : 2) : (dists[1] > dists[2] ? 1 : 2);
+
+		composante = dists[0] > dists[1] ? (dists[0]>dists[2] ? 0 : 2) : (dists[1] > dists[2] ? 1 : 2); // On prend l'indice pour lequel la distance est la plus grande
+		// Pour target, on prend le milieu des deux centres de chaque intervalle pour la composante choisie
 		target = (intervalle_this.max[composante]+intervalle_this.min[composante]+intervalle_c.max[composante]+intervalle_c.min[composante])/4;
-		return new ContextePID(mode, composante, target);
+		return new ContextePID(mode, composante, target); // On construit le contexte calculé
 	}
 	
+	
+	/**
+	 * 
+	 * @param c couleur avec laquelle on veut savoir si on est entre deux
+	 * @param pointRGB la mesure en RGB
+	 * @param pointRatio la même mesure en ratios
+	 * @return true ssi la mesure passée est entre this et la couleur c
+	 */
 	public boolean estEntreDeux(CouleurLigne c, float[] pointRGB, float[] pointRatio) {
 		boolean forcer = forcerIRGB||c.forcerIRGB||true;
 		Intervalle i_this = forcer? IRGB : IRatios;
@@ -148,12 +201,24 @@ public enum CouleurLigne {
 		return false;
 	}
 	
+	/**
+	 * 
+	 * @param point mesure dont on veut calculer la distance
+	 * @param irgb indique si la mesure est en RGB ou en ratios
+	 * @return La distance euclidienne entre la mesure et l'intervalle
+	 */
 	public float distanceDe(float[] point, boolean irgb) {
 		Intervalle I = irgb? IRGB : IRatios;
 		float[] dists = I.distance(point);
 		return (float) Math.pow(dists[0]*dists[0]+dists[1]*dists[1]+dists[2]*dists[2], .5f);
 	}
 	
+	/**
+	 * Indique pour deux couleurs et un intervalle donné, quelle couleur est plus forte pour chauqe composante
+	 * @param c couleurLigne contre laquelle on teste this
+	 * @param irgb indique si le test se fait sur les intervalles RGB ou ratio
+	 * @return un tableau de 3 floats valant 1 en i si la composante i de this est plus élevée, et -1 sinon
+	 */
 	public float[] dominations(CouleurLigne c, boolean irgb) {
 		float[] diffs;
 		if (irgb)
@@ -162,6 +227,7 @@ public enum CouleurLigne {
 			diffs = IRatios.distance(IRGB, true);
 		return new float [] {Math.signum(diffs[0]),Math.signum(diffs[1]),Math.signum(diffs[2]) };
 	}
+	
 	
 	
 	public class ContextePID {
@@ -187,7 +253,7 @@ public enum CouleurLigne {
 
 /**
  * Modélise des intervalles à plusieurs dimensions et une relation d'inclusion "(x1, ..., xn) appartient à (I1, ..., In)
- * ssi pour tout i dans {1,...,n}, xi appartient à Ii.
+ * ssi pour tout i dans {1,...,n}, xi appartient à Ii".
  * <p>
  * Sert à tester de manière compacte l'appartenace d'une certaine mesure (par exemple RGB) à des limites définies pour chaque partie
  * de la mesure.
