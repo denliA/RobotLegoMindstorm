@@ -32,15 +32,17 @@ public class Menu implements Lancable{
 		int button = -1;
 		int choix = 1;
 		int page = 0;
-		char[][] buffer = new char[6][18];
+		char[][] buffer = new char[6][];
 		int i,j,k,l;
 		int debutColonne=0;
+		long max=0;
 		while(button != Button.ID_ESCAPE) {
 			LCD.clear(1,2, 100);
 			LCD.drawString("->", 0, choix+1);
 			LCD.drawString(titre, 3, 0);
 			for (i=0; i<6 && i+6*page<tab.length;i++) { //i=nombre de lignes
 				buffer[i]=tab[i+page*6].getTitre().toCharArray();
+				max= (long) (max<buffer[i].length ? buffer[i] : max);
 				for (j=debutColonne, k=0;j<buffer[i].length;j++,k++) {
 					LCD.drawChar(buffer[i][j], 2+k, i+2);
 				}

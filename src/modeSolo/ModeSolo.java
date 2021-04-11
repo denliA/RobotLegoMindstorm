@@ -10,12 +10,16 @@ import capteurs.Capteur;
 import capteurs.Couleur;
 import capteurs.CouleurLigne;
 import capteurs.Toucher;
+import capteurs.Ultrason;
 import exceptions.OuvertureException;
 import exceptions.*;
 
 public class ModeSolo {
 	public static void ramasserPalet(int nbPalets,boolean rougeAgauche) throws EchecGarageException, InterruptedException, OuvertureException {
 		new Capteur();
+		Toucher.startScan();
+		Ultrason.startScan();
+		Couleur.startScanAtRate(0);
 		Executor executor = Executors.newSingleThreadExecutor();
 		final double vitesse = 25;
 		final double acceleration = 30;
@@ -155,7 +159,10 @@ public class ModeSolo {
 					Pilote.seRedresserSurLigne(couleur,true,90,80);
 				}
 			}
-		}	
+		}
+		Toucher.stopScan();
+		Ultrason.stopScan();
+		Couleur.stopScan();
 	}
 }
 	

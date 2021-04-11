@@ -43,13 +43,13 @@ public class TestPilote {
 		}
 	}
 	
-	public static void testPID(final CouleurLigne c, final float vitesse) {
-		new Thread(new Runnable() { public void run() {Pilote.suivreLignePID(c, vitesse);}}).run();
-		long debut = System.currentTimeMillis();
-		while(System.currentTimeMillis() - debut < 5000 && Button.ENTER.isUp());
-		Pilote.SetSeDeplace(false);
-		MouvementsBasiques.pilot.stop();
-	}
+//	public static void testPID(final CouleurLigne c, final float vitesse) {
+//		new Thread(new Runnable() { public void run() {Pilote.suivreLignePID(c, vitesse);}}).run();
+//		long debut = System.currentTimeMillis();
+//		while(System.currentTimeMillis() - debut < 5000 && Button.ENTER.isUp());
+//		Pilote.SetSeDeplace(false);
+//		MouvementsBasiques.pilot.stop();
+//	}
 	
 	public static void testSuivreLigne(CouleurLigne c) {
 		Pilote.suivreLigne(c);
