@@ -76,4 +76,21 @@ public class Carte {
 		return(terrain);
 	}
 	
+	/**
+	 * Méthode permettant de trouver le palet le plus proche du robot en calculant la distance entre le "centre" du robot et le centre du palet.
+	 * Cela nous permet au robot d'avoir un début de "stratégie" qui est d'aller au plus proche de lui.
+	 * @return Le palet le plus proche du robot
+	 */
+	public Palet paletProche() {
+		Palet res = palets[0];
+		float dist = robot.getPosition().distance(palets[0].getCentre());
+		for(int i = 1; i<palets.length;i++) {
+			if(robot.getPosition().distance(palets[i].getCentre())<dist) {
+				res = palets[i];
+				dist = robot.getPosition().distance(palets[i].getCentre());
+			}
+		}
+		return(res);
+	}
+	
 }
