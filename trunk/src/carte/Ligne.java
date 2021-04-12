@@ -98,6 +98,7 @@ public class Ligne{
 		}
 	}
 	
+	@SuppressWarnings("unused")
 	public static class Etat{
 		private Point position;
 		private float direction;
