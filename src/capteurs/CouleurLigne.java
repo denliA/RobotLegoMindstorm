@@ -222,9 +222,9 @@ public enum CouleurLigne {
 	public float[] dominations(CouleurLigne c, boolean irgb) {
 		float[] diffs;
 		if (irgb)
-			diffs = IRGB.distance(IRGB, true);
+			diffs = IRGB.distance(c.IRGB, true);
 		else
-			diffs = IRatios.distance(IRGB, true);
+			diffs = IRatios.distance(c.IRGB, true);
 		return new float [] {Math.signum(diffs[0]),Math.signum(diffs[1]),Math.signum(diffs[2]) };
 	}
 	
@@ -436,6 +436,20 @@ class Intervalle {
 			}
 		}
 		return true;
+	}
+	
+	public float[] centre() {
+		float[] res = new float[taille];
+		for (int i=0; i<taille; i++) res[i] = (min[i]+max[i])/2;
+		return res;
+	}
+	
+	public float[] rapportsAuCentre(float[] point) {
+		float[] res = centre();
+		for (int i=0; i<taille; i++) {
+			res[i] = point[i]/res[i];
+		}
+		return res;
 	}
 	
 	public String toString() {
