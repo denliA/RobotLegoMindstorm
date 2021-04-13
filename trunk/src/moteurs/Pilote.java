@@ -73,13 +73,13 @@ public class Pilote {
 	public static void suivreLigne(CouleurLigne c) { //je mets en void car l'interface Deplacement n'est pas encore realisée. Je ne sais pas quoi retourner
 		
 		
-		final float coef_gauche = 1.15f;
-		final float coef_droit = 1.17f;//TODO utiliser le repport des vitesses gauche et droit par défaut au lieu d'un 1.27/1.25?
-		final long dureeRotation = 150; //TODO calibrer, en fonction de la vitesse?
+		final float coef_gauche = 1.30f;
+		final float coef_droit = 1.34f;//TODO utiliser le repport des vitesses gauche et droit par défaut au lieu d'un 1.27/1.25?
+		final long dureeRotation = 180; //TODO calibrer, en fonction de la vitesse? (180 presque)
 		MouvementsBasiques.chassis.setLinearSpeed(20);
 		MouvementsBasiques.chassis.setLinearAcceleration(10);
-		final int max_cycles =  3; // TODO calibrer
-		
+		final int max_cycles =  2; // TODO calibrer
+		int iterations = 0;
 		
 		System.out.println("DEBUT DE SUIVRE LIGNE ("+MouvementsBasiques.pilot.getLinearSpeed()+" / "+MouvementsBasiques.pilot.getLinearAcceleration()+")");
 		
@@ -122,10 +122,9 @@ public class Pilote {
 					//tourner à droite pendant dureeRotation*2
 					debut = System.currentTimeMillis();
 					Moteur.MOTEUR_GAUCHE.setSpeed(defaultSpeedGauche*coef_gauche);
-					System.out.println("  Entrée dans le second while du suivi");
-					while((last=Couleur.buffer.getLast()).couleur_x!=c &&((System.currentTimeMillis() - debut) < (dureeRotation*2))&& seDeplace) {
+					while((last=Couleur.buffer.getLast()).couleur_x!=c &&((System.currentTimeMillis() - debut) < (dureeRotation*2.5))&& seDeplace) {
 						if(c.intersections.containsKey(last.couleur_x)) {
-							cycles--; dec = true;
+							if(!dec) cycles--;
 							break;
 						}
 					}
@@ -133,14 +132,14 @@ public class Pilote {
 				}
 				else 
 					cycles=0;
-				if(Couleur.getLastCouleur()!=c && (cycles>= max_cycles) && seDeplace) {
+				if((last=Couleur.buffer.getLast()).couleur_x!=c && (cycles>= max_cycles) && seDeplace) {
 					//gestion d'erreur le robot n'a pas pu se redresser sur une ligne de couleur et il est perdu. Il faut arreter le mouvement
 					MouvementsBasiques.chassis.setLinearAcceleration(1000);
 					MouvementsBasiques.chassis.stop();
 					MouvementsBasiques.chassis.waitComplete();
 					MouvementsBasiques.chassis.setLinearAcceleration(10);
 					try {
-						seRedresserSurLigne(c, true, 90,120); // TODO à calibrer
+						seRedresserSurLigne(c, true, 40,60); // TODO à calibrer
 					}
 					catch (Exception e) {
 						break;
@@ -154,6 +153,15 @@ public class Pilote {
 			else {
 				cycles = 0;
 			}
+			if(iterations==1 && last.couleur_x!=c)  {
+				MouvementsBasiques.chassis.setLinearAcceleration(1000);
+				MouvementsBasiques.chassis.stop();
+				MouvementsBasiques.chassis.waitComplete();
+				MouvementsBasiques.chassis.setLinearAcceleration(10);
+				seRedresserSurLigne(c, true, 40, 60, 3);
+				MouvementsBasiques.chassis.travel(Float.POSITIVE_INFINITY); 
+			}
+			iterations++;
 		}
 		MouvementsBasiques.chassis.stop(); //Le robot s'arrete
 		MouvementsBasiques.chassis.setLinearAcceleration(def_acc);
@@ -269,7 +277,7 @@ public class Pilote {
 		return (t==c);
 	}
 	
-	public static void chercheLigne(CouleurLigne c,double vitesseLineaire,double accelerationLineaire,double vitesseAngulaire) {
+	public static void chercheLigne(CouleurLigne c,double vitesseLineaire,double accelerationLineaire,double vitesseAngulaire, boolean adroite) {
 		MouvementsBasiques.chassis.setAngularSpeed(vitesseAngulaire);
 		MouvementsBasiques.chassis.setLinearSpeed(vitesseLineaire);
 		MouvementsBasiques.chassis.setLinearAcceleration(accelerationLineaire);
@@ -278,8 +286,8 @@ public class Pilote {
 		while(Couleur.getLastCouleur()!=c);
 		MouvementsBasiques.chassis.travel(10); //avance de 10 cm
 		MouvementsBasiques.chassis.waitComplete();
-		tournerJusqua(c,true,360);
-		tournerJusqua(c, false, 40);
+		tournerJusqua(c,adroite,360);
+		tournerJusqua(c, !adroite, 40);
 		
 	}
 	
@@ -299,13 +307,20 @@ public class Pilote {
 		
 	}
 	
-	public static void tournerJusqua(CouleurLigne c,boolean agauche, int vitesse) {
+	
+	public static void tournerJusqua(CouleurLigne c, boolean agauche, int vitesse) {
+		tournerJusqua(c, agauche, vitesse, 300);
+	}
+	
+	public static void tournerJusqua(CouleurLigne c,boolean adroite, int vitesse, int temps_deb) {
+		
+		seDeplace = true;
 		Moteur.MOTEUR_DROIT.setAcceleration(20*vitesse);
 		Moteur.MOTEUR_GAUCHE.setAcceleration(20*vitesse);
 		Moteur.MOTEUR_DROIT.setSpeed(vitesse);
 		Moteur.MOTEUR_GAUCHE.setSpeed(vitesse);
 		Moteur.MOTEUR_GAUCHE.startSynchronization();
-		if(agauche) {
+		if(adroite) {
 		Moteur.MOTEUR_DROIT.forward();
 		Moteur.MOTEUR_GAUCHE.backward();
 		}
@@ -314,89 +329,15 @@ public class Pilote {
 			Moteur.MOTEUR_GAUCHE.forward();
 		}
 		Moteur.MOTEUR_GAUCHE.endSynchronization();
-		Delay.msDelay(200);
-		while(Couleur.getLastCouleur()!=c);
+		long debut = System.currentTimeMillis();
+		while(System.currentTimeMillis()-debut<temps_deb && seDeplace)
+			;
+		while(Couleur.getLastCouleur()!=c&&seDeplace);
 		Moteur.MOTEUR_GAUCHE.startSynchronization();
 			Moteur.MOTEUR_DROIT.stop();
 			Moteur.MOTEUR_GAUCHE.stop();
 		Moteur.MOTEUR_GAUCHE.endSynchronization();
 	}
 	
-	
-	
-	
-	
-	
-	
-	
-	
-//	public static void suivreLignePID(CouleurLigne c) {
-//		float KP = 15;
-//		float KD = 10;
-//		float KI =0;
-//		seDeplace = true;
-//		float sign = 1;
-//		MouvementsBasiques.setVitesseRobot(25);
-//		MouvementsBasiques.setAccelerationRobot(15);
-//		float DEFAULT_SPEED = Moteur.MOTEUR_DROIT.getSpeed();
-//		float MAX_SPEED = Moteur.MOTEUR_DROIT.getMaxSpeed();
-//		
-//		CouleurLigne.ContextePID contexte = c.contexteGris; // {mode : 0 pour RGB 1 pour Ratios ; indice pour le tableau du mode ; target}
-//		
-////		if (contexte.mode_rgb) {
-////			KP = KP /255;
-////			KD = KD/255;
-////			KI = KI/255;
-////		}
-//		
-//		System.out.println("Default speed : " + DEFAULT_SPEED);
-//		System.out.println(c+":  "+c.IRatios);
-//		System.out.println(CouleurLigne.GRIS+":  "+CouleurLigne.GRIS.IRatios);
-//		System.out.println("Contexte: "+contexte);
-//		
-//		
-//		float error = 0f;
-//		float previousError = 0f;
-//		float integral = 0f;
-//		float derivative = 0f;
-//		float correction = 0f;
-//		MouvementsBasiques.chassis.travel(Float.POSITIVE_INFINITY);
-//		do {
-//			BufferContexte last = Couleur.buffer.getLast();
-//			error = (contexte.mode_rgb ? last.rgb_x : last.ratios_x)[contexte.indice] - contexte.target;
-//			if (true) {
-//				
-//				if (Float.isNaN(correction)) return;
-//				
-//				
-//				if (true || c.estEntreDeux(CouleurLigne.GRIS, last.rgb_x, last.ratios_x)||last.couleur_x==CouleurLigne.GRIS) {
-//					integral += error;
-//					derivative = error - previousError;
-//					correction = sign*((error * KP)+(integral * KI)+(derivative * KD)); //PID control
-//					previousError = error;
-//				}
-//				else {
-//					error = previousError;
-//					derivative = 0;
-//					correction = 0;
-//				}
-//				System.out.println("valeur : "+last.rgb_x[0]+" -- "+last.rgb_x[1]+" -- "+last.rgb_x[2]);
-//				System.out.println(last.couleur_x + "Entre deux : "+ c.estEntreDeux(CouleurLigne.GRIS, last.rgb_x, last.ratios_x));
-//				System.out.println("	Erreur: " +  error + "  Derivee: "+derivative);
-//				// limiter le output 
-//				if (correction>MAX_SPEED)
-//					correction = MAX_SPEED;
-//				else if (correction<-MAX_SPEED)
-//					correction = -MAX_SPEED;
-//				// tourner robot
-//				Moteur.MOTEUR_GAUCHE.setSpeed(DEFAULT_SPEED+correction);
-//				Moteur.MOTEUR_DROIT.setSpeed(DEFAULT_SPEED-correction);
-////				if(derivative*error > 0  && derivative > .1*error)
-////					sign = -sign;
-//				System.out.println("	Corrigée : "+(DEFAULT_SPEED+correction)+"\n");
-//			}
-//		}
-//		while(seDeplace);
-//	}
 
 }
