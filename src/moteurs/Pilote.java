@@ -98,18 +98,22 @@ public class Pilote {
 		
 		BufferContexte last;
 		
-		
 		int cycles = 0;
 		while(seDeplace) {
+			boolean dec=false;
 			long debut;
 			if ((last=Couleur.buffer.getLast()).couleur_x!=c && seDeplace) {
 				System.out.println("  Entrée dans le premier while du suivi");
 				//tourner à gauche pendant dureeRotation
 				debut = System.currentTimeMillis();
 				
-				
+				//|| (last.couleur_x!=CouleurLigne.GRIS && last.couleur_x!=c&&Couleur.transitionneEntre(c, CouleurLigne.GRIS)==0)
 				Moteur.MOTEUR_DROIT.setSpeed(defaultSpeedDroit*coef_droit); 
 				while((last=Couleur.buffer.getLast()).couleur_x!=c && ((System.currentTimeMillis() - debut) < dureeRotation) && seDeplace) {
+					if(c.intersections.containsKey(last.couleur_x)) {
+						cycles--; dec = true;
+						break;
+					}
 
 				}
 				Moteur.MOTEUR_DROIT.setSpeed(defaultSpeedDroit);
@@ -119,7 +123,10 @@ public class Pilote {
 					Moteur.MOTEUR_GAUCHE.setSpeed(defaultSpeedGauche*coef_gauche);
 					System.out.println("  Entrée dans le second while du suivi");
 					while((last=Couleur.buffer.getLast()).couleur_x!=c &&((System.currentTimeMillis() - debut) < (dureeRotation*2))&& seDeplace) {
-						
+						if(c.intersections.containsKey(last.couleur_x)) {
+							cycles--; dec = true;
+							break;
+						}
 					}
 					Moteur.MOTEUR_GAUCHE.setSpeed(defaultSpeedGauche);
 				}
@@ -129,10 +136,10 @@ public class Pilote {
 					//gestion d'erreur le robot n'a pas pu se redresser sur une ligne de couleur et il est perdu. Il faut arreter le mouvement
 					MouvementsBasiques.chassis.setLinearAcceleration(1000);
 					MouvementsBasiques.chassis.stop();
-					Delay.msDelay(250);
+					MouvementsBasiques.chassis.waitComplete();
 					MouvementsBasiques.chassis.setLinearAcceleration(10);
 					try {
-						seRedresserSurLigne(c, true, 45,80); // TODO à calibrer
+						seRedresserSurLigne(c, true, 90,120); // TODO à calibrer
 					}
 					catch (Exception e) {
 						break;
@@ -165,7 +172,7 @@ public class Pilote {
 	
 	
 	public static boolean seRedresserSurLigne(CouleurLigne c, boolean gauche_bouge, float max_angle, int vitesse_angulaire) {
-		return seRedresserSurLigne(c, gauche_bouge, max_angle, vitesse_angulaire, 3);
+		return seRedresserSurLigne(c, gauche_bouge, max_angle, vitesse_angulaire, 2);
 	}
 	
 	
@@ -208,7 +215,7 @@ public class Pilote {
 				tournerToCouleur(c, gauche_bouge, -20);
 				MouvementsBasiques.pilot.setAngularSpeed(vitesse_angulaire);
 			}
-			if (seDeplace && iterations < max_iterations) {
+			if (seDeplace && iterations < max_iterations-1) {
 				MouvementsBasiques.chassis.travel(6);
 				MouvementsBasiques.chassis.waitComplete();
 				//while (MouvementsBasiques.chassis.isMoving() && seDeplace) Thread.yield();
@@ -251,13 +258,37 @@ public class Pilote {
 		
 		MouvementsBasiques.chassis.setAngularAcceleration(1000);
 		System.out.println("    		Entrée dans le stop");
-		MouvementsBasiques.chassis.stop();
-		Delay.msDelay(250);
-		System.out.println("    		Sortie du stop");
+		Moteur.MOTEUR_GAUCHE.startSynchronization();
+			Moteur.MOTEUR_DROIT.stop();
+			Moteur.MOTEUR_GAUCHE.stop();
+		Moteur.MOTEUR_GAUCHE.endSynchronization();
 		MouvementsBasiques.chassis.setAngularAcceleration(def_angular_acceleration);
 		
 		System.out.println("		Sortie de tournertoCouleur ("+MouvementsBasiques.pilot.getLinearSpeed()+" / "+MouvementsBasiques.pilot.getLinearAcceleration()+")");
 		return (t==c);
+	}
+	
+	public static void tournerJusqua(CouleurLigne c,boolean agauche, int vitesse) {
+		Moteur.MOTEUR_DROIT.setAcceleration(20*vitesse);
+		Moteur.MOTEUR_GAUCHE.setAcceleration(20*vitesse);
+		Moteur.MOTEUR_DROIT.setSpeed(vitesse);
+		Moteur.MOTEUR_GAUCHE.setSpeed(vitesse);
+		Moteur.MOTEUR_GAUCHE.startSynchronization();
+		if(agauche) {
+		Moteur.MOTEUR_DROIT.forward();
+		Moteur.MOTEUR_GAUCHE.backward();
+		}
+		else {
+			Moteur.MOTEUR_DROIT.backward();
+			Moteur.MOTEUR_GAUCHE.forward();
+		}
+		Moteur.MOTEUR_GAUCHE.endSynchronization();
+		Delay.msDelay(200);
+		while(Couleur.getLastCouleur()!=c);
+		Moteur.MOTEUR_GAUCHE.startSynchronization();
+			Moteur.MOTEUR_DROIT.stop();
+			Moteur.MOTEUR_GAUCHE.stop();
+		Moteur.MOTEUR_GAUCHE.endSynchronization();
 	}
 	
 	
