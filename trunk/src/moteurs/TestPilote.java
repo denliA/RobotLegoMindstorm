@@ -32,7 +32,7 @@ public class TestPilote {
 		//testSuivreLigne(CouleurLigne.JAUNE);
 		//testPID(CouleurLigne.JAUNE, 25);
 		
-		Pilote.chercheLigne(CouleurLigne.JAUNE, 25, 30, 180);
+		Pilote.chercheLigne(CouleurLigne.JAUNE, 25, 30, 180,true);
 		
 //		Vector <CouleurLigne> couleurs = new Vector <CouleurLigne>();
 //		couleurs.add(CouleurLigne.ROUGE);
