@@ -1,6 +1,7 @@
 package moteurs;
 
 import java.awt.Robot;
+import java.util.Vector;
 
 import capteurs.*;
 import capteurs.Couleur.BufferContexte;
@@ -46,7 +47,7 @@ public class Pilote {
 		double acceleration = MouvementsBasiques.getAccelerationRobot();
 		float[] RGB = Couleur.getRGB();
 		if(RGB[0] < 2 &&RGB[1] < 2 &&RGB[2] < 2) {
-			if(MouvementsBasiques.isMovingPilot()) { //si le robot bouge via MovePilot, on invoque la méthode stop de MovePilot qui perturbe les RegulatedMoteurs suivants
+			if(MouvementsBasiques.isMovingPilot()) { //si le robot bouge via MovePilot, on invoque la méthode sstop de MovePilot qui perturbe les RegulatedMoteurs suivants
 				MouvementsBasiques.setAccelerationRobot(150);
 				MouvementsBasiques.arreter();
 				Sound.twoBeeps();
@@ -266,6 +267,36 @@ public class Pilote {
 		
 		System.out.println("		Sortie de tournertoCouleur ("+MouvementsBasiques.pilot.getLinearSpeed()+" / "+MouvementsBasiques.pilot.getLinearAcceleration()+")");
 		return (t==c);
+	}
+	
+	public static void chercheLigne(CouleurLigne c,double vitesseLineaire,double accelerationLineaire,double vitesseAngulaire) {
+		MouvementsBasiques.chassis.setAngularSpeed(vitesseAngulaire);
+		MouvementsBasiques.chassis.setLinearSpeed(vitesseLineaire);
+		MouvementsBasiques.chassis.setLinearAcceleration(accelerationLineaire);
+		
+		MouvementsBasiques.chassis.travel(Double.POSITIVE_INFINITY);
+		while(Couleur.getLastCouleur()!=c);
+		MouvementsBasiques.chassis.travel(10); //avance de 10 cm
+		MouvementsBasiques.chassis.waitComplete();
+		tournerJusqua(c,true,360);
+		tournerJusqua(c, false, 40);
+		
+	}
+	
+	public static CouleurLigne chercheLigne(Vector <CouleurLigne> c,double vitesseLineaire,double accelerationLineaire,double vitesseAngulaire) {
+		MouvementsBasiques.chassis.setAngularSpeed(vitesseAngulaire);
+		MouvementsBasiques.chassis.setLinearSpeed(vitesseLineaire);
+		MouvementsBasiques.chassis.setLinearAcceleration(accelerationLineaire);
+		
+		MouvementsBasiques.chassis.travel(Double.POSITIVE_INFINITY);
+		CouleurLigne t;
+		while((t=Couleur.getLastCouleur())==CouleurLigne.GRIS || !c.contains(t));
+		MouvementsBasiques.chassis.travel(10); //avance de 10 cm
+		MouvementsBasiques.chassis.waitComplete();
+		tournerJusqua(t,true,360);
+		tournerJusqua(t, false, 40);
+		return t;
+		
 	}
 	
 	public static void tournerJusqua(CouleurLigne c,boolean agauche, int vitesse) {
