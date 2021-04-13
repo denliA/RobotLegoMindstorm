@@ -37,7 +37,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @see Capteur
  */
 public class Couleur {
-
+	
 	
 	//Attributs de la classe Couleur
 	private static float rouge;
@@ -47,7 +47,10 @@ public class Couleur {
 	private static float IDCouleur;
 	private static float intensiteRouge;
 	public static int scanRate=-1;
-	private static BufferContexte last = new BufferContexte();
+	// Les deux attributs last est previous sont en doublon avec les deux dernières valeurs du buffer, mais utiles pour avoir un accès rapide sans avoir besoin
+	// d'assurer la synchronisation
+	private static BufferContexte last;
+	private static BufferContexte previous;
 	public static BufferCouleurs buffer = new BufferCouleurs(5000);
 	
 	
@@ -213,13 +216,14 @@ public class Couleur {
 		 * @return tableau contenant les nombre dernières mesures
 		 */
 		public BufferContexte[] historique(int nombre) {
-			BufferContexte[] hist = new BufferContexte[nombre];
+			int th = Math.min(nombre, mesures_effectuees);
+			BufferContexte[] hist = new BufferContexte[th];
 			int n = 0;
 			synchronized(buffer_lock) {
-				for (int i=index; i>=0&&n<nombre; i--, n++) {
+				for (int i=index; i>=0&&n<th; i--, n++) {
 					hist[n] = buffer[i];
 				}
-				for (int i=taille-1; i>index&&n<nombre; i--, n++) {
+				for (int i=taille-1; i>index&&n<th; i--, n++) {
 					hist[n] = buffer[i];
 				}
 			}
@@ -262,16 +266,18 @@ public class Couleur {
 	private final static Object buffer_lock = new Object();
 	
 	// Pour lancer périodiquement des mesures
-	private static Timer lanceur = new Timer(100, 
-			new TimerListener() {
+	static TimerListener ecouteur = new TimerListener() {
 		public void timedOut() {
 			update(); // On prend toutes les mesures avec le capteur
 			// On met le dernier bloc de mesure dans last, et on sauvegarde ce dernier dans buffer. La dernière valeur se trouve toujours en doublon, mais 
 			// avoir la dernière mesure hors du buffer est un gain de temps autant pour le buffer que pour le client
+			previous = last;
 			last = new BufferContexte(((INTERPRETER&modeFlag)!=0?getCouleurLigne():null), System.currentTimeMillis(), rouge, vert, bleu, rouge/vert, bleu/vert, bleu/rouge);
 			buffer.save(last);
 		}
-	});
+	};
+	private static Timer lanceur = new Timer(100, ecouteur
+			);
 	
 	
 
@@ -336,11 +342,9 @@ public class Couleur {
 	 */
 	public static void startScanAtRate(int delay) {
 		// Dans le cas ou on n'a pas fait de scan avant, on fait au moins un scan et une sauvegarde dans le buffer avant de rendre la main, pour
-		// que l'appelant ait au moins une valeur à exploiter juste après.
+		// que l'appelant ait au moins deux valeurs à exploiter juste après.
 		if (! (scanRate<0)) {
-			update();
-			buffer.save(getCouleurLigne());
-			scanRate = delay;
+			ecouteur.timedOut(); ecouteur.timedOut();
 		}
 		lanceur.setDelay(delay);
 		lanceur.start();
@@ -495,6 +499,33 @@ public class Couleur {
 		}
 		// Si on n'a pas encore retourné, c'est qu'on a pas trouvé la couleur
 		return false;
+	}
+	
+	
+	public static float transitionneEntre(CouleurLigne origine, CouleurLigne arrivee) {
+		BufferContexte passe = previous, present = last;
+		if(passe==present) { passe = previous; present = last; }
+		
+		float [] variation_origine = new float[3], variation_arrivee=new float[3];
+		float[] dists_origine_present = origine.IRGB.distance(present.rgb_x);
+		float[] dists_origine_passe = origine.IRGB.distance(passe.rgb_x);
+		float[] dists_arrivee_present = arrivee.IRGB.distance(present.rgb_x);
+		float[] dists_arrivee_passe = arrivee.IRGB.distance(passe.rgb_x);
+		
+		for (int i=0;i<3;i++) {
+			variation_origine[i] = Math.signum(dists_origine_present[i] - dists_origine_passe[i]);
+			variation_arrivee[i] = Math.signum(dists_arrivee_present[i] - dists_arrivee_passe[i]);
+		}
+		
+		float direction_presumee = variation_origine[0];
+		for (int i=0; i<3;i++) {
+			if(variation_origine[i]*direction_presumee<0)
+				return 0;
+			if(variation_arrivee[i]*direction_presumee > 0)
+				return 0;
+		}
+		return direction_presumee;
+		
 	}
 	
 }
