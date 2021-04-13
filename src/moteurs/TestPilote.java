@@ -1,5 +1,9 @@
 package moteurs;
 
+import java.util.Vector;
+
+import javax.swing.event.ListSelectionEvent;
+
 import capteurs.Capteur;
 import capteurs.Couleur;
 import capteurs.CouleurLigne;
@@ -25,8 +29,16 @@ public class TestPilote {
 		//MouvementsBasiques.setAccelerationRobot(MouvementsBasiques.getAccelerationRobot()/5);
 		//MouvementsBasiques.setVitesseRobot(MouvementsBasiques.getVitesseRobot()/2);
 		//testSeRedresserSurLigne(CouleurLigne.JAUNE) ;
-		testSuivreLigne(CouleurLigne.JAUNE);
+		//testSuivreLigne(CouleurLigne.JAUNE);
 		//testPID(CouleurLigne.JAUNE, 25);
+		
+		Pilote.chercheLigne(CouleurLigne.JAUNE, 25, 30, 180);
+		
+//		Vector <CouleurLigne> couleurs = new Vector <CouleurLigne>();
+//		couleurs.add(CouleurLigne.ROUGE);
+//		couleurs.add(CouleurLigne.NOIRE);
+//		couleurs.add(CouleurLigne.JAUNE);
+//		Pilote.chercheLigne(couleurs, 25, 30, 180);
 	}
 	
 	public static void testSeRedresserSurLigne(CouleurLigne ligne) {
