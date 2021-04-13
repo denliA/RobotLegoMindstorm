@@ -42,7 +42,7 @@ public class Menu implements Lancable{
 			LCD.drawString(titre, 3, 0);
 			for (i=0; i<6 && i+6*page<tab.length;i++) { //i=nombre de lignes
 				buffer[i]=tab[i+page*6].getTitre().toCharArray();
-				max= (long) (max<buffer[i].length ? buffer[i] : max);
+				max= (max<buffer[i].length ? buffer[i].length : max);
 				for (j=debutColonne, k=0;j<buffer[i].length;j++,k++) {
 					LCD.drawChar(buffer[i][j], 2+k, i+2);
 				}

@@ -211,9 +211,12 @@ public class InterfaceTextuelle {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				} //lance la musique dans un executor
+				Delay.msDelay(2000);
 				LCD.clear();
 				LCD.drawString("arreter?", 3, 5);
-				while(button != Button.ID_ENTER);//je ne fais rien
+				while(button != Button.ID_ENTER) {
+					button = Button.waitForAnyPress();
+				}
 				Musique.stopMusic();	
 			}
 
