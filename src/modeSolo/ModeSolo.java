@@ -16,11 +16,16 @@ import exceptions.*;
 public class ModeSolo {
 	//methode classique pour le ModeSolo
 	public static void ramasserPalet(int nbPalets,boolean rougeAgauche) throws EchecGarageException, InterruptedException, OuvertureException {
-		ramasserPalet(nbPalets,3,0,rougeAgauche);
+		ramasserPalet(nbPalets,3,0,0,rougeAgauche);
+	}
+	
+	//surcharge pour indiquer que le ModeCompetition a ramasé un palet
+	public static void ramasserPalet(int nbPalets,int nbPaletScored,boolean rougeAgauche) throws EchecGarageException, InterruptedException, OuvertureException {
+		ramasserPalet(nbPalets,3,0,nbPaletScored,rougeAgauche);
 	}
 	
 	//surcharge pour indiquer dans le ModeCompetition si une ligne a deja été parcourue
-	public static void ramasserPalet(int nbPalets,int palets_par_ligne, int lignesParcourues,boolean rougeAgauche) throws EchecGarageException, InterruptedException, OuvertureException {
+	public static void ramasserPalet(int nbPalets,int palets_par_ligne, int lignesParcourues,int nbPaletScored,boolean rougeAgauche) throws EchecGarageException, InterruptedException, OuvertureException {
 		//Ne pas rouvrir les capteurs si ils ont deja ete ouverts dans le modeCompetition
 		if (lignesParcourues!=1) {
 		new Capteur();
@@ -37,13 +42,13 @@ public class ModeSolo {
 		MouvementsBasiques.chassis.setLinearSpeed(vitesse);
 		MouvementsBasiques.chassis.setLinearAcceleration(acceleration);
 		int scoredPalets=0;
-		int trio;
 		boolean tient_palet=false;
 		boolean droite=false;
 		boolean gauche=false;
 		boolean milieu=false;
 		int rien_trouve;
 		boolean touche=false;
+		int trio;
 		
 		if(!Pince.getOuvert()){
 			Pince.ouvrir();
@@ -71,7 +76,12 @@ public class ModeSolo {
 		
 		while((scoredPalets<nbPalets)&&(lignesParcourues<3)) {
 			//System.out.println("Début de "+couleur);
-			trio=0;
+			if (nbPaletScored==1) {
+				trio=nbPaletScored;
+			}
+			else {
+				trio=0;
+			}
 			rien_trouve = 0;
 			while(trio<palets_par_ligne && rien_trouve<2) { //pour rammasser les 3 palets sur une ligne de couleur
 				System.out.println("Itération "+trio+" de "+couleur);
