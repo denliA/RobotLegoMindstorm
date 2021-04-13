@@ -21,27 +21,37 @@ public class ModeCompetition {
 		Toucher.startScan();
 		Ultrason.startScan();
 		Couleur.startScanAtRate(0);
-		ExecutorService executor2 = Executors.newSingleThreadExecutor();
-		final double vitesse = 25;
-		final double acceleration = 30;
-		final double vitesse_angulaire = 180;
-		double acceleration_angulaire = MouvementsBasiques.chassis.getAngularAcceleration();
-		MouvementsBasiques.chassis.setAngularSpeed(vitesse_angulaire);
-		MouvementsBasiques.chassis.setLinearSpeed(vitesse);
-		MouvementsBasiques.chassis.setLinearAcceleration(acceleration);
-		int scoredPalets=0;
+		
+		double angle;
 		boolean droite=false;
 		boolean gauche=false;
 		boolean milieu=false;
 		boolean touche=false;
 		boolean couleurRepassee=false;
-		double angle;
+		CouleurLigne couleur2;
+		Thread t1;
+		
+		final double vitesse = 25;
+		final double acceleration = 30;
+		final double vitesse_angulaire = 180;
+		double acceleration_angulaire = MouvementsBasiques.chassis.getAngularAcceleration();
+		
+		MouvementsBasiques.chassis.setAngularSpeed(vitesse_angulaire);
+		MouvementsBasiques.chassis.setLinearSpeed(vitesse);
+		MouvementsBasiques.chassis.setLinearAcceleration(acceleration);
 		
 		if(!Pince.getOuvert()){
 			Pince.ouvrir();
 		}
 		CouleurLigne couleur = Couleur.getLastCouleur();
 		System.out.println(couleur);
+		
+		t1 = new Thread(new ArgRunnableDuo(couleur) {
+			public void run() {
+				Pilote.suivreLigne((CouleurLigne) truc);
+			}
+		} );
+		
 		if (rougeAgauche) { //robot demarre coté armoire
 			if (couleur==CouleurLigne.ROUGE)
 				droite=true; //je bifurque tjrs vers la ligne de droite
@@ -60,73 +70,76 @@ public class ModeCompetition {
 				droite=true; //je bifurque tjrs vers la ligne de droite
 		}
 		
-		executor2.execute(new ArgRunnableDuo(couleur) {
-			public void run() {
-				Pilote.suivreLigne((CouleurLigne) truc);
-			}
-		} );
+		t1.start();
 		
 		while(((touche=Toucher.getTouche())==false) && (Couleur.getLastCouleur()!=CouleurLigne.BLANCHE)); //on ne fait rien
 		
 		Pilote.SetSeDeplace(false); //arrete le suivi de ligne
 		MouvementsBasiques.chassis.waitComplete();
-		executor2.shutdown(); //on detruit le pool de l'executor2 pour liberer des ressources
-
+		
 	
 		if(touche) { //si le robot vient de toucher un palet
 			Pince.fermer();
+			angle=90; //angle pour tourner a gauche
 			if(gauche){
-				MouvementsBasiques.chassis.arc(); MouvementsBasiques.chassis.waitComplete();  //se decaler vers la gauche de la ligne
-				angle = 90;
+				//se decaler vers la gauche de la ligne
+				MouvementsBasiques.chassis.rotate(angle); MouvementsBasiques.chassis.waitComplete();  
+				MouvementsBasiques.chassis.travel(25); MouvementsBasiques.chassis.waitComplete();  
+				MouvementsBasiques.chassis.rotate(-angle);	MouvementsBasiques.chassis.waitComplete(); 
+				
 			}
 			if(droite){
-				MouvementsBasiques.chassis.arc(); MouvementsBasiques.chassis.waitComplete();  //se decaler vers la droite de la ligne
-				angle = -90;
+				//se decaler vers la droite de la ligne
+				angle=-90;
+				MouvementsBasiques.chassis.rotate(angle); MouvementsBasiques.chassis.waitComplete(); 
+				MouvementsBasiques.chassis.travel(25); MouvementsBasiques.chassis.waitComplete();  
+				MouvementsBasiques.chassis.rotate(-angle); MouvementsBasiques.chassis.waitComplete();  
+				
 			}
 			if(milieu){
-				MouvementsBasiques.chassis.arc(); MouvementsBasiques.chassis.waitComplete();  //se decaler vers la droite de la ligne
-				angle = -90;
+				//se decaler vers la gauche de la ligne
+				MouvementsBasiques.chassis.rotate(angle); MouvementsBasiques.chassis.waitComplete();  
+				MouvementsBasiques.chassis.travel(25); MouvementsBasiques.chassis.waitComplete();  
+				MouvementsBasiques.chassis.rotate(-angle);	MouvementsBasiques.chassis.waitComplete(); 
 			}
 			MouvementsBasiques.chassis.travel(Double.POSITIVE_INFINITY); //comme un forward(), le robot avance tout droit tant qu'il n'est pas arrete
 			while(Couleur.getLastCouleur()!=CouleurLigne.BLANCHE) { //peut etre vide a ajouter?
 				couleurRepassee=(Couleur.getLastCouleur()==couleur?true:false); //la couleur de depart a ete detectee?
 			}
-			scoredPalets++;
+			MouvementsBasiques.chassis.stop();
 			Pince.ouvrir();
 			MouvementsBasiques.chassis.travel(-5); MouvementsBasiques.chassis.waitComplete(); //robot recule
+			//si le robot n'est pas repassé sur la ligne de couleur de depart
 			if (!couleurRepassee) {
 				//tourner dans la direction contraire au decalage
-				angle= -angle;
+				angle=-angle;
 			}
-			MouvementsBasiques.chassis.arc(0,angle); MouvementsBasiques.chassis.waitComplete(); //tourner de 90 degres vers la gauche ou la droite selon la position de depart
-			Pilote.seRedresserSurLigne(couleur,true,40,80);	
-			modeSolo.ModeSolo.ramasserPalet(nbPalets-scoredPalets, 3, 0, rougeAgauche);
+			MouvementsBasiques.chassis.rotate(angle); MouvementsBasiques.chassis.waitComplete();
+			Pilote.chercheLigne(couleur,vitesse,acceleration,vitesse_angulaire,true); //se gare sur la couleur initiale
+			modeSolo.ModeSolo.ramasserPalet(nbPalets-1, 3, 0, 1, !rougeAgauche);
 			
 		}
 		else { //si le robot a atteint la ligne blanche de l'adversaire sans ramasser de palets
 			if (gauche) {
-				MouvementsBasiques.chassis.arc(0,90); MouvementsBasiques.chassis.waitComplete(); //tourne à gauche de 90 degres
-				MouvementsBasiques.chassis.travel(50); MouvementsBasiques.chassis.waitComplete();  //avance de 50 cm;
-				MouvementsBasiques.chassis.arc(0,90); MouvementsBasiques.chassis.waitComplete();  //tourne à gauche de 90 degres
-				//se redresser sur ligne noire
-				Pilote.seRedresserSurLigne(CouleurLigne.NOIRE,true,40,80);	
+				angle = 100;
+				MouvementsBasiques.chassis.rotate(angle); MouvementsBasiques.chassis.waitComplete();
+				couleur2 = rougeAgauche? CouleurLigne.ROUGE : CouleurLigne.JAUNE;
+				Pilote.chercheLigne(couleur2,vitesse,acceleration,vitesse_angulaire,true);
 			}
 			if (droite) {
-				MouvementsBasiques.chassis.arc(0,-90); MouvementsBasiques.chassis.waitComplete();  //tourne à droite de 90 degres
-				MouvementsBasiques.chassis.travel(50);  MouvementsBasiques.chassis.waitComplete(); //avance de 50 cm;
-				MouvementsBasiques.chassis.arc(0,-90); MouvementsBasiques.chassis.waitComplete();  //tourne à droite de 90 degres
-				//se redresser sur ligne noire
-				Pilote.seRedresserSurLigne(CouleurLigne.NOIRE,true,40,80);		
+				angle = -100;
+				MouvementsBasiques.chassis.rotate(angle); MouvementsBasiques.chassis.waitComplete();
+				couleur2 = rougeAgauche? CouleurLigne.JAUNE : CouleurLigne.ROUGE;
+				Pilote.chercheLigne(couleur2,vitesse,acceleration,vitesse_angulaire,false);
 			}
 			if (milieu) {
-				//robot va sur la ligne de gauche
-				MouvementsBasiques.chassis.arc(0,90); MouvementsBasiques.chassis.waitComplete();  //tourne à gauche de 90 degres
-				MouvementsBasiques.chassis.travel(50);  MouvementsBasiques.chassis.waitComplete();//avance de 50 cm;
-				MouvementsBasiques.chassis.arc(0,90); MouvementsBasiques.chassis.waitComplete();  //tourne à gauche de 90 degres
-				couleur = rougeAgauche? CouleurLigne.ROUGE : CouleurLigne.JAUNE;
-				Pilote.seRedresserSurLigne(couleur,true,90,80);
+				//se decaler vers la gauche
+				angle = (rougeAgauche? 100 : -100);
+				MouvementsBasiques.chassis.rotate(angle); MouvementsBasiques.chassis.waitComplete(); 
+				couleur2 = rougeAgauche? CouleurLigne.ROUGE : CouleurLigne.JAUNE;
+				Pilote.chercheLigne(couleur2,vitesse,acceleration,vitesse_angulaire,true); 
 			}
-			modeSolo.ModeSolo.ramasserPalet(nbPalets, 3, 1, rougeAgauche); //une ligne a deja ete parcourue
+			modeSolo.ModeSolo.ramasserPalet(nbPalets, 3, 0, 0, !rougeAgauche); //une ligne a deja ete parcourue mais c pas grave
 		}
 	}
 }
