@@ -40,13 +40,13 @@ import java.util.HashMap;
 public enum CouleurLigne { 
 	
 	
-	GRIS(new float[] {20f, 29f, 27.5f, 37f, 15f, 22f}, new float[] {.69f, .78f, 0.5f, 0.6f, .67f, .82f},true),
+	GRIS(new float[] {19f, 29f, 27.5f, 37f, 15f, 22f}, new float[] {.66f, .78f, 0.5f, 0.62f, .67f, .85f},true),
 	VERTE (new float[] {8f, 16f, 28.5f, 42f, 4.5f, 11f}, 1, -.75f,  new float[] {0.30f, 0.40f, 0.20f, 0.25f, 0.58f, 0.70f},1,-.75f),
 	BLEUE (new float[] {4.5f, 10f, 27f , 40f , 17.75f, 29.25f}, 1,-.75f, new float[] {0.17f, 0.28f, 0.61f, 0.78f, 2.50f, 4.00f},1,-.75f),
 	NOIRE(new float[] {2,12,2,12,2,12 }, 1,-1, new float[] {0.55f, 1f, 0.40f, 0.67f, 0.40f, 0.98f}, 0, -.5f, new CouleurLigne[] {BLEUE, VERTE}, true),
-	ROUGE ( new float[] {22.5f, 36f, 5.75f, 13.5f, 2f, 11.25f}, 1,-.75f, new float[] {2.80f, 3.80f, 0.45f, 0.60f, 0.10f, 0.20f}, 1,-.75f, new CouleurLigne[] {BLEUE, VERTE}, false), 
-	BLANCHE (new float[] {40f, 255f, 60f, 255f, 30f, 255f}, new float[] {0.63f, 0.77f, 0.52f, 0.65f, 0.67f, 0.95f}, true), 
-	JAUNE (new float[] {38f, 58f, 50f, 71.5f, 7.5f, 13f}, 1,-.75f, new float[] {0.75f, 0.83f, 0.15f, 0.20f, 0.18f, 0.26f},1,-.75f, new CouleurLigne[] {BLEUE, VERTE}, false),
+	ROUGE ( new float[] {22.5f, 36f, 5.75f, 13.5f, 2f, 11.25f}, 1,-.75f, new float[] {2.80f, 3.80f, 0.45f, 0.60f, 0.10f, 0.20f}, 1,-.75f, new CouleurLigne[] {BLEUE, VERTE, NOIRE}, false), 
+	BLANCHE (new float[] {37f, 255f, 55f, 255f, 28f, 255f}, new float[] {0.63f, 0.77f, 0.52f, 0.65f, 0.67f, 0.95f}, true), 
+	JAUNE (new float[] {38f, 58f, 50f, 71.5f, 7.5f, 13f}, 1,-.75f, new float[] {0.75f, 0.83f, 0.15f, 0.20f, 0.18f, 0.26f},1,-.75f, new CouleurLigne[] {BLEUE, VERTE, NOIRE}, false),
 	VIDE(new float[] {0,1,0,1,0,1 },null),
 	INCONNU(null, null),
 	NOIREH(null,null),
