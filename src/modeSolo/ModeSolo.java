@@ -95,7 +95,6 @@ public class ModeSolo {
 
 				while((tient_palet || (touche=Toucher.getTouche())==false)&&(Couleur.getLastCouleur()!=CouleurLigne.BLANCHE))
 					; //on ne fait rien
-					//System.out.print("Dans le while\t");
 				
 				Pilote.SetSeDeplace(false); //arrete le suivi de ligne
 				MouvementsBasiques.chassis.waitComplete();
@@ -103,27 +102,29 @@ public class ModeSolo {
 				if (tient_palet){ //si le robot a atteint sa ligne blanche d'en but et qu'il a ramassé un palet
 					trio++;
 					scoredPalets++;
-//					MouvementsBasiques.chassis.travel((3-trio)*4); MouvementsBasiques.chassis.waitComplete();
 					Pince.ouvrir();
 					tient_palet = false;
 					if(trio<palets_par_ligne) {
-						MouvementsBasiques.chassis.travel(-8-(3-trio)*4); MouvementsBasiques.chassis.waitComplete(); //robot recule
+						MouvementsBasiques.chassis.travel(-8); MouvementsBasiques.chassis.waitComplete(); //robot recule
 
 					}else {
 						MouvementsBasiques.chassis.travel(-8); MouvementsBasiques.chassis.waitComplete();
 						lignesParcourues++;
 					}
-					Pilote.tournerJusqua(couleur, true,300);
+					Pilote.tournerJusqua(couleur, true,250);
 					Pilote.tournerJusqua(couleur, false, 50,50);
 				}
 				else if(touche) { //si le robot vient de toucher un palet
 					tient_palet=true;
 					Pince.fermer();
-					if(couleur==CouleurLigne.NOIRE && trio == 1)
-						Pilote.tournerJusqua(couleur, true, 300, 850);
-					else 
-						Pilote.tournerJusqua(couleur, true,300);
-					Pilote.tournerJusqua(couleur, false, 50,50);
+					if(couleur==CouleurLigne.NOIRE && trio == 1) {
+						Pilote.tournerJusqua(couleur, true, 250, 850);
+						Pilote.tournerJusqua(couleur, false, 50, 50);
+					}
+					else {
+						Pilote.tournerJusqua(couleur, true,250);
+						Pilote.tournerJusqua(couleur, false, 50,50);
+					}
 				}
 				else { //si le robot a atteint la ligne blanche de l'adversaire sans ramasser de palets
 					if (rien_trouve==1) {
@@ -135,9 +136,8 @@ public class ModeSolo {
 					Pilote.tournerJusqua(couleur, true,300);
 					Pilote.tournerJusqua(couleur, false, 50,50);
 				}
-				//Pilote.seRedresserSurLigne(couleur, Couleur.aRecemmentVu(couleur, 40), 30*(1+trio), 60);
 			}
-			if (lignesParcourues>=3)
+			if (lignesParcourues>=3||scoredPalets>=nbPalets)
 				break;
 			if (gauche) {
 				//se redresser sur ligne noire
@@ -152,25 +152,15 @@ public class ModeSolo {
 				MouvementsBasiques.chassis.arc(0,90); MouvementsBasiques.chassis.waitComplete(); //tourne à gauche de 90 degres
 				
 				Pilote.chercheLigne(couleur, vitesse, acceleration, vitesse_angulaire, false);
-//				MouvementsBasiques.chassis.travel(50); MouvementsBasiques.chassis.waitComplete();  //avance de 50 cm;
-//				MouvementsBasiques.chassis.arc(0,-90); MouvementsBasiques.chassis.waitComplete();  //tourne à droite de 90 degres
-//				Pilote.tournerJusqua(couleur, false,300);
-//				Pilote.tournerJusqua(couleur, true, 50,50);
 			}
 			if (droite) {
 				if (lignesParcourues==1) {
 					couleur = CouleurLigne.NOIRE; //bizare demander a wassim pour le Couleur.aRecemmentVu
-//					Pilote.seRedresserSurLigne(CouleurLigne.NOIRE,Couleur.aRecemmentVu(couleur, 10),90,90);
 				}
 				else if (lignesParcourues==2) {
 					couleur = rougeAgauche? CouleurLigne.JAUNE: CouleurLigne.ROUGE;
-//					Pilote.seRedresserSurLigne(couleur,Couleur.aRecemmentVu(couleur, 10),90,90);
 				}		
 				MouvementsBasiques.chassis.arc(0,-90); MouvementsBasiques.chassis.waitComplete();  //tourne à droite de 90 degres
-//				MouvementsBasiques.chassis.travel(50);  MouvementsBasiques.chassis.waitComplete(); //avance de 50 cm;
-//				MouvementsBasiques.chassis.arc(0,90); MouvementsBasiques.chassis.waitComplete();  //tourne à gauche de 90 degres
-//				Pilote.tournerJusqua(couleur, true,300);
-//				Pilote.tournerJusqua(couleur, false, 50,50);
 				Pilote.chercheLigne(couleur, vitesse, acceleration, vitesse_angulaire, true);
 			}
 			if (milieu) {
@@ -178,20 +168,12 @@ public class ModeSolo {
 					couleur = rougeAgauche? CouleurLigne.ROUGE : CouleurLigne.JAUNE;
 					MouvementsBasiques.chassis.arc(0,90); MouvementsBasiques.chassis.waitComplete();  //tourne à gauche de 90 degres
 					MouvementsBasiques.chassis.travel(50);  MouvementsBasiques.chassis.waitComplete();//avance de 50 cm;
-//					MouvementsBasiques.chassis.arc(0,-90); MouvementsBasiques.chassis.waitComplete();  //tourne à droite de 90 degres
-//					Pilote.tournerJusqua(couleur, false,300);
-//					Pilote.tournerJusqua(couleur, true, 50,50);
 					Pilote.chercheLigne(couleur, vitesse, acceleration, vitesse_angulaire, false);
-					//Pilote.seRedresserSurLigne(couleur,true,90,80);
 				}else if(lignesParcourues==2) {
 					couleur = rougeAgauche? CouleurLigne.JAUNE : CouleurLigne.ROUGE;
 					MouvementsBasiques.chassis.arc(0,-90); MouvementsBasiques.chassis.waitComplete();  //tourne à droite de 90 degres
 					MouvementsBasiques.chassis.travel(100);  MouvementsBasiques.chassis.waitComplete(); //avance de 100 cm;
-//					MouvementsBasiques.chassis.arc(0,90); MouvementsBasiques.chassis.waitComplete();  //tourne à gauche de 90 degres
-//					Pilote.tournerJusqua(couleur, false, 300);
-//					Pilote.tournerJusqua(couleur, true, 50, 50);
 					Pilote.chercheLigne(couleur, vitesse, acceleration, vitesse_angulaire, true);
-					//Pilote.seRedresserSurLigne(couleur,true,90,80);
 				}
 			}
 		}

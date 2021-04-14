@@ -10,12 +10,12 @@ public class TestGetCouleur {
 
 	public static void main(String[] args) {
 		int button = -1;
-		boolean buffer = true;
+		boolean buffer = false;
 		while(button != Button.ID_ESCAPE) {
 			if (buffer)
 				testGetLastCouleur();
 			else 
-				collectionnerDonnees("./Scans/20210408/AvancerVerte_", false);
+				collectionnerDonnees("./Scans/20210414/AvancerGrisFenetrePorte_", false);
 			buffer=!buffer;
 			button = Button.waitForAnyPress();
 		}
@@ -58,7 +58,7 @@ public class TestGetCouleur {
 			button = Button.waitForAnyPress();
 			if (button == Button.ID_ENTER) {
 				contexte = Couleur.buffer.getLast();
-				System.out.println(contexte+ "\n" + CouleurLigne.JAUNE.estEntreDeux(CouleurLigne.GRIS, contexte.rgb_x, contexte.ratios_x));
+				System.out.println(contexte+ "\n");
 				//System.out.println("Couleurs touchées: " + contexte.couleur_x + (contexte.intersection_x == null ? "" : contexte.intersection_x) + "\n");
 				//System.out.println(Arrays.asList(Couleur.buffer.historique(10)));
 			}
@@ -67,6 +67,9 @@ public class TestGetCouleur {
 	}
 	
 	public static void collectionnerDonnees(String prefixeFichier, boolean tourner) {
+		new Capteur();
+		Couleur.setScanMode((byte) (Couleur.BUFFERING|Couleur.RGBMODE));
+		Couleur.startScanAtRate(0);
 		Date date = new Date() ;
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss") ;
 		//SimpleDateFormat dateFormat2 = new SimpleDateFormat("yyyymmdd");

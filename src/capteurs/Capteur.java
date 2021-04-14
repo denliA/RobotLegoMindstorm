@@ -34,6 +34,7 @@ public class Capteur {
 	static {
 		ouvrirCapteurCouleur();
 	}
+	
 	//ouvrir capteur
 	public static void ouvrirCapteurCouleur() {
 		while (COLOR_SENSOR==null || TOUCH_SENSOR==null || ULTRASONIC_SENSOR==null) {
@@ -53,7 +54,7 @@ public class Capteur {
 				Sound.beepSequenceUp();
 				System.err.println(e.toString());
 				e.printStackTrace(System.err);
-				Capteur.ouvrirCapteurCouleur();
+				Capteur.ouvrirCapteurCouleur(); // S'appelle récursivement tant qu'il y a une erreur à l'ouverture d'un des capteurs
 				System.err.println("L'occurence de l'erreur est finie !");
 			}
 		}
