@@ -34,7 +34,6 @@ public class ModeCompetition {
 		final double vitesse = 25;
 		final double acceleration = 30;
 		final double vitesse_angulaire = 180;
-		double acceleration_angulaire = MouvementsBasiques.chassis.getAngularAcceleration();
 		
 		MouvementsBasiques.chassis.setAngularSpeed(vitesse_angulaire);
 		MouvementsBasiques.chassis.setLinearSpeed(vitesse);
