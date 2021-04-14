@@ -88,7 +88,7 @@ public class Pilote {
 		final long dureeRotation = 250; //TODO calibrer, en fonction de la vitesse? (200 bien mais se décale vers la gauche des fois)
 		MouvementsBasiques.chassis.setLinearSpeed(20);
 		MouvementsBasiques.chassis.setLinearAcceleration(5);
-		final int max_cycles = 1; // TODO calibrer (cycles commence à 0)
+		final int max_cycles = 2; // TODO calibrer (cycles commence à 0)
 		
 		
 		long debut;
