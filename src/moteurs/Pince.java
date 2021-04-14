@@ -46,7 +46,6 @@ public class Pince {
 	//methodes modifiant la valeur de ouvert simultanement
 	public static void ouvrir() throws OuvertureException {
 		if(ouvert) {
-			//envoyer message d'erreur ?
 			throw new OuvertureException("Pinces deja ouvertes.");
 		}
 		else {

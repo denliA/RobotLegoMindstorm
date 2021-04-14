@@ -14,6 +14,15 @@ import lejos.utility.TimerListener;
 public class Pilote {
 	static private boolean seDeplace = false;
 	static private boolean suiviLigne = false;
+	static private boolean videVu = false;
+	
+	public static boolean getVideVu() {
+		return videVu;
+	}
+	
+	public static void setVideVu() {
+		videVu=false;
+	}
 
 	public static boolean getSeDeplace(){
 		return seDeplace;
@@ -44,29 +53,17 @@ public class Pilote {
 	}
 	
 	public static void vide() {
-		double acceleration = MouvementsBasiques.getAccelerationRobot();
 		float[] RGB = Couleur.getRGB();
 		if(RGB[0] < 2 &&RGB[1] < 2 &&RGB[2] < 2) {
-			if(MouvementsBasiques.isMovingPilot()) { //si le robot bouge via MovePilot, on invoque la méthode sstop de MovePilot qui perturbe les RegulatedMoteurs suivants
-				MouvementsBasiques.setAccelerationRobot(150);
-				MouvementsBasiques.arreter();
-				Sound.twoBeeps();
-			}else {
-				Moteur.MOTEUR_DROIT.setAcceleration(10000);
-				Moteur.MOTEUR_GAUCHE.setAcceleration(10000);
-				MouvementsBasiques.arreterMoteurs(); //on met la vitesse des moteurs à zero si le robot utilise directement les moteurs
-				Sound.beep();
-			}
+			MouvementsBasiques.chassis.stop();
 			seDeplace=false;
-			MouvementsBasiques.avancerTravel(acceleration,-15); //robot recule
-			MouvementsBasiques.tourner(180); //demi-tour
+			videVu=true;
+			MouvementsBasiques.chassis.travel(-10); //robot recule
+			//demi-tour
+			//MouvementsBasiques.tourner(180); 
+			
 		}
 	}
-	
-	
-	
-	
-	
 	
 	
 	/**
@@ -83,13 +80,12 @@ public class Pilote {
 		
 		
 		//Paramètres de calibration
-		final float coef_gauche = 1.15f; // TODO calibrer
+		final float coef_gauche = 1.15f;
 		final float coef_droit = 1.15f;//TODO calibrer
 		final long dureeRotation = 250; //TODO calibrer, en fonction de la vitesse? (200 bien mais se décale vers la gauche des fois)
 		MouvementsBasiques.chassis.setLinearSpeed(20);
 		MouvementsBasiques.chassis.setLinearAcceleration(5);
-		final int max_cycles = 2; // TODO calibrer (cycles commence à 0)
-		
+		final int max_cycles = 2; //nombre de fois ou il ne trouve pas la couleur avant d'appeler seRedresserSurLigne. Cycles commence à 0.
 		
 		long debut;
 		int iterations = 0;
@@ -110,8 +106,9 @@ public class Pilote {
 			sorti = false;
 			debut = System.currentTimeMillis();
 			boolean trouve=false;
-			while(System.currentTimeMillis()-debut < dureeRotation*2 && seDeplace) // au tout début, on laisse le robot avancer tout droit pendant une période (dureeRotation)
-				;
+			while(System.currentTimeMillis()-debut < dureeRotation*2 && seDeplace){
+				// au tout début, on laisse le robot avancer tout droit pendant une période (dureeRotation)
+			};
 			if(Couleur.getLastCouleur() != c&&seDeplace) { // Si après cette durée, il s'est déjà décalé
 				sorti = true;
 				MouvementsBasiques.chassis.stop(); // On arrête le mouvement

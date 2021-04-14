@@ -5,6 +5,7 @@ import java.util.concurrent.Semaphore;
 
 import lejos.robotics.RegulatedMotor;
 import lejos.robotics.chassis.Chassis;
+import lejos.robotics.chassis.Wheel;
 import lejos.robotics.chassis.WheeledChassis;
 import lejos.robotics.navigation.MovePilot;
 import lejos.utility.Delay;
@@ -23,7 +24,7 @@ public class MouvementsBasiques {
 	static double rightWheelDiameter = DIAM_ROUE_INCH;
 	public static Semaphore s1 = new Semaphore(1);
 	
-	public static WheeledChassis chassis = new WheeledChassis(
+	public static WheeledChassis chassis = new WheeledChassis2(
 			new WheeledChassis.Modeler[] { 
 					WheeledChassis.modelWheel(Moteur.MOTEUR_GAUCHE, leftWheelDiameter).offset(trackWidth / 2).invert(false),
 					WheeledChassis.modelWheel(Moteur.MOTEUR_DROIT, rightWheelDiameter).offset(-trackWidth / 2).invert(false) },
@@ -185,7 +186,12 @@ public class MouvementsBasiques {
 	}
 }
 
+class WheeledChassis2 extends WheeledChassis{
 
+	public WheeledChassis2(Wheel[] wheels, int dim) {
+		super(wheels, dim);
+	}
+}
 
 
 
