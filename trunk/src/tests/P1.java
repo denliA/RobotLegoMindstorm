@@ -20,7 +20,7 @@ public class P1 implements interfaceEmbarquee.Lancable{
 			button = Button.waitForAnyPress();
 			if (button == Button.ID_ENTER) {
 				couleur = Couleur.getLastCouleur();
-				System.out.println(couleur.toString());
+				System.out.println(couleur);
 			}
 			Button.waitForAnyEvent();
 		}

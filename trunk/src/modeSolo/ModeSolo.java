@@ -2,7 +2,6 @@ package modeSolo;
 import moteurs.MouvementsBasiques;
 import moteurs.Pince;
 import moteurs.Pilote;
-
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -15,33 +14,34 @@ import exceptions.*;
 
 public class ModeSolo {
 	//methode classique pour le ModeSolo
-	public static void ramasserPalet(int nbPalets,boolean rougeAgauche) throws EchecGarageException, InterruptedException, OuvertureException {
-		ramasserPalet(nbPalets,3,0,0,rougeAgauche);
+	public static void ramasserPalet(int nbPalets,boolean rougeAgauche) throws OuvertureException {
+		ramasserPalet(nbPalets,3,false,false,rougeAgauche);
 	}
 	
-	//surcharge pour indiquer que le ModeCompetition a ramasé un palet
-	public static void ramasserPalet(int nbPalets,int nbPaletScored,boolean rougeAgauche) throws EchecGarageException, InterruptedException, OuvertureException {
-		ramasserPalet(nbPalets,3,0,nbPaletScored,rougeAgauche);
+	//surcharge pour indiquer que le ModeCompetition a ramassé un palet
+	public static void ramasserPalet(int nbPalets,boolean PaletScored,boolean rougeAgauche) throws OuvertureException {
+		ramasserPalet(nbPalets,3,false,PaletScored,rougeAgauche);
 	}
 	
-	//surcharge pour indiquer dans le ModeCompetition si une ligne a deja été parcourue
-	public static void ramasserPalet(int nbPalets,int palets_par_ligne, int lignesParcourues,int nbPaletScored,boolean rougeAgauche) throws EchecGarageException, InterruptedException, OuvertureException {
+	
+	public static void ramasserPalet(int nbPalets,int palets_par_ligne, boolean ligneDuo, boolean PaletScored,boolean rougeAgauche) throws OuvertureException {
 		//Ne pas rouvrir les capteurs si ils ont deja ete ouverts dans le modeCompetition
-		if (lignesParcourues!=1) {
-		new Capteur();
-		Toucher.startScan();
-		Ultrason.startScan();
-		Couleur.startScanAtRate(0);
+		if ((ligneDuo==false)&&(PaletScored==false)) {
+			new Capteur();
+			Toucher.startScan();
+			Ultrason.startScan();
+			Couleur.startScanAtRate(0);
+			Pilote.startVideAtRate(0);
 		}
 		ExecutorService executor = Executors.newSingleThreadExecutor();
 		final double vitesse = 25;
 		final double acceleration = 30;
 		final double vitesse_angulaire = 180;
-		double acceleration_angulaire = MouvementsBasiques.chassis.getAngularAcceleration();
 		MouvementsBasiques.chassis.setAngularSpeed(vitesse_angulaire);
 		MouvementsBasiques.chassis.setLinearSpeed(vitesse);
 		MouvementsBasiques.chassis.setLinearAcceleration(acceleration);
 		int scoredPalets=0;
+		int lignesParcourues=0;
 		boolean tient_palet=false;
 		boolean droite=false;
 		boolean gauche=false;
@@ -76,25 +76,32 @@ public class ModeSolo {
 		
 		while((scoredPalets<nbPalets)&&(lignesParcourues<3)) {
 			//System.out.println("Début de "+couleur);
-			if (nbPaletScored==1) {
-				trio=nbPaletScored;
+			if (PaletScored) {
+				trio=1;
+				PaletScored=false; //la prochaine fois on ne rentre plus dans cette boucle
 			}
 			else {
 				trio=0;
 			}
 			rien_trouve = 0;
 			while(trio<palets_par_ligne && rien_trouve<2) { //pour rammasser les 3 palets sur une ligne de couleur
+				//Ne pas parcourir la ligne de milieu si elle a deja été parcourue par le modeCompetition
+				if (ligneDuo) {
+					ligneDuo=false;
+					lignesParcourues++;
+					break;
+				}
 				System.out.println("Itération "+trio+" de "+couleur);
 
-				
 				executor.execute(new ArgRunnable(couleur) {
 					public void run() {
 						Pilote.suivreLigne((CouleurLigne) truc);
 					}
-				} );
+				});
 
-				while((tient_palet || (touche=Toucher.getTouche())==false)&&(Couleur.getLastCouleur()!=CouleurLigne.BLANCHE))
-					; //on ne fait rien
+				while((tient_palet || (touche=Toucher.getTouche())==false)&&(Couleur.getLastCouleur()!=CouleurLigne.BLANCHE)){
+					//on ne fait rien
+				}; 
 				
 				Pilote.SetSeDeplace(false); //arrete le suivi de ligne
 				MouvementsBasiques.chassis.waitComplete();
@@ -118,8 +125,8 @@ public class ModeSolo {
 					tient_palet=true;
 					Pince.fermer();
 					if(couleur==CouleurLigne.NOIRE && trio == 1) {
-						Pilote.tournerJusqua(couleur, true, 250, 850);
-						Pilote.tournerJusqua(couleur, false, 50, 50);
+						Pilote.tournerJusqua(couleur, true, 250, 850); //si adroite est vrai, la roue droite avance et la roue gauche recule. Donc le robot tourne a gauche
+						Pilote.tournerJusqua(couleur, false, 50, 50); //le robot tourne a droite
 					}
 					else {
 						Pilote.tournerJusqua(couleur, true,250);
@@ -142,49 +149,50 @@ public class ModeSolo {
 			if (gauche) {
 				//se redresser sur ligne noire
 				if (lignesParcourues==1) {
-					//Pilote.seRedresserSurLigne(CouleurLigne.NOIRE,true,40,80);
 					couleur = CouleurLigne.NOIRE;
 				}
 				else if (lignesParcourues==2) {
 					couleur = rougeAgauche? CouleurLigne.ROUGE : CouleurLigne.JAUNE;
-					//Pilote.seRedresserSurLigne(couleur,true,40,40);
 				}
-				MouvementsBasiques.chassis.arc(0,90); MouvementsBasiques.chassis.waitComplete(); //tourne à gauche de 90 degres
-				
-				Pilote.chercheLigne(couleur, vitesse, acceleration, vitesse_angulaire, false);
+				MouvementsBasiques.chassis.rotate(90); MouvementsBasiques.chassis.waitComplete(); //tourne à gauche de 90 degres
+				Pilote.chercheLigne(couleur, vitesse, acceleration, vitesse_angulaire, false); //se gare sur la ligne de couleur
 			}
 			if (droite) {
 				if (lignesParcourues==1) {
-					couleur = CouleurLigne.NOIRE; //bizare demander a wassim pour le Couleur.aRecemmentVu
+					couleur = CouleurLigne.NOIRE;
 				}
 				else if (lignesParcourues==2) {
 					couleur = rougeAgauche? CouleurLigne.JAUNE: CouleurLigne.ROUGE;
 				}		
-				MouvementsBasiques.chassis.arc(0,-90); MouvementsBasiques.chassis.waitComplete();  //tourne à droite de 90 degres
-				Pilote.chercheLigne(couleur, vitesse, acceleration, vitesse_angulaire, true);
+				MouvementsBasiques.chassis.rotate(-90); MouvementsBasiques.chassis.waitComplete();  //tourne à droite de 90 degres
+				Pilote.chercheLigne(couleur, vitesse, acceleration, vitesse_angulaire, true); //se gare sur la ligne de couleur
 			}
 			if (milieu) {
 				if (lignesParcourues==1) {
+					//D'abord, le robot va sur la ligne de gauche
 					couleur = rougeAgauche? CouleurLigne.ROUGE : CouleurLigne.JAUNE;
-					MouvementsBasiques.chassis.arc(0,90); MouvementsBasiques.chassis.waitComplete();  //tourne à gauche de 90 degres
-					MouvementsBasiques.chassis.travel(50);  MouvementsBasiques.chassis.waitComplete();//avance de 50 cm;
+					MouvementsBasiques.chassis.rotate(90); MouvementsBasiques.chassis.waitComplete();  //tourne à gauche de 90 degres
 					Pilote.chercheLigne(couleur, vitesse, acceleration, vitesse_angulaire, false);
 				}else if(lignesParcourues==2) {
+					//Puis, le robot va sur la ligne de droite
 					couleur = rougeAgauche? CouleurLigne.JAUNE : CouleurLigne.ROUGE;
-					MouvementsBasiques.chassis.arc(0,-90); MouvementsBasiques.chassis.waitComplete();  //tourne à droite de 90 degres
-					MouvementsBasiques.chassis.travel(100);  MouvementsBasiques.chassis.waitComplete(); //avance de 100 cm;
-					Pilote.chercheLigne(couleur, vitesse, acceleration, vitesse_angulaire, true);
+					MouvementsBasiques.chassis.rotate(-90); MouvementsBasiques.chassis.waitComplete();  //tourne à droite de 90 degres
+					Pilote.chercheLigne(couleur, vitesse, acceleration, vitesse_angulaire, true); //se gare sur la ligne de couleur
 				}
 			}
 		}
 		Toucher.stopScan();
 		Ultrason.stopScan();
 		Couleur.stopScan();
+		Pilote.stopVide();
 		executor.shutdown();
 	}
 }
 	
-
+/* Dans un thread, on n'a pas acces a des variables d'instances d'autres classes
+ * or ici, on a besoin de passer la couleur en parametre de suivreLigne() qui sera executée dans la methode run() du thread */
+ 
+//Pour contourner ça, voici une classe qui permet de passer un parametre à un Runnable
 abstract class ArgRunnable implements Runnable {
 	Object truc;
 	public ArgRunnable(Object truc) {

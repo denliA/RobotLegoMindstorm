@@ -173,12 +173,6 @@ public class InterfaceTextuelle {
 								if(Configurations.strategieSolo.getVal().equals("ramasserPalets")) {
 									try {
 										modeSolo.ModeSolo.ramasserPalet(1, false);
-									} catch (EchecGarageException e) {
-										// TODO Auto-generated catch block
-										e.printStackTrace();
-									} catch (InterruptedException e) {
-										// TODO Auto-generated catch block
-										e.printStackTrace();
 									} catch (OuvertureException e) {
 										// TODO Auto-generated catch block
 										e.printStackTrace();
