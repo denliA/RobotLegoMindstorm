@@ -1,6 +1,5 @@
 package moteurs;
 
-import java.awt.Robot;
 import java.util.Vector;
 
 import capteurs.*;
@@ -14,6 +13,7 @@ import lejos.utility.TimerListener;
 
 public class Pilote {
 	static private boolean seDeplace = false;
+	static private boolean suiviLigne = false;
 
 	public static boolean getSeDeplace(){
 		return seDeplace;
@@ -76,19 +76,19 @@ public class Pilote {
 	 */
 	public static void suivreLigne(CouleurLigne c) {
 		seDeplace = true;
-		
+		suiviLigne = true;
 		// vitesses d'avant l'appel, à remettre à la fin
 		double def_acc=MouvementsBasiques.chassis.getLinearAcceleration();
 		double def_speed = MouvementsBasiques.chassis.getLinearSpeed();
 		
 		
 		//Paramètres de calibration
-		final float coef_gauche = 1.20f; // TODO calibrer
-		final float coef_droit = 1.22f;//TODO calibrer
-		final long dureeRotation = 150; //TODO calibrer, en fonction de la vitesse? (180 presque)
+		final float coef_gauche = 1.15f; // TODO calibrer
+		final float coef_droit = 1.15f;//TODO calibrer
+		final long dureeRotation = 250; //TODO calibrer, en fonction de la vitesse? (200 bien mais se décale vers la gauche des fois)
 		MouvementsBasiques.chassis.setLinearSpeed(20);
-		MouvementsBasiques.chassis.setLinearAcceleration(10);
-		final int max_cycles =  3; // TODO calibrer
+		MouvementsBasiques.chassis.setLinearAcceleration(5);
+		final int max_cycles = 1; // TODO calibrer (cycles commence à 0)
 		
 		
 		long debut;
@@ -104,20 +104,26 @@ public class Pilote {
 		
 		
 		// Si dès le début, le robot se décale de la ligne dès le début, c'est qu'il n'était pas bien placé, et on essaie de le faire se redresser avec tournerJusqua
+		boolean sorti;
+		int angle=10, vitesse_roues = 50;
 		do {
+			sorti = false;
 			debut = System.currentTimeMillis();
-			while(System.currentTimeMillis()-debut < dureeRotation && seDeplace) // au tout début, on laisse le robot avancer tout droit pendant une période (dureeRotation)
+			boolean trouve=false;
+			while(System.currentTimeMillis()-debut < dureeRotation*2 && seDeplace) // au tout début, on laisse le robot avancer tout droit pendant une période (dureeRotation)
 				;
-			if(Couleur.getLastCouleur() != c) { // Si après cette durée, il s'est déjà décalé
+			if(Couleur.getLastCouleur() != c&&seDeplace) { // Si après cette durée, il s'est déjà décalé
+				sorti = true;
 				MouvementsBasiques.chassis.stop(); // On arrête le mouvement
-				while(MouvementsBasiques.chassis.isMoving());
+				while(MouvementsBasiques.chassis.isMoving() && seDeplace);
 				// On se redresse grâce à tournerJusqua (en se limitant à 40° à l'aller, et 80° au retour, valeurs à possiblement corriger) 
-				tournerJusqua(c, true, 50, 0, 40);
-				tournerJusqua(c, true, 50, 0, 80);
+				trouve = tournerJusqua(c, true, vitesse_roues, 0, angle);
+				trouve|= tournerJusqua(c, false, 50, 0, angle*2);
 				MouvementsBasiques.chassis.travel(Float.POSITIVE_INFINITY); // On relance le mouvement
+				if (!trouve) { angle = angle+10; vitesse_roues+=30;}
 			}
 			
-		} while(Couleur.getLastCouleur()!=c && seDeplace); // On répète l'opération jusuqu'à ce que le robot puisse rester sur la ligne pendant au moins une période
+		} while(sorti && seDeplace); // On répète l'opération jusuqu'à ce que le robot puisse rester sur la ligne pendant au moins une période
 		
 		
 		BufferContexte last;
@@ -126,12 +132,14 @@ public class Pilote {
 		// On commence le vrai suivi ici
 		int cycles = 0; // Compte le nombre de fois qu'on a tourné à droite puis à gauche sans tomber sur la couleur
 		while(seDeplace) {
+			System.out.println("Début de l'itération "+iterations);
 			boolean dec=false;
 			if ((last=Couleur.buffer.getLast()).couleur_x!=c && seDeplace) { // Si on est pas sur la couleur, on entre en phase de realignment
 				// On tourne d'abord vers la droite, et ce jusqu'à ce qu'on tombe sur la ligne ou que dureeRotation millisecondes se soient écoulées
 				debut = System.currentTimeMillis();
 				Moteur.MOTEUR_DROIT.setSpeed(defaultSpeedDroit*coef_droit); // On augmente la vitesse de la roue droite
-				while((last=Couleur.buffer.getLast()).couleur_x!=c && ((System.currentTimeMillis() - debut) < dureeRotation) && seDeplace) {
+				//System.out.println("	Entrée dans le premier while et cycles="+cycles+"et couleur="+last.couleur_x);
+				while((last=Couleur.buffer.getLast()).couleur_x!=c && (((System.currentTimeMillis() - debut) < dureeRotation) || Couleur.variationDistanceDe(c)<0)&& seDeplace) {
 					if(c.intersections.containsKey(last.couleur_x)) { // Si on est dans une intersection de la couleur recherchée, arrêter de tourner
 						cycles--; dec = true; // Si on est sur l'intersection, on ne compte pas ça comme un cycle sans trouver de couleur.
 						break;
@@ -143,7 +151,8 @@ public class Pilote {
 				if ((last=Couleur.buffer.getLast()).couleur_x!=c) {
 					debut = System.currentTimeMillis();
 					Moteur.MOTEUR_GAUCHE.setSpeed(defaultSpeedGauche*coef_gauche);
-					while((last=Couleur.buffer.getLast()).couleur_x!=c &&((System.currentTimeMillis() - debut) < (dureeRotation*2.5))&& seDeplace) {
+					//System.out.println("	Entrée dans le second while et cycles="+cycles+"et couleur="+last.couleur_x);
+					while((last=Couleur.buffer.getLast()).couleur_x!=c &&(((System.currentTimeMillis() - debut) < (dureeRotation*2.5))||Couleur.variationDistanceDe(c)<0)&& seDeplace) {
 						if(c.intersections.containsKey(last.couleur_x)) {// Si on est dans une intersection de la couleur recherchée, arrêter de tourner
 							if(!dec) cycles--;
 							break;
@@ -151,22 +160,25 @@ public class Pilote {
 					}
 					Moteur.MOTEUR_GAUCHE.setSpeed(defaultSpeedGauche);
 				}
-				else 
+				else {
 					cycles=0; // dès qu'on voit la couleur, on met cycles à 0.
+				}
 				
 				// Si on n'a pas trouvé la couleur et qu'on cherche depuis max_cycles fois, on essaie de se redresser à l'arrêt.
 				if((last=Couleur.buffer.getLast()).couleur_x!=c && (cycles>= max_cycles) && seDeplace) { 
 					//gestion d'erreur le robot n'a pas pu se redresser sur une ligne de couleur et il est perdu. Il faut arrêter le mouvement
+					System.out.println("	entrée dans le code de coreection");
 					MouvementsBasiques.chassis.setLinearAcceleration(1000);
 					MouvementsBasiques.chassis.stop();
 					MouvementsBasiques.chassis.waitComplete();
 					MouvementsBasiques.chassis.setLinearAcceleration(10);
-						seRedresserSurLigne(c, true, 60,60); // TODO à calibrer (l'angle max et la vitesse de rotation)
 					cycles = 0;
+					seRedresserSurLigne(c, false, 90,60); // TODO à calibrer (l'angle max et la vitesse de rotation)
 					MouvementsBasiques.chassis.travel(Float.POSITIVE_INFINITY); 	
 				}
-				else if (cycles<max_cycles && seDeplace) // On incrémente le nombre de cycles passés sans trouver la couleur.
-					cycles++; 
+				else if (cycles<max_cycles && seDeplace) { // On incrémente le nombre de cycles passés sans trouver la couleur.
+					if (last.couleur_x==CouleurLigne.GRIS || dec) { cycles++; } 
+				}
 			}
 			else {
 				cycles = 0; // dès qu'on voit la couleur, on met cycles à 0.
@@ -175,6 +187,7 @@ public class Pilote {
 		}
 		
 		// On arrête le déplacement, et on remet les valeurs par défaut.
+		suiviLigne = false;
 		MouvementsBasiques.chassis.stop();
 		MouvementsBasiques.chassis.setLinearAcceleration(def_acc);
 		MouvementsBasiques.chassis.setLinearSpeed(def_speed);
@@ -213,7 +226,8 @@ public class Pilote {
 		
 		boolean retour = true;
 		
-		seDeplace = true;
+		if (!suiviLigne)
+			seDeplace = true;
 		int iterations = 0;
 		
 		while(Couleur.getLastCouleur() != c && seDeplace && iterations < max_iterations) {
@@ -238,7 +252,6 @@ public class Pilote {
 			if (seDeplace && iterations < max_iterations) {
 				MouvementsBasiques.chassis.travel(6);
 				MouvementsBasiques.chassis.waitComplete();
-				//while (MouvementsBasiques.chassis.isMoving() && seDeplace) Thread.yield();
 			}
 			
 			if (seDeplace && iterations == 0) {
@@ -259,7 +272,6 @@ public class Pilote {
 		MouvementsBasiques.chassis.setLinearAcceleration(def_acc);
 		MouvementsBasiques.chassis.setAngularSpeed(def_speed_angulaire);
 		
-		System.out.println("	SORTIE DE SE REDRESSER ("+MouvementsBasiques.pilot.getLinearSpeed()+" / "+MouvementsBasiques.pilot.getLinearAcceleration()+")");
 		
 		return retour;
 		
@@ -267,7 +279,6 @@ public class Pilote {
 	
 
 	private static boolean tournerToCouleur(CouleurLigne c, boolean gauche_bouge, double angle) {
-		System.out.println("		Entrée dans tournertoCouleur");
 		float coef = gauche_bouge ? -1 : 1;
 		double def_angular_acceleration = MouvementsBasiques.chassis.getAngularAcceleration();
 		CouleurLigne t;
@@ -277,8 +288,8 @@ public class Pilote {
 			;//On sort du while si le robot s'est redressé sur la bonne couleur ou si le temps est écoulé.
 		
 		MouvementsBasiques.chassis.setAngularAcceleration(1000);
-		System.out.println("    		Entrée dans le stop");
-		MouvementsBasiques.chassis.stop();
+		System.out.println("    		Entrée dans le stop de tounrerToCouleur");
+		MouvementsBasiques.chassis.stop(); MouvementsBasiques.chassis.waitComplete();
 		MouvementsBasiques.chassis.setAngularAcceleration(def_angular_acceleration);
 		
 		System.out.println("		Sortie de tournertoCouleur ("+MouvementsBasiques.pilot.getLinearSpeed()+" / "+MouvementsBasiques.pilot.getLinearAcceleration()+")");
@@ -321,8 +332,8 @@ public class Pilote {
 	 * Appelle la fonction tournerJusqua() avec une attente initiale par défaut de 300 milliSecondes et sans limite d'angle (4000, largement plus que le tour)
 	 * @see #tournerJusqua(CouleurLigne, boolean, int, int, int)
 	 */
-	public static void tournerJusqua(CouleurLigne c, boolean agauche, int vitesse) {
-		tournerJusqua(c, agauche, vitesse, 300);
+	public static boolean tournerJusqua(CouleurLigne c, boolean adroite, int vitesse) {
+		return tournerJusqua(c, adroite, vitesse, 300);
 	}
 	
 	
@@ -330,8 +341,8 @@ public class Pilote {
 	 * Appelle la fonction {@link #tournerJusqua(CouleurLigne, boolean, int, int, int)} sans limite d'angle (4000, largement plus que necessaire)
 	 * @see #tournerJusqua(CouleurLigne, boolean, int, int, int)
 	 */
-	public static void tournerJusqua(CouleurLigne c, boolean agauche, int vitesse, int temps_deb) {
-		tournerJusqua(c, agauche, vitesse, temps_deb, 4000);
+	public static boolean tournerJusqua(CouleurLigne c, boolean adroite, int vitesse, int temps_deb) {
+		return tournerJusqua(c, adroite, vitesse, temps_deb, 4000);
 	}
 	
 	
@@ -346,7 +357,7 @@ public class Pilote {
 	 * auquel cas il ne faut pas commencer à vérifier immédiatement car en se trouve sur la couleur au départ
 	 * @param max_angle 
 	 */
-	public static void tournerJusqua(CouleurLigne c,boolean adroite, int vitesse, int temps_deb, int max_angle) {
+	public static boolean tournerJusqua(CouleurLigne c,boolean adroite, int vitesse, int temps_deb, int max_angle) {
 		
 		// Mise en place de la vérification de non dépassement de l'angle maximal
 		double max_angle_roues = 1.1*MouvementsBasiques.trackWidth*max_angle/5.6; // Calcul de l'angle maximal que doit faire une roue selon l'angle maximal du robot.
@@ -356,11 +367,13 @@ public class Pilote {
 		// Si on est déjà sur la bonne couleur ET que l'on veut attendre 0 secondes avant de commencer à vérifier (c'est à dire qu'on veut juste retrouver la ligne),
 		// alors on retourne directement
 		if(Couleur.getLastCouleur() == c && temps_deb ==0) {
-			return;
+			return true;
 		}
 		
 		// Mise en place des conditions initiales
-		seDeplace = true;
+		if(!suiviLigne)	{
+			seDeplace = true;
+		}
 		Moteur.MOTEUR_DROIT.setAcceleration(20*vitesse);
 		Moteur.MOTEUR_GAUCHE.setAcceleration(20*vitesse);
 		Moteur.MOTEUR_DROIT.setSpeed(vitesse);
@@ -384,13 +397,19 @@ public class Pilote {
 		long debut = System.currentTimeMillis();
 		while(System.currentTimeMillis()-debut<temps_deb && seDeplace && Math.abs(Moteur.MOTEUR_DROIT.getTachoCount()-tacho_debut) <= max_angle_roues)
 			;
-		
+		CouleurLigne coul;
 		// Arrêt de la rotation juste après la détection de la ligne
-		while(Couleur.getLastCouleur()!=c&&seDeplace && Math.abs(Moteur.MOTEUR_DROIT.getTachoCount()-tacho_debut) <= max_angle_roues);
+		while((coul=Couleur.getLastCouleur())!=c&&seDeplace && Math.abs(Moteur.MOTEUR_DROIT.getTachoCount()-tacho_debut) <= max_angle_roues);
 		Moteur.MOTEUR_GAUCHE.startSynchronization();
 			Moteur.MOTEUR_DROIT.stop();
 			Moteur.MOTEUR_GAUCHE.stop();
 		Moteur.MOTEUR_GAUCHE.endSynchronization();
+		Delay.msDelay(50);
+		if(Moteur.MOTEUR_DROIT.getTachoCount()-tacho_debut>max_angle_roues) {
+			//System.out.println("((a dépassé l'angle)) (("+Moteur.MOTEUR_DROIT.getTachoCount()+",   "+tacho_debut);
+		}
+		return coul==c;
+			
 	}
 	
 

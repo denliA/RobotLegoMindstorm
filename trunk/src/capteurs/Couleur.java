@@ -52,6 +52,8 @@ public class Couleur {
 	private static BufferContexte last;
 	private static BufferContexte previous;
 	public static BufferCouleurs buffer = new BufferCouleurs(5000);
+	static CouleurLigne lastCouleur;
+	static boolean blanche;
 	
 	
 	// Constantes pour le modeFlag
@@ -407,11 +409,18 @@ public class Couleur {
 				}
 			}
 			
+			if(cand==CouleurLigne.BLANCHE) {
+				blanche = true;
+			}
+			
 			// On retourne la couleur trouvée, ou CouleurLigne.INCONNU si il n'y a aucun candidat.
-			if (cand !=null)
+			if (cand !=null) {
+				lastCouleur = cand;
 				return cand;
+			}
 			
 			// Si aucune couleur n'a une probabilité >0, on dit qu'on ne sait pas quelle couleur c'est
+			lastCouleur = CouleurLigne.INCONNU;
 			return CouleurLigne.INCONNU;
 		
 	}
@@ -423,7 +432,7 @@ public class Couleur {
 	 * @return couleurLigne représentant 
 	 */
 	public static CouleurLigne getLastCouleur() {
-		return last.couleur_x;
+		return lastCouleur;
 	}
 	
 	
@@ -501,7 +510,14 @@ public class Couleur {
 		return false;
 	}
 	
-	
+	/**
+	 * Détecte quand le robot avancer de la ligne origine vers la ligne arrivee (ou l'opposé)
+	 * <p>Est assez précise pour vérifier pour une seule couleur si l'on sait ou on est, mais 
+	 * donne beaucoup de faux positifs lorsqu'on vérifie pour toutes les couleurs.
+	 * @param origine couleurLigne depuis laquelle on se repère
+	 * @param arrivee couleurLigne vers laquelle on souhaite voir si on avance 
+	 * @return -1.0 si on va de <code>arrivee</code> à <code>origine</code>, 1.0 si c'est l'opposé, et 0 sinon.
+	 */
 	public static float transitionneEntre(CouleurLigne origine, CouleurLigne arrivee) {
 		BufferContexte passe = previous, present = last;
 		if(passe==present) { passe = previous; present = last; }
@@ -526,6 +542,21 @@ public class Couleur {
 		}
 		return direction_presumee;
 		
+	}
+	
+	public static float variationDistanceDe(CouleurLigne repere) {
+		BufferContexte passe = previous, present = last;
+		float distance_passe = repere.distanceDe(passe.rgb_x, true);
+		float distance_present = repere.distanceDe(present.rgb_x, true);
+		return Math.signum(distance_present-distance_passe);
+	}
+	
+	public static boolean blacheTouchee() {
+		if (blanche) {
+			blanche=false;
+			return true;
+		}
+		else return false;
 	}
 	
 }

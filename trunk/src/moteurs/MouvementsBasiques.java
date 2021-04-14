@@ -19,7 +19,7 @@ public class MouvementsBasiques {
 	/* Moteur gauche tourne plus vite que le moteur droit. Pour compenser, on cosidère que la roue gauche est plus grande que celle de droite.
 	 * Elle nécessite donc plus de rotations du moteur pour réaliser un tour complet. Les moteurs gauche et droit reçoivent la meme vitesse de rotation.
 	 */
-	static double leftWheelDiameter = DIAM_ROUE_INCH*1.0045; //1.0045 bon calibrage
+	static double leftWheelDiameter = DIAM_ROUE_INCH*1.01; //1.0045 bon calibrage
 	static double rightWheelDiameter = DIAM_ROUE_INCH;
 	public static Semaphore s1 = new Semaphore(1);
 	
@@ -188,93 +188,4 @@ public class MouvementsBasiques {
 
 
 
-class WheeledChassis2 extends WheeledChassis {
-	
-	int nWheels;
-	int[] e = new int[3];
-	int requests =-1;
-	
-	public WheeledChassis2(WheeledChassis.Modeler[] modeler, int type) {
-		super(modeler, type);
-		Field nWheelsField;
-		try {
-			nWheelsField = WheeledChassis.class.getField("nWheels");
-			nWheelsField.setAccessible(true);
-			nWheels = nWheelsField.getInt(this);
-		} catch (NoSuchFieldException e) {
-			
-			e.printStackTrace();
-		} catch (SecurityException e) {
-			
-			e.printStackTrace();
-		} catch (IllegalArgumentException e) {
-		
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-		
-			e.printStackTrace();
-		}
-	}
-	
-	@Override
-    public synchronized void setVelocity(double linearSpeed, double direction, double angularSpeed) {
-      if (dummyWheels ==1 && (direction % 180 != 0) ) throw new RuntimeException("Invalid direction for differential a robot."); 
-      // create matrices with speed and acceleration components using direction;
-      Matrix motorSpeed = forward.times(toCartesianMatrix(linearSpeed, Math.toRadians(direction), angularSpeed));
-      Matrix motorAcceleration = forwardAbs.times(copyAbsolute(toCartesianMatrix(linearAcceleration, Math.toRadians(direction), angularAcceleration)));
-      Matrix currentMotorSpeed = (getAttribute(ROTATIONSPEED));
-
-      // calculate acceleration for each of the wheels. 
-      // The goal is that all wheels take an even amount of time to reach final speed
-    
-      // Calculate difference between final speed and current speed
-      Matrix dif = motorSpeed.minus(currentMotorSpeed); 
-      // Calculate how much time each wheel needs to reach final speed;
-      Matrix time = dif.arrayRightDivide(motorAcceleration); 
-      // Find the longest time
-      double longestTime = getMax(time); 
-      if (longestTime == 0) return; // Aha, no speed differences. Do nothing.
-      // Devide speed difference by the longest time to get acceleration for each wheel
-      dif = dif.timesEquals(1 / longestTime); 
-      // Set the dynamics and execute motion
-      master.startSynchronization();
-      	for (int i = 0; i < nWheels; i++) {
-      		motor[i].setAcceleration((int) dif.get(i, 0));
-      		motor[i].setSpeed((int) Math.abs(motorSpeed.get(i, 0)));
-      		switch((int)Math.signum(motorSpeed.get(i, 0))) {
-      			case -1: motor[i].backward(); break;
-      			case 0: motor[i].stop(); break;
-      			case 1: motor[i].forward(); break;
-      		}
-      	}
-      master.endSynchronization();
-      System.out.println("				Fin du stoppage!!!!!");
-	}
-	
-	@Override
-	public boolean isMoving() {
-		if (++requests == 0)
-			for (int i=0; i<motor.length;i++)
-				e[i] = motor[i].getTachoCount();
-		boolean used_requests = false;
-		int i=0;
-	    for (RegulatedMotor wheel : motor) {
-	        if (wheel.isMoving()) {
-	          if (requests >= 50) {
-	        	  if (motor[i].getTachoCount() != e[i])
-	        		  return true;
-	        	  else
-	        		  used_requests = true;
-	          }
-	          else
-	        	  return true;
-	        }
-	        i++;
-	      }
-	      if (!used_requests) requests = 0;
-	      return false;
-	}
-	
-	
-}
 
