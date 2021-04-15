@@ -13,6 +13,8 @@ import capteurs.Ultrason;
 import exceptions.*;
 import interfaceEmbarquee.Musique;
 import lejos.hardware.Button;
+import lejos.hardware.Sound;
+import lejos.hardware.Sounds;
 import lejos.hardware.lcd.LCD;
 import lejos.utility.Delay;
 
@@ -35,7 +37,7 @@ public class ModeSolo {
 			Toucher.startScan();
 			Ultrason.startScan();
 			Couleur.startScanAtRate(0);
-			Pilote.startVideAtRate(0);
+			//Pilote.startVideAtRate(0);
 		}
 		ExecutorService executor = Executors.newSingleThreadExecutor();
 		final double vitesse = 25;
@@ -79,7 +81,6 @@ public class ModeSolo {
 		
 		
 		while((scoredPalets<nbPalets)&&(lignesParcourues<3)) {
-			//System.out.println("Début de "+couleur);
 			if (PaletScored) {
 				trio=1;
 				PaletScored=false; //la prochaine fois on ne rentre plus dans cette boucle
@@ -95,15 +96,15 @@ public class ModeSolo {
 					lignesParcourues++;
 					break;
 				}
-				System.out.println("Itération "+trio+" de "+couleur);
 
 				executor.execute(new ArgRunnable(couleur) {
 					public void run() {
 						Pilote.suivreLigne((CouleurLigne) truc);
 					}
 				});
-
-				while((tient_palet || (touche=Toucher.getTouche())==false)&&(Couleur.getLastCouleur()!=CouleurLigne.BLANCHE)){
+				
+				Couleur.blacheTouchee();
+				while((tient_palet || (touche=Toucher.getTouche())==false)&&!Couleur.blacheTouchee()){
 					//on ne fait rien
 				};
 				
@@ -115,7 +116,7 @@ public class ModeSolo {
 				if (tient_palet){ //si le robot a atteint sa ligne blanche d'en but et qu'il a ramassé un palet
 					trio++;
 					scoredPalets++;
-					Pince.ouvrir(300);
+					Pince.ouvrir(250);
 					tient_palet = false;
 					if(trio<palets_par_ligne) {
 						MouvementsBasiques.chassis.travel(-8); MouvementsBasiques.chassis.waitComplete(); //robot recule
@@ -132,7 +133,7 @@ public class ModeSolo {
 					//lance le bruitage dans un thread
 					Musique.startMusic("Wow.wav");
 					tient_palet=true;
-					Pince.fermer(300);
+					Pince.fermer(500);
 					if(couleur==CouleurLigne.NOIRE && trio == 1) {
 						Pilote.tournerJusqua(couleur, true, 250, 850); //si adroite est vrai, la roue droite avance et la roue gauche recule. Donc le robot tourne a gauche
 						Pilote.tournerJusqua(couleur, false, 50, 50); //le robot tourne a droite
@@ -151,7 +152,7 @@ public class ModeSolo {
 					}
 					else
 						rien_trouve++;	
-					Pilote.tournerJusqua(couleur, true,300);
+					Pilote.tournerJusqua(couleur, true,250);
 					Pilote.tournerJusqua(couleur, false, 50,50);
 				}
 			}
@@ -204,17 +205,17 @@ public class ModeSolo {
 		}
 		
 		//possibilite d'arreter la musique qui ne dure pas plus de 30 secondes
-		int button = -1;
-		Delay.msDelay(2000);
-		LCD.clear();
-		LCD.drawString("Arreter?", 3, 3);
-		LCD.drawString("Pressez sur Entree", 3, 4);
-		while((button!=Button.ID_ENTER)&&(button!=Button.ID_ESCAPE)) {
-			button = Button.waitForAnyPress();
-		}
-		if (button!=Button.ID_ENTER) {
-			Musique.stopMusic();	
-		}
+//		int button = -1;
+//		Delay.msDelay(2000);
+//		LCD.clear();
+//		LCD.drawString("Arreter?", 3, 3);
+//		LCD.drawString("Pressez sur Entree", 3, 4);
+//		while((button!=Button.ID_ENTER)&&(button!=Button.ID_ESCAPE)) {
+//			button = Button.waitForAnyPress();
+//		}
+//		if (button!=Button.ID_ENTER) {
+//			Musique.stopMusic();	
+//		}
 		
 		//arreter les mesures des capteurs et fermer le pool de threads
 		Toucher.stopScan();
