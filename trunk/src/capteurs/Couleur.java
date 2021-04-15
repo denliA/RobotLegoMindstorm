@@ -1,6 +1,7 @@
 package capteurs;
 
 import lejos.hardware.Sound;
+import lejos.hardware.Sounds;
 import lejos.utility.Delay;
 import lejos.utility.Timer;
 import lejos.utility.TimerListener;
@@ -54,6 +55,7 @@ public class Couleur {
 	public static BufferCouleurs buffer = new BufferCouleurs(5000);
 	static CouleurLigne lastCouleur;
 	static boolean blanche;
+	static float[] blanche_bornesInf = CouleurLigne.BLANCHE.IRGB.min;
 	
 	
 	// Constantes pour le modeFlag
@@ -244,8 +246,8 @@ public class Couleur {
 			try {
 				File f=new File(savePath);
 				FileWriter writer = new FileWriter(f);
-				writer.write("Vitesse : " + moteurs.MouvementsBasiques.getVitesseRobot() + "\t Accélération :" + moteurs.MouvementsBasiques.pilot.getAngularSpeed() + "\n");
-				writer.write("R\tG\tB\tR/G\tB/G\tB/R\tTemps\tCouleur\tIntersection\n");
+				writer.write("Vitesse : " + moteurs.MouvementsBasiques.chassis.getLinearSpeed() + ";Vitesse angulaire :" + moteurs.MouvementsBasiques.chassis.getAngularSpeed()+ "\n");
+				writer.write("R;G;B;R/G;B/G;B/R;Temps;Couleur;Intersection\n");
 				for (int i=h.length-1; i>=0 ; i--) {
 					String s = h[i].formatCSV();
 					if (s!="RIENG")
@@ -409,9 +411,6 @@ public class Couleur {
 				}
 			}
 			
-			if(cand==CouleurLigne.BLANCHE) {
-				blanche = true;
-			}
 			
 			// On retourne la couleur trouvée, ou CouleurLigne.INCONNU si il n'y a aucun candidat.
 			if (cand !=null) {
@@ -421,6 +420,8 @@ public class Couleur {
 			
 			// Si aucune couleur n'a une probabilité >0, on dit qu'on ne sait pas quelle couleur c'est
 			lastCouleur = CouleurLigne.INCONNU;
+			
+			
 			return CouleurLigne.INCONNU;
 		
 	}
@@ -472,6 +473,9 @@ public class Couleur {
 				rouge = 255*couleurRGB[0];
 				vert = 255*couleurRGB[1];
 				bleu = 255*couleurRGB[2];
+			}
+			if(rouge>blanche_bornesInf[0]&&vert>blanche_bornesInf[1]&&bleu>blanche_bornesInf[2]) {
+				blanche = true;
 			}
 		}
 		if((modeFlag & IDMODE)!=0) {
