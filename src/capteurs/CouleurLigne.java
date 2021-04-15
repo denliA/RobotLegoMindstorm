@@ -40,7 +40,7 @@ import java.util.HashMap;
 public enum CouleurLigne { 
 	
 	
-	GRIS(new float[] {19f, 29f, 27.5f, 37f, 15f, 22f}, new float[] {.66f, .78f, 0.5f, 0.62f, .67f, .85f},true),
+	GRIS(new float[] {19f, 29f, 27.5f, 37f, 15f, 22f}, new float[] {.66f, .825f, 0.5f, 0.62f, .67f, .85f},true),
 	VERTE (new float[] {8f, 16f, 28.5f, 42f, 4.5f, 11f}, 1, -.75f,  new float[] {0.30f, 0.40f, 0.20f, 0.25f, 0.58f, 0.70f},1,-.75f),
 	BLEUE (new float[] {4.5f, 10f, 27f , 40f , 17.75f, 29.25f}, 1,-.75f, new float[] {0.17f, 0.28f, 0.61f, 0.78f, 2.50f, 4.00f},1,-.75f),
 	NOIRE(new float[] {2,12,2,12,2,12 }, 1,-1, new float[] {0.55f, 1f, 0.40f, 0.67f, 0.40f, 0.98f}, 0, -.5f, new CouleurLigne[] {BLEUE, VERTE}, true),

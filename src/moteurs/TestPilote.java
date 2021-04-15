@@ -18,15 +18,17 @@ public class TestPilote {
 	public static void main(String args[]) throws Exception {
 		new Capteur();
 		Couleur.startScanAtRate(0); //commence le scan de la couleur immediatement. Quand une tache est finie, une autre est relancée sans délai.
+		MouvementsBasiques.chassis.setLinearAcceleration(10);
+		MouvementsBasiques.chassis.setLinearSpeed(20);
 		//testSeRedresserSurLigne(CouleurLigne.JAUNE);
 
 		
 		//MouvementsBasiques.setAccelerationRobot(MouvementsBasiques.getAccelerationRobot()/5);
 		//MouvementsBasiques.setVitesseRobot(MouvementsBasiques.getVitesseRobot()/2);
-		//testSeRedresserSurLigne(CouleurLigne.JAUNE) ;
+		testSeRedresserSurLigne(CouleurLigne.JAUNE) ;
 		//testSuivreLigne(CouleurLigne.JAUNE);
 		//testPID(CouleurLigne.JAUNE, 25);
-		testSuivreLigne(CouleurLigne.JAUNE);
+		//testSuivreLigne(CouleurLigne.JAUNE);
 		//Pilote.tournerJusqua(CouleurLigne.JAUNE, true, 100, 0,90);
 		
 		

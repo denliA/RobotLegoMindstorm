@@ -183,11 +183,11 @@ public class Pilote {
 					//gestion d'erreur le robot n'a pas pu se redresser sur une ligne de couleur et il est perdu. Il faut arrêter le mouvement
 					System.out.println("	entrée dans le code de correction");
 					MouvementsBasiques.chassis.setLinearAcceleration(1000);
-					MouvementsBasiques.chassis.stop();
+					MouvementsBasiques.chassis.travel(-8);
 					MouvementsBasiques.chassis.waitComplete();
 					MouvementsBasiques.chassis.setLinearAcceleration(10);
 					cycles = 0;
-					seRedresserSurLigne(c, false, 90,60); // TODO à calibrer (l'angle max et la vitesse de rotation)
+					seRedresserSurLigne(c, false, 90,180); // TODO à calibrer (l'angle max et la vitesse de rotation)
 					MouvementsBasiques.chassis.travel(Float.POSITIVE_INFINITY); 	
 				}
 				else if (cycles<max_cycles && seDeplace) { // On incrémente le nombre de cycles passés sans trouver la couleur.
@@ -245,14 +245,15 @@ public class Pilote {
 		int iterations = 0;
 		
 		while(Couleur.getLastCouleur() != c && seDeplace && iterations < max_iterations) {
-			trouve = tournerToCouleur(c, gauche_bouge, max_angle);
+			trouve = tournerJusqua(c, !gauche_bouge, (int)vitesse_angulaire, 0, (int)max_angle);
 			if (!trouve && seDeplace) {
-				trouve = tournerToCouleur(c, gauche_bouge, -max_angle);
+//				trouve = tournerToCouleur(c, gauche_bouge, -max_angle);
+				trouve = tournerJusqua(c, !gauche_bouge, (int)vitesse_angulaire, 0, (int)max_angle);
 				if(!trouve && seDeplace) {
 					gauche_bouge = !gauche_bouge;
-					trouve = tournerToCouleur(c, gauche_bouge, max_angle);
+					trouve = tournerJusqua(c, !gauche_bouge, (int)vitesse_angulaire, 0, (int)max_angle);
 					if (!trouve && seDeplace) {
-						trouve = tournerToCouleur(c, gauche_bouge, -max_angle);
+						trouve = tournerJusqua(c, !gauche_bouge, (int)vitesse_angulaire, 0, (int)max_angle);
 						retour = false;
 						break;
 					}
@@ -260,11 +261,11 @@ public class Pilote {
 			}
 			if (Couleur.getLastCouleur()!=c&&seDeplace) {
 				MouvementsBasiques.pilot.setAngularSpeed(vitesse_angulaire/4);
-				tournerToCouleur(c, gauche_bouge, -20);
+				trouve = tournerJusqua(c, !gauche_bouge, (int)(vitesse_angulaire/2), 0, (int)-20);
 				MouvementsBasiques.pilot.setAngularSpeed(vitesse_angulaire);
 			}
 			if (seDeplace && iterations < max_iterations) {
-				MouvementsBasiques.chassis.travel(6);
+				MouvementsBasiques.chassis.travel(10);
 				MouvementsBasiques.chassis.waitComplete();
 			}
 			
@@ -347,7 +348,7 @@ public class Pilote {
 	 * @see #tournerJusqua(CouleurLigne, boolean, int, int, int)
 	 */
 	public static boolean tournerJusqua(CouleurLigne c, boolean adroite, int vitesse) {
-		return tournerJusqua(c, adroite, vitesse, 300);
+		return tournerJusqua(c, adroite, vitesse, 200);
 	}
 	
 	
