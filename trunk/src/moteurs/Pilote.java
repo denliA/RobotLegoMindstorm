@@ -89,8 +89,8 @@ public class Pilote {
 		
 		
 		//Paramètres de calibration
-		final float coef_gauche = 1.15f;
-		final float coef_droit = 1.15f;//TODO calibrer
+		final float coef_gauche = 1.23f;
+		final float coef_droit = 1.20f;//TODO calibrer
 		final long dureeRotation = 250; //TODO calibrer, en fonction de la vitesse? (200 bien mais se décale vers la gauche des fois)
 		MouvementsBasiques.chassis.setLinearSpeed(20);
 		MouvementsBasiques.chassis.setLinearAcceleration(5);
@@ -110,8 +110,8 @@ public class Pilote {
 		
 		// Si dès le début, le robot se décale de la ligne dès le début, c'est qu'il n'était pas bien placé, et on essaie de le faire se redresser avec tournerJusqua
 		boolean sorti;
-		int angle=10, vitesse_roues = 50;
 		do {
+			int angle=10, vitesse_roues = 50;
 			sorti = false;
 			debut = System.currentTimeMillis();
 			boolean trouve=false;
@@ -123,10 +123,11 @@ public class Pilote {
 				MouvementsBasiques.chassis.stop(); // On arrête le mouvement
 				while(MouvementsBasiques.chassis.isMoving() && seDeplace);
 				// On se redresse grâce à tournerJusqua (en se limitant à 40° à l'aller, et 80° au retour, valeurs à possiblement corriger) 
-				trouve = tournerJusqua(c, true, vitesse_roues, 0, angle);
-				trouve|= tournerJusqua(c, false, 50, 0, angle*2);
+				do {
+					trouve = tournerJusqua(c, true, vitesse_roues, 0, angle);
+					trouve|= tournerJusqua(c, false, 50, 0, angle*2);
+				} while(!trouve && (angle = angle*2)!=0 && (vitesse_roues=(int)(vitesse_roues*1.5))!=0);
 				MouvementsBasiques.chassis.travel(Float.POSITIVE_INFINITY); // On relance le mouvement
-				if (!trouve) { angle = angle+10; vitesse_roues+=30;}
 			}
 			
 		} while(sorti && seDeplace); // On répète l'opération jusuqu'à ce que le robot puisse rester sur la ligne pendant au moins une période
@@ -138,7 +139,6 @@ public class Pilote {
 		// On commence le vrai suivi ici
 		int cycles = 0; // Compte le nombre de fois qu'on a tourné à droite puis à gauche sans tomber sur la couleur
 		while(seDeplace) {
-			System.out.println("Début de l'itération "+iterations);
 			boolean dec=false;
 			if ((last=Couleur.buffer.getLast()).couleur_x!=c && seDeplace) { // Si on est pas sur la couleur, on entre en phase de realignment
 				// On tourne d'abord vers la droite, et ce jusqu'à ce qu'on tombe sur la ligne ou que dureeRotation millisecondes se soient écoulées
@@ -155,6 +155,7 @@ public class Pilote {
 				
 				// Si on ne voit toujours pas la couleur, on tourne dans la direction opposée pendant deux fois plus de temps
 				if ((last=Couleur.buffer.getLast()).couleur_x!=c) {
+					int nb_pas_bien = 0; boolean pas_bien;
 					debut = System.currentTimeMillis();
 					Moteur.MOTEUR_GAUCHE.setSpeed(defaultSpeedGauche*coef_gauche);
 					//System.out.println("	Entrée dans le second while et cycles="+cycles+"et couleur="+last.couleur_x);
@@ -182,10 +183,8 @@ public class Pilote {
 					
 					//gestion d'erreur le robot n'a pas pu se redresser sur une ligne de couleur et il est perdu. Il faut arrêter le mouvement
 					System.out.println("	entrée dans le code de correction");
-					MouvementsBasiques.chassis.setLinearAcceleration(1000);
-					MouvementsBasiques.chassis.travel(-8);
+					MouvementsBasiques.chassis.travel(-15);
 					MouvementsBasiques.chassis.waitComplete();
-					MouvementsBasiques.chassis.setLinearAcceleration(10);
 					cycles = 0;
 					seRedresserSurLigne(c, false, 90,180); // TODO à calibrer (l'angle max et la vitesse de rotation)
 					MouvementsBasiques.chassis.travel(Float.POSITIVE_INFINITY); 	
@@ -227,7 +226,6 @@ public class Pilote {
 	public static boolean seRedresserSurLigne(CouleurLigne c, boolean gauche_bouge, double max_angle, double vitesse_angulaire, int max_iterations) {
 		boolean trouve;
 		
-		System.out.println("	ENTREE DANS SE REDRESSER ("+MouvementsBasiques.pilot.getLinearSpeed()+" / "+MouvementsBasiques.pilot.getLinearAcceleration()+")");
 		// On garde les vitesses angulaires d'avant l'appel de cette fonction
 		double def_acc = MouvementsBasiques.chassis.getLinearAcceleration();
 		double def_speed = MouvementsBasiques.chassis.getLinearSpeed();
@@ -293,23 +291,6 @@ public class Pilote {
 	}
 	
 
-	private static boolean tournerToCouleur(CouleurLigne c, boolean gauche_bouge, double angle) {
-		float coef = gauche_bouge ? -1 : 1;
-		double def_angular_acceleration = MouvementsBasiques.chassis.getAngularAcceleration();
-		CouleurLigne t;
-		
-		MouvementsBasiques.chassis.arc(coef*6.24, angle);
-		while((t=Couleur.getLastCouleur()) != c && seDeplace && MouvementsBasiques.chassis.isMoving() )
-			;//On sort du while si le robot s'est redressé sur la bonne couleur ou si le temps est écoulé.
-		
-		MouvementsBasiques.chassis.setAngularAcceleration(1000);
-		System.out.println("    		Entrée dans le stop de tounrerToCouleur");
-		MouvementsBasiques.chassis.stop(); MouvementsBasiques.chassis.waitComplete();
-		MouvementsBasiques.chassis.setAngularAcceleration(def_angular_acceleration);
-		
-		System.out.println("		Sortie de tournertoCouleur ("+MouvementsBasiques.pilot.getLinearSpeed()+" / "+MouvementsBasiques.pilot.getLinearAcceleration()+")");
-		return (t==c);
-	}
 	
 	public static void chercheLigne(CouleurLigne c,double vitesseLineaire,double accelerationLineaire,double vitesseAngulaire, boolean adroite) {
 		MouvementsBasiques.chassis.setAngularSpeed(vitesseAngulaire);
@@ -348,7 +329,7 @@ public class Pilote {
 	 * @see #tournerJusqua(CouleurLigne, boolean, int, int, int)
 	 */
 	public static boolean tournerJusqua(CouleurLigne c, boolean adroite, int vitesse) {
-		return tournerJusqua(c, adroite, vitesse, 200);
+		return tournerJusqua(c, adroite, vitesse, 350);
 	}
 	
 	
