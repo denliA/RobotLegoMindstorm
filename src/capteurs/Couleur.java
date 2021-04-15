@@ -56,6 +56,7 @@ public class Couleur {
 	static CouleurLigne lastCouleur;
 	static boolean blanche;
 	static float[] blanche_bornesInf = CouleurLigne.BLANCHE.IRGB.min;
+	static boolean vide;
 	
 	
 	// Constantes pour le modeFlag
@@ -477,6 +478,9 @@ public class Couleur {
 			if(rouge>blanche_bornesInf[0]&&vert>blanche_bornesInf[1]&&bleu>blanche_bornesInf[2]) {
 				blanche = true;
 			}
+			else if (rouge<3 && bleu<3 && vert <3) {
+				vide = true;
+			}
 		}
 		if((modeFlag & IDMODE)!=0) {
 			Delay.msDelay(delai);
@@ -558,6 +562,14 @@ public class Couleur {
 	public static boolean blacheTouchee() {
 		if (blanche) {
 			blanche=false;
+			return true;
+		}
+		else return false;
+	}
+	
+	public static boolean videTouche() {
+		if (vide) {
+			vide = false; 
 			return true;
 		}
 		else return false;

@@ -306,18 +306,28 @@ public class Pilote {
 		
 	}
 	
-	public static CouleurLigne chercheLigne(Vector <CouleurLigne> c,double vitesseLineaire,double accelerationLineaire,double vitesseAngulaire) {
+	public static CouleurLigne chercheLigne(Vector <CouleurLigne> c,double vitesseLineaire,double accelerationLineaire,double vitesseAngulaire, boolean adroite) {
 		MouvementsBasiques.chassis.setAngularSpeed(vitesseAngulaire);
 		MouvementsBasiques.chassis.setLinearSpeed(vitesseLineaire);
 		MouvementsBasiques.chassis.setLinearAcceleration(accelerationLineaire);
 		
-		MouvementsBasiques.chassis.travel(Double.POSITIVE_INFINITY);
-		CouleurLigne t;
-		while((t=Couleur.getLastCouleur())==CouleurLigne.GRIS || !c.contains(t));
-		MouvementsBasiques.chassis.travel(10); //avance de 10 cm
-		MouvementsBasiques.chassis.waitComplete();
-		tournerJusqua(t,true,300,200);
-		tournerJusqua(t, false, 40);
+		CouleurLigne t=CouleurLigne.INCONNU;
+		boolean vide;
+		do {
+			MouvementsBasiques.chassis.travel(Double.POSITIVE_INFINITY);
+			while(!(vide=Couleur.videTouche()) && ((t=Couleur.getLastCouleur())==CouleurLigne.GRIS || !c.contains(t)));
+			if (vide) {
+				MouvementsBasiques.chassis.stop();
+				MouvementsBasiques.chassis.travel(-10);
+				MouvementsBasiques.chassis.rotate(180);
+			}
+			else {
+				MouvementsBasiques.chassis.travel(10); //avance de 10 cm
+				MouvementsBasiques.chassis.waitComplete();
+			}
+		} while(vide);
+		tournerJusqua(t,adroite,300,200);
+		tournerJusqua(t, !adroite, 40);
 		return t;
 		
 	}
