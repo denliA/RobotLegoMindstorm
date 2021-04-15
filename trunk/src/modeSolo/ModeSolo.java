@@ -192,11 +192,6 @@ public class ModeSolo {
 				}
 			}
 		}
-		Toucher.stopScan();
-		Ultrason.stopScan();
-		Couleur.stopScan();
-		Pilote.stopVide();
-		executor.shutdown();
 		
 		//limite arbitraire pour evaluer notre niveau de satisfaction
 		if (scoredPalets>(nbPalets)/2) {
@@ -207,6 +202,8 @@ public class ModeSolo {
 			//partie perdue
 			Musique.startMusic("LosingSong.wav"); //lance le bruitage dans un thread
 		}
+		
+		//possibilite d'arreter la musique qui ne dure pas plus de 30 secondes
 		int button = -1;
 		Delay.msDelay(2000);
 		LCD.clear();
@@ -218,6 +215,13 @@ public class ModeSolo {
 		if (button!=Button.ID_ENTER) {
 			Musique.stopMusic();	
 		}
+		
+		//arreter les mesures des capteurs et fermer le pool de threads
+		Toucher.stopScan();
+		Ultrason.stopScan();
+		Couleur.stopScan();
+		Pilote.stopVide();
+		executor.shutdown();
 	}
 }
 	
