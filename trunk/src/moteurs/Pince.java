@@ -15,7 +15,10 @@ public class Pince {
 	private static boolean ouvert=false;
 	static FileWriter outputer = null;
 	static FileReader inputer = null;
+	static Thread t;
 	static {
+		Moteur.MOTEUR_PINCE.setSpeed(36000);
+		Moteur.MOTEUR_PINCE.setAcceleration(9000);
 		try {
 			inputer = new FileReader("statutPince");
 			ouvert = (inputer.read() == '1');
@@ -65,7 +68,6 @@ public class Pince {
 			throw new OuvertureException("Pinces deja fermees.");
 		}
 		else {
-			Moteur.MOTEUR_PINCE.setSpeed(36000);
 			Moteur.MOTEUR_PINCE.backward();
 			ouvert = false;
 			saveState();
@@ -74,6 +76,50 @@ public class Pince {
 			
 		}
 	}
+	
+	public static void ouvrir(int delai) throws OuvertureException {
+		if(ouvert) {
+			//envoyer message d'erreur ?
+			throw new OuvertureException("Pinces deja ouvertes.");
+		}
+		else {
+			t = new Thread(new Runnable() { 
+				public void run() {
+					Moteur.MOTEUR_PINCE.forward();
+					ouvert = true;
+					saveState();
+					Delay.msDelay(OUVERTURE);
+					Moteur.MOTEUR_PINCE.stop();
+				}
+			});
+			t.start();
+			Delay.msDelay(delai);
+		}
+	}
+	
+	public static void  fermer(int delai) throws OuvertureException {
+		if(!ouvert) {
+			//TO DO
+			//envoyer message d'erreur ?
+			throw new OuvertureException("Pinces deja fermees.");
+		}
+			
+		else {
+			t = new Thread(new Runnable() { 
+				public void run() {
+					Moteur.MOTEUR_PINCE.backward();
+					ouvert = false;
+					saveState();
+					Delay.msDelay((long)(OUVERTURE*1.5));
+					Moteur.MOTEUR_PINCE.stop();
+				}
+			});
+			t.start();
+			Delay.msDelay(delai);
+		}
+	}
+	
+	
 }
 
 

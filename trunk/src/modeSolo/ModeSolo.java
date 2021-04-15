@@ -115,7 +115,7 @@ public class ModeSolo {
 				if (tient_palet){ //si le robot a atteint sa ligne blanche d'en but et qu'il a ramassé un palet
 					trio++;
 					scoredPalets++;
-					Pince.ouvrir();
+					Pince.ouvrir(300);
 					tient_palet = false;
 					if(trio<palets_par_ligne) {
 						MouvementsBasiques.chassis.travel(-8); MouvementsBasiques.chassis.waitComplete(); //robot recule
@@ -132,7 +132,7 @@ public class ModeSolo {
 					//lance le bruitage dans un thread
 					Musique.startMusic("Wow.wav");
 					tient_palet=true;
-					Pince.fermer();
+					Pince.fermer(300);
 					if(couleur==CouleurLigne.NOIRE && trio == 1) {
 						Pilote.tournerJusqua(couleur, true, 250, 850); //si adroite est vrai, la roue droite avance et la roue gauche recule. Donc le robot tourne a gauche
 						Pilote.tournerJusqua(couleur, false, 50, 50); //le robot tourne a droite

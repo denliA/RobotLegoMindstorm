@@ -2,8 +2,7 @@
 
 import capteurs.*;
 import exceptions.OuvertureException;
-import lejos.utility.Delay;
-import moteurs.Pilote;
+
 
 public class TestModeSolo {
 
