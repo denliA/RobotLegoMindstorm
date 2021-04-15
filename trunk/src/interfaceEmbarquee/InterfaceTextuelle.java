@@ -1,9 +1,12 @@
 package interfaceEmbarquee;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
+import capteurs.CouleurLigne;
+import capteurs.CouleurLigne.ContextePID;
 import exceptions.EchecGarageException;
 import exceptions.OuvertureException;
 import lejos.hardware.Button;
@@ -15,8 +18,7 @@ import moteurs.Pilote;
 public class InterfaceTextuelle {
 	
 	public static void main(String[] args) {
-		Picker strategieSolo = new Picker("Strategies",Configurations.strategieSolo);
-		Picker strategieDuo = new Picker("Strategies",Configurations.strategieDuo);
+		
 		Menu basiques = new Menu("Basiques",new Lancable[] {
 				new Lancable() {
 					public void lancer() {}
@@ -162,32 +164,69 @@ public class InterfaceTextuelle {
 		});
 		
 		
-		Picker bruitages = new Picker("Bruitages",Configurations.musique);
-		Picker visages = new Picker("Visages",Configurations.expression);
-		
 		Lancable lancerSolo = new Lancable() {
-							public void lancer() {
-								if(Configurations.musique.getVal().equals("megalovania")) {
-									Sound.playSample(new File("MEGALOVANIA3.wav"), Sound.VOL_MAX);
-								}
-								if(Configurations.strategieSolo.getVal().equals("ramasserPalets")) {
-									try {
-										modeSolo.ModeSolo.ramasserPalet(1, false);
-									} catch (OuvertureException e) {
-										// TODO Auto-generated catch block
-										e.printStackTrace();
-									}
-								}
-							}
-							
-							public String getTitre() {
-								return "Lancer";
-							}
+			public void lancer() {
+				if(Configurations.strategieSolo.getVal().equals("ramasserPalets")) {
+					//choisir le camp de départ
+					boolean camp = true;
+					int button = -1;
+					LCD.clear();
+					LCD.drawString("RougeAGauche?", 3, 1);
+					LCD.drawString("vrai <<  >> faux", 1, 3);
+					while((button!=Button.ID_LEFT)&&(button!=Button.ID_RIGHT)) {
+						button = Button.waitForAnyPress();
+					}
+					if (button == Button.ID_LEFT) {
+						camp=true;
+					}
+					else if (button == Button.ID_RIGHT) {
+						camp=false;
+					}
+					//appeler la fonction a executer
+					try {
+						modeSolo.ModeSolo.ramasserPalet(9, camp);
+					} catch (OuvertureException e) {
+						System.out.println("Prob pour ouvrir pince");
+						e.printStackTrace();
+					} catch (InterruptedException e) {
+						System.out.println("Prob pour lancer musique");
+						e.printStackTrace();
+					}
+				}
+			}
+				
+			public String getTitre() {
+				return "Lancer";
+			}
 		};
 		Lancable lancerDuo = new Lancable() {
 			public void lancer() {
 				if(Configurations.strategieDuo.getVal().equals("ramasserPaletsDuo")) {
-					//fonction a coder
+					//choisir le camp de départ
+					boolean camp = true;
+					int button = -1;
+					LCD.clear();
+					LCD.drawString("RougeAGauche?", 3, 1);
+					LCD.drawString("vrai <<  >> faux", 1, 3);
+					while((button!=Button.ID_LEFT)&&(button!=Button.ID_RIGHT)) {
+						button = Button.waitForAnyPress();
+					}
+					if (button == Button.ID_LEFT) {
+						camp=true;
+					}
+					else if (button == Button.ID_RIGHT) {
+						camp=false;
+					}
+					//appeler la fonction a executer
+					try {
+						modeCompetition.ModeCompetition.ramasserPalet(9, camp);
+					} catch (OuvertureException e) {
+						System.out.println("Prob pour ouvrir pince");
+						e.printStackTrace();
+					} catch (InterruptedException e) {
+						System.out.println("Prob pour lancer musique");
+						e.printStackTrace();
+					}
 				}
 			}
 			
@@ -195,23 +234,54 @@ public class InterfaceTextuelle {
 				return "Lancer";
 			}
 		};
-		Lancable lancerReglages = new Lancable() {
+		
+		Lancable lancerMusique = new Lancable() {
 			//les fichiers.waw doivent etre mono,8000Hz et unsigned 8 bit
 			public void lancer() {
 				int button = -1;
 				try {
-					Musique.startMusic("megalovania","MEGALOVANIA.wav");
+					Musique.startMusic(); //lance la musique dans un thread
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
-				} //lance la musique dans un executor
+				} 
 				Delay.msDelay(2000);
 				LCD.clear();
-				LCD.drawString("arreter?", 3, 5);
-				while(button != Button.ID_ENTER) {
+				LCD.drawString("Arreter?", 3, 3);
+				LCD.drawString("Pressez sur Entree", 3, 4);
+				while((button!=Button.ID_ENTER)&&(button!=Button.ID_ESCAPE)) {
 					button = Button.waitForAnyPress();
 				}
-				Musique.stopMusic();	
+				if (button!=Button.ID_ENTER) {
+					Musique.stopMusic();	
+				}
+			}
+
+			public String getTitre() {
+				return "Lancer";
+			}
+		};
+		
+		Lancable lancerBruitage = new Lancable() {
+			//les fichiers.waw doivent etre mono,8000Hz et unsigned 8 bit
+			public void lancer() {
+				try {
+					Musique.startSound();
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+
+			public String getTitre() {
+				return "Lancer";
+			}
+		};
+		
+		Lancable lancerExpression = new Lancable() {
+			//les fichiers.waw doivent etre mono,8000Hz et unsigned 8 bit
+			public void lancer() {
+				//TODO	
 			}
 
 			public String getTitre() {
@@ -220,11 +290,23 @@ public class InterfaceTextuelle {
 		};
 		
 		
+		
+		Picker strategieSolo = new Picker("Strategies",Configurations.strategieSolo);
+		Picker strategieDuo = new Picker("Strategies",Configurations.strategieDuo);
+		Picker visages = new Picker("Visages",Configurations.expression);
+		Picker musiques = new Picker("Musiques",Configurations.musique);
+		Picker bruitages = new Picker("Bruitages",Configurations.bruitage);
+		
+		
+		Menu songs = new Menu("Musiques",new Lancable[] {lancerMusique,musiques});
+		Menu sounds = new Menu("Bruitages",new Lancable[] {lancerBruitage,bruitages});
+		Menu expressions = new Menu("Expressions",new Lancable[] {lancerExpression,visages});
+		
 		Menu modeSolo = new Menu("Mode Solo",new Lancable[] {lancerSolo,strategieSolo});
 		Menu modeCompetition = new Menu("Mode Competition",new Lancable[] {lancerDuo,strategieDuo});
 		Menu scenarios = new Menu("Scenarios",new Lancable[] {basiques,avances,optionnels});
 		Menu statistiques = new Menu("Statistiques"); //pas le temps de les faire?
-		Menu reglages = new Menu("Reglages",new Lancable[] {lancerReglages,bruitages,visages});
+		Menu reglages = new Menu("Reglages",new Lancable[] {songs,sounds,expressions});
 		
 		Menu menuPrincipal = new Menu("Menu Principal",new Lancable[] {modeSolo,modeCompetition,scenarios,statistiques,reglages});
 		menuPrincipal.lancer();

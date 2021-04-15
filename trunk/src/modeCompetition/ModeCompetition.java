@@ -6,6 +6,7 @@ import capteurs.CouleurLigne;
 import capteurs.Toucher;
 import capteurs.Ultrason;
 import exceptions.OuvertureException;
+import interfaceEmbarquee.Musique;
 import moteurs.MouvementsBasiques;
 import moteurs.Pilote;
 import moteurs.Pince;
@@ -45,9 +46,10 @@ public class ModeCompetition {
      *            Indique le camp de depart du robot. Si la ligne rouge est à gauche, ce boolean est vrai. Sinon, il est faux.
      *  
      * @throws OuvertureException      Si les pinces étaient dejà ouvertes quand on a demandé de les ouvrir. 
+	 * @throws InterruptedException 
      */
 	
-	public static void ramasserPalet(int nbPalets,boolean rougeAgauche) throws OuvertureException {
+	public static void ramasserPalet(int nbPalets,boolean rougeAgauche) throws OuvertureException, InterruptedException {
 		
 		new Capteur(); //Charger la classe capteur pour pouvoir l'utiliser
 		//Debut des prises de mesures par les capteurs
@@ -123,7 +125,9 @@ public class ModeCompetition {
 		MouvementsBasiques.chassis.waitComplete();
 		
 		/* Si le robot vient de toucher un palet */
-		if(touche) { 
+		if(touche) {
+			//lance le bruitage dans un thread
+			Musique.startMusic("Wow.wav");
 			Pince.fermer();
 			angle=90; //angle pour tourner a gauche
 			if(gauche){
@@ -153,6 +157,8 @@ public class ModeCompetition {
 					couleurRepassee=true; //flag mis a vrai si se test est vrai au moins une fois
 				}
 			}
+			//lance le bruitage dans un thread
+			Musique.startMusic("Easy.wav");
 			MouvementsBasiques.chassis.stop();
 			Pince.ouvrir();
 			MouvementsBasiques.chassis.travel(-5); MouvementsBasiques.chassis.waitComplete(); //robot recule
@@ -170,7 +176,9 @@ public class ModeCompetition {
 			
 		}
 		/* Si le robot a atteint la ligne blanche de l'adversaire sans ramasser de palets */
-		else { 
+		else {
+			//lance le bruitage dans un thread
+			Musique.startMusic("MissionFailed.wav");
 			//robot recule
 			MouvementsBasiques.chassis.travel(-5); MouvementsBasiques.chassis.waitComplete();
 			//faire demi-tour

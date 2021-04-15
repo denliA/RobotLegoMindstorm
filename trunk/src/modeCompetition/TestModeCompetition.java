@@ -9,7 +9,10 @@ public class TestModeCompetition {
 		try {
 			ModeCompetition.ramasserPalet(9,true);
 		} catch (OuvertureException e) {
-			// TODO Auto-generated catch block
+			System.out.println("Prob d'ouverture des pinces");
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			System.out.println("Prob pour lancer musique");
 			e.printStackTrace();
 		}
 

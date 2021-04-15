@@ -4,10 +4,11 @@ import java.util.Arrays;
 import java.util.Vector;
 
 public enum Configurations{
-	strategieSolo("ramasserPalets",new String[] {"ramasserPalets","ABCDEFGHIJKLMNOPQRSTUVWXYZ"}),
+	strategieSolo("ramasserPalets",new String[] {"ramasserPalets"}),
 	strategieDuo("ramasserPaletsDuo",new String[] {"ramasserPaletsDuo"}),
 	
-	musique("megalovania",new String[] {"megalovania","glitzAtTheRitz"}),
+	musique("megalovania",new String[] {"megalovania","victory","losing"}),
+	bruitage("wow",new String[] {"wow","easy","ohNo","nani","missionFailed","whilhelmScream","goatScream","nope","ennemySpotted","targetAcquired","targetLocked"}),
 	expression("sourire",new String[] {"sourire","larmes"});
 	
 	private String val; //valeur selectionnée

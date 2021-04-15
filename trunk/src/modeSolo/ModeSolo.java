@@ -11,20 +11,24 @@ import capteurs.CouleurLigne;
 import capteurs.Toucher;
 import capteurs.Ultrason;
 import exceptions.*;
+import interfaceEmbarquee.Musique;
+import lejos.hardware.Button;
+import lejos.hardware.lcd.LCD;
+import lejos.utility.Delay;
 
 public class ModeSolo {
 	//methode classique pour le ModeSolo
-	public static void ramasserPalet(int nbPalets,boolean rougeAgauche) throws OuvertureException {
+	public static void ramasserPalet(int nbPalets,boolean rougeAgauche) throws OuvertureException, InterruptedException {
 		ramasserPalet(nbPalets,3,false,false,rougeAgauche);
 	}
 	
 	//surcharge pour indiquer que le ModeCompetition a ramassé un palet
-	public static void ramasserPalet(int nbPalets,boolean PaletScored,boolean rougeAgauche) throws OuvertureException {
+	public static void ramasserPalet(int nbPalets,boolean PaletScored,boolean rougeAgauche) throws OuvertureException, InterruptedException {
 		ramasserPalet(nbPalets,3,false,PaletScored,rougeAgauche);
 	}
 	
 	
-	public static void ramasserPalet(int nbPalets,int palets_par_ligne, boolean ligneDuo, boolean PaletScored,boolean rougeAgauche) throws OuvertureException {
+	public static void ramasserPalet(int nbPalets,int palets_par_ligne, boolean ligneDuo, boolean PaletScored,boolean rougeAgauche) throws OuvertureException, InterruptedException {
 		//Ne pas rouvrir les capteurs si ils ont deja ete ouverts dans le modeCompetition
 		if ((ligneDuo==false)&&(PaletScored==false)) {
 			new Capteur();
@@ -101,7 +105,9 @@ public class ModeSolo {
 
 				while((tient_palet || (touche=Toucher.getTouche())==false)&&(Couleur.getLastCouleur()!=CouleurLigne.BLANCHE)){
 					//on ne fait rien
-				}; 
+				};
+				
+				
 				
 				Pilote.SetSeDeplace(false); //arrete le suivi de ligne
 				MouvementsBasiques.chassis.waitComplete();
@@ -121,7 +127,10 @@ public class ModeSolo {
 					Pilote.tournerJusqua(couleur, true,250);
 					Pilote.tournerJusqua(couleur, false, 50,50);
 				}
-				else if(touche) { //si le robot vient de toucher un palet
+				//si le robot vient de toucher un palet
+				else if(touche) { 
+					//lance le bruitage dans un thread
+					Musique.startMusic("Wow.wav");
 					tient_palet=true;
 					Pince.fermer();
 					if(couleur==CouleurLigne.NOIRE && trio == 1) {
@@ -134,6 +143,8 @@ public class ModeSolo {
 					}
 				}
 				else { //si le robot a atteint la ligne blanche de l'adversaire sans ramasser de palets
+					//lance le bruitage dans un thread
+					Musique.startMusic("MissionFailed.wav");
 					if (rien_trouve==1) {
 						lignesParcourues++;
 						rien_trouve++;
@@ -186,6 +197,27 @@ public class ModeSolo {
 		Couleur.stopScan();
 		Pilote.stopVide();
 		executor.shutdown();
+		
+		//limite arbitraire pour evaluer notre niveau de satisfaction
+		if (scoredPalets>(nbPalets)/2) {
+			//partie gagnée
+			Musique.startMusic("VictorySong.wav"); //lance le bruitage dans un thread
+		}
+		else {
+			//partie perdue
+			Musique.startMusic("LosingSong.wav"); //lance le bruitage dans un thread
+		}
+		int button = -1;
+		Delay.msDelay(2000);
+		LCD.clear();
+		LCD.drawString("Arreter?", 3, 3);
+		LCD.drawString("Pressez sur Entree", 3, 4);
+		while((button!=Button.ID_ENTER)&&(button!=Button.ID_ESCAPE)) {
+			button = Button.waitForAnyPress();
+		}
+		if (button!=Button.ID_ENTER) {
+			Musique.stopMusic();	
+		}
 	}
 }
 	
