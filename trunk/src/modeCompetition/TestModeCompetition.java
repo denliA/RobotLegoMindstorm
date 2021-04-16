@@ -12,7 +12,7 @@ public class TestModeCompetition {
 			System.out.println("Prob d'ouverture des pinces");
 			e.printStackTrace();
 		} catch (InterruptedException e) {
-			System.out.println("Prob pour lancer musique");
+			System.out.println("Musique interrompue");
 			e.printStackTrace();
 		}
 
