@@ -20,17 +20,17 @@ import lejos.utility.Delay;
 
 public class ModeSolo {
 	//methode classique pour le ModeSolo
-	public static void ramasserPalet(int nbPalets,boolean rougeAgauche) throws OuvertureException, InterruptedException {
+	public static void ramasserPalet(int nbPalets,boolean rougeAgauche) throws OuvertureException{
 		ramasserPalet(nbPalets,3,false,false,rougeAgauche);
 	}
 	
 	//surcharge pour indiquer que le ModeCompetition a ramassé un palet
-	public static void ramasserPalet(int nbPalets,boolean PaletScored,boolean rougeAgauche) throws OuvertureException, InterruptedException {
+	public static void ramasserPalet(int nbPalets,boolean PaletScored,boolean rougeAgauche) throws OuvertureException {
 		ramasserPalet(nbPalets,3,false,PaletScored,rougeAgauche);
 	}
 	
 	
-	public static void ramasserPalet(int nbPalets,int palets_par_ligne, boolean ligneDuo, boolean PaletScored,boolean rougeAgauche) throws OuvertureException, InterruptedException {
+	public static void ramasserPalet(int nbPalets,int palets_par_ligne, boolean ligneDuo, boolean PaletScored,boolean rougeAgauche) throws OuvertureException {
 		//Ne pas rouvrir les capteurs si ils ont deja ete ouverts dans le modeCompetition
 		if ((ligneDuo==false)&&(PaletScored==false)) {
 			new Capteur();

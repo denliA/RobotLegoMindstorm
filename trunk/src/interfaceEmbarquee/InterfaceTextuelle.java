@@ -188,9 +188,6 @@ public class InterfaceTextuelle {
 					} catch (OuvertureException e) {
 						System.out.println("Prob pour ouvrir pince");
 						e.printStackTrace();
-					} catch (InterruptedException e) {
-						System.out.println("Prob pour lancer musique");
-						e.printStackTrace();
 					}
 				}
 			}
@@ -222,9 +219,6 @@ public class InterfaceTextuelle {
 						modeCompetition.ModeCompetition.ramasserPalet(9, camp);
 					} catch (OuvertureException e) {
 						System.out.println("Prob pour ouvrir pince");
-						e.printStackTrace();
-					} catch (InterruptedException e) {
-						System.out.println("Prob pour lancer musique");
 						e.printStackTrace();
 					}
 				}

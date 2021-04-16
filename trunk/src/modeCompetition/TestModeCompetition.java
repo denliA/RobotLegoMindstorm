@@ -11,11 +11,7 @@ public class TestModeCompetition {
 		} catch (OuvertureException e) {
 			System.out.println("Prob d'ouverture des pinces");
 			e.printStackTrace();
-		} catch (InterruptedException e) {
-			System.out.println("Musique interrompue");
-			e.printStackTrace();
 		}
-
 	}
 
 }
