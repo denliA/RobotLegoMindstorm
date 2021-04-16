@@ -1,55 +1,11 @@
 package interfaceEmbarquee;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-
-import exceptions.OuvertureException;
-import lejos.hardware.Button;
 import lejos.hardware.Sound;
 import lejos.hardware.lcd.LCD;
-import lejos.utility.Delay;
-import modeCompetition.ModeCompetition;
 
 public class Musique{
-	static ExecutorService executor = Executors.newSingleThreadExecutor();
-	static Future<Void> future;
-	
 	static Thread t;
-	
-	
-	public static void jouerSon(final String name) throws InterruptedException {
-		t = new Thread(new Runnable() {
-			public void run() {
-				boolean end=false;
-	            while((!t.isInterrupted())&&(!end)){
-	            	LCD.clear();
-	            	int res;
-	            	File fichier= new File(name);
-					res = Sound.playSample(fichier, Sound.VOL_MAX); //attention : instruction bloquante
-					LCD.clear();
-					if (res<0) {
-						LCD.drawString("Erreur musique", 3, 5);
-					}
-					else {
-						end=true;
-					}
-	            }
-	            if (t.isInterrupted()) {
-	            	LCD.clear();
-	            	LCD.drawString("Musique interrompue",3,5);
-	            	//throw new InterruptedException();
-	            }
-	            else {
-					LCD.drawString("Musique finie",3,5);
-				} 
-			}
-		});
-		t.start();		
-	}
 	
 	//lance le bruitage choisi dans le picker
 	public static void startSound(){
@@ -62,16 +18,30 @@ public class Musique{
 	}
 	
 	//lance le son dont le fichier.wav est passé en paramètre
-	public static void startMusic(final String name){
-		try {
-			jouerSon(name);
-		} catch (InterruptedException e) {
-			LCD.clear();
-        	LCD.drawString("Musique interrompue",3,5);
-			e.printStackTrace();
-		} finally {
-			LCD.drawString("Musique finie",3,5);
-		}
+	public static void startMusic(final String name) {
+		t = new Thread(new Runnable() {
+			public void run(){
+				while(!t.isInterrupted()){
+					LCD.clear();
+					int res;
+					File fichier= new File(name);
+					if (!fichier.exists()) {
+						return; //On n'essaye pas de jouer une musique qui n'est existe pas
+					}
+					res = Sound.playSample(fichier, Sound.VOL_MAX); //attention : instruction bloquante
+					if (res<0) {
+						LCD.drawString("Prob jouer musique", 3, 5);
+					}
+					else {
+						LCD.drawString("Musique finie", 3, 5);
+					}
+					return;
+				}
+				LCD.clear();
+	        	LCD.drawString("Musique interrompue",3,6);
+			}
+		});
+		t.start();		
 	}
 	
 	public static void stopMusic(){
