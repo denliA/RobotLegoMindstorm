@@ -6,7 +6,7 @@ public class NFA0 implements interfaceEmbarquee.Lancable{
 	}
 	
 	public String getTitre() {
-		return "NFA0";
+		return "NFA0 - Ligne blanche adverse";
 	}
 	
 }

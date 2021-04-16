@@ -6,7 +6,7 @@ public class NFBM4 implements interfaceEmbarquee.Lancable{
 	}
 	
 	public String getTitre() {
-		return "NFBM4";
+		return "NFBM4 - Detecter vide";
 	}
 	
 }

@@ -6,7 +6,7 @@ public class NFA5 implements interfaceEmbarquee.Lancable{
 	}
 	
 	public String getTitre() {
-		return "NFA5";
+		return "NFA5 - Ramener palet position connue";
 	}
 	
 }

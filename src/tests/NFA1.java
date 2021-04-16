@@ -6,7 +6,7 @@ public class NFA1 implements interfaceEmbarquee.Lancable{
 	}
 	
 	public String getTitre() {
-		return "NFA1";
+		return "NFA1 - Rectangle";
 	}
 	
 }

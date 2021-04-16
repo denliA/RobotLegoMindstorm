@@ -6,7 +6,7 @@ public class NFBM6 implements interfaceEmbarquee.Lancable{
 	}
 	
 	public String getTitre() {
-		return "NFBM6";
+		return "NFBM6 - Capteur ultrason";
 	}
 	
 }

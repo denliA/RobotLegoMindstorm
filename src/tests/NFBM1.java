@@ -6,7 +6,7 @@ public class NFBM1 implements interfaceEmbarquee.Lancable{
 	}
 	
 	public String getTitre() {
-		return "NFBM1";
+		return "NFBM1 - Reconnaitre couleur";
 	}
 	
 }

@@ -6,7 +6,7 @@ public class NFA2 implements interfaceEmbarquee.Lancable{
 	}
 	
 	public String getTitre() {
-		return "NFA2";
+		return "NFA2 - Creneau";
 	}
 	
 }

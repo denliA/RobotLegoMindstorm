@@ -6,7 +6,7 @@ public class NFA7 implements interfaceEmbarquee.Lancable{
 	}
 	
 	public String getTitre() {
-		return "NFA7";
+		return "NFA7 - Chemin predefini 9 palets";
 	}
 	
 }

@@ -6,7 +6,7 @@ public class NFA3 implements interfaceEmbarquee.Lancable{
 	}
 	
 	public String getTitre() {
-		return "NFA3";
+		return "NFA3 - Intersection ligne";
 	}
 	
 }

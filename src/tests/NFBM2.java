@@ -6,7 +6,7 @@ public class NFBM2 implements interfaceEmbarquee.Lancable{
 	}
 	
 	public String getTitre() {
-		return "NFBM2";
+		return "NFBM2 - Reconnaître intersections";
 	}
 	
 }
