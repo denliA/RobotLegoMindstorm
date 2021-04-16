@@ -8,6 +8,7 @@ import capteurs.Couleur.BufferContexte;
 import carte.Carte;
 import carte.Point;
 import carte.Robot;
+import carte.Ligne;
 import carte.Ligne.LCC;
 import interfaceEmbarquee.Musique;
 import lejos.robotics.chassis.Chassis;
@@ -19,6 +20,9 @@ import lejos.utility.TimerListener;
 public class Pilote {
 	static private Carte carte = Carte.carteUsuelle;
 	static private Robot robot = carte.getRobot();
+	private static Chassis chassis = MouvementsBasiques.chassis;
+	final private static float INF = Float.POSITIVE_INFINITY;
+	
 	
 	static private boolean seDeplace = false;
 	static private boolean suiviLigne = false;
@@ -299,7 +303,7 @@ public class Pilote {
 		while(Couleur.getLastCouleur()!=c);
 		MouvementsBasiques.chassis.travel(10); //avance de 10 cm
 		MouvementsBasiques.chassis.waitComplete();
-		tournerJusqua(c,adroite,300,200);
+		tournerJusqua(c,adroite,250,200);
 		tournerJusqua(c, !adroite, 40);
 		
 	}
@@ -313,13 +317,14 @@ public class Pilote {
 		boolean vide;
 		do {
 			MouvementsBasiques.chassis.travel(Double.POSITIVE_INFINITY);
-			while(!(vide=Couleur.videTouche()) && ((t=Couleur.getLastCouleur())==CouleurLigne.GRIS || !c.contains(t)));
+			while(!(vide=Couleur.videTouche()) && (!c.contains(t=Couleur.getLastCouleur())));
 			if (vide) {
 				MouvementsBasiques.chassis.setLinearAcceleration(250);
 				MouvementsBasiques.chassis.stop(); MouvementsBasiques.chassis.waitComplete();
 				MouvementsBasiques.chassis.setLinearAcceleration(accelerationLineaire);
 				MouvementsBasiques.chassis.travel(-10); MouvementsBasiques.chassis.waitComplete();
 				MouvementsBasiques.chassis.rotate(180); MouvementsBasiques.chassis.waitComplete();
+				return t;
 			}
 			else {
 				MouvementsBasiques.chassis.travel(10); //avance de 10 cm
@@ -418,19 +423,10 @@ public class Pilote {
 			
 	}
 	
-	private static Chassis chassis = MouvementsBasiques.chassis;
-	final private static float INF = Float.POSITIVE_INFINITY;
 	private static Vector<CouleurLigne> longues = new Vector<>(Arrays.asList(new CouleurLigne[] {CouleurLigne.ROUGE, CouleurLigne.JAUNE}));
 	private static Vector<CouleurLigne> courtes = new Vector<>(Arrays.asList(new CouleurLigne[] {CouleurLigne.VERTE, CouleurLigne.BLEUE, CouleurLigne.BLANCHE}));
 	
-	public static void main(String[] args) {
-		new capteurs.Capteur();
-		Couleur.startScanAtRate(0);
-		LCC res = l();
-		if (res==null) System.out.println("NULL"); else System.out.println();
-		
-	}
-	
+
 	public static LCC chercherPosition() {
 		seDeplace = true;
 		int vitesse = 15;
@@ -464,6 +460,8 @@ public class Pilote {
 			}
 			times++;
 		} while(bvide && times <=2);
+		
+		
 		
 		if (courtes.contains(c)||bblanche) {
 			inter1 = bblanche ? CouleurLigne.BLANCHE :c;
@@ -530,8 +528,7 @@ public class Pilote {
 		
 		Pilote.SetSeDeplace(false);
 		chassis.stop();
-		seDeplace = false;
-		return new LCC(carte.Ligne.hashLignes.get(ligne), inter1, inter2);
+		return new LCC(Ligne.hashLignes.get(ligne), inter1, inter2);
 			
 	}
 
