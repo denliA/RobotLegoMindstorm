@@ -93,16 +93,28 @@ public class P2 implements interfaceEmbarquee.Lancable{
 			Pilote.stopVide();
 		}
 		else {
-			MouvementsBasiques.chassis.travel(30);
-			//faire demi-tour
-			Pilote.tournerJusqua(couleur,true,250); //tourne jusqu'à la couleur
-			Pilote.tournerJusqua(couleur, false, 50,50); //se remet bien sur la ligne si on la dépasse
-			try {
-				//appelle le ramasserPalet du modeSolo sachant qu'une ligne a été parcourue sans ramasser de palet
-				modeSolo.ModeSolo.ramasserPalet(1,1,true,false,!rougeAgauche);
-			} catch (OuvertureException e) {
-				System.out.println("Prob pour ouvrir pince");
-				e.printStackTrace();
+			//la ligne verte a été detectée a la première intersection
+			if(!rougeAgauche) {
+				try {
+					modeCompetition.ModeCompetition.ramasserPalet(1, rougeAgauche);
+				} catch (OuvertureException e) {
+					System.out.println("Prob pour ouvrir pince");
+					e.printStackTrace();
+				}
+			}
+			//la ligne verte a été detectée a la troisième intersection
+			else {
+				MouvementsBasiques.chassis.travel(30);
+				//faire demi-tour
+				Pilote.tournerJusqua(couleur,true,250); //tourne jusqu'à la couleur
+				Pilote.tournerJusqua(couleur, false, 50,50); //se remet bien sur la ligne si on la dépasse
+				try {
+					//appelle le ramasserPalet du modeSolo sachant qu'une ligne a été parcourue sans ramasser de palet
+					modeSolo.ModeSolo.ramasserPalet(1,1,true,false,!rougeAgauche);
+				} catch (OuvertureException e) {
+					System.out.println("Prob pour ouvrir pince");
+					e.printStackTrace();
+				}
 			}
 		}
 		executor1.shutdown();
