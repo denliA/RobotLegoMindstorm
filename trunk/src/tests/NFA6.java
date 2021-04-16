@@ -6,7 +6,7 @@ public class NFA6 implements interfaceEmbarquee.Lancable{
 	}
 	
 	public String getTitre() {
-		return "NFA6";
+		return "NFA6 - Ramener palet ultrason";
 	}
 	
 }

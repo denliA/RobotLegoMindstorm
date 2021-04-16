@@ -6,7 +6,7 @@ public class NFBA1 implements interfaceEmbarquee.Lancable{
 	}
 	
 	public String getTitre() {
-		return "NFBA1";
+		return "NFBA1 - Avancer tout droit";
 	}
 	
 }

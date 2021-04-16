@@ -6,7 +6,7 @@ public class OFA1 implements interfaceEmbarquee.Lancable{
 	}
 	
 	public String getTitre() {
-		return "OFA1";
+		return "OFA1 - Carte virtuelle";
 	}
 	
 }

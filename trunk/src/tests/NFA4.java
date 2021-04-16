@@ -6,7 +6,7 @@ public class NFA4 implements interfaceEmbarquee.Lancable{
 	}
 	
 	public String getTitre() {
-		return "NFA4";
+		return "NFA4 - Intersection partout";
 	}
 	
 }

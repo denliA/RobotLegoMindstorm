@@ -6,7 +6,7 @@ public class NFBA3 implements interfaceEmbarquee.Lancable{
 	}
 	
 	public String getTitre() {
-		return "NFBA3";
+		return "NFBA3 - Ramener palet";
 	}
 	
 }

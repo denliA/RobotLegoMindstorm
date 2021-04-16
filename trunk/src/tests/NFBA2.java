@@ -6,7 +6,7 @@ public class NFBA2 implements interfaceEmbarquee.Lancable{
 	}
 	
 	public String getTitre() {
-		return "NFBA2";
+		return "NFBA2 - Faire angle droit";
 	}
 	
 }
