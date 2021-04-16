@@ -1,18 +1,25 @@
 package moteurs;
 
+import java.util.Arrays;
 import java.util.Vector;
 
 import capteurs.*;
 import capteurs.Couleur.BufferContexte;
-import capteurs.CouleurLigne.ContextePID;
+import carte.Carte;
+import carte.Point;
+import carte.Robot;
+import carte.Ligne.LCC;
 import interfaceEmbarquee.Musique;
-import lejos.hardware.Sound;
+import lejos.robotics.chassis.Chassis;
 import lejos.utility.Delay;
 import lejos.utility.Timer;
 import lejos.utility.TimerListener;
 
 
 public class Pilote {
+	static private Carte carte = Carte.carteUsuelle;
+	static private Robot robot = carte.getRobot();
+	
 	static private boolean seDeplace = false;
 	static private boolean suiviLigne = false;
 	static private boolean videVu = false;
@@ -92,7 +99,6 @@ public class Pilote {
 		final int max_cycles = 2; //nombre de fois ou il ne trouve pas la couleur avant d'appeler seRedresserSurLigne. Cycles commence à 0.
 		
 		long debut;
-		int iterations = 0;
 
 		//Vitesses des moteurs
 		MouvementsBasiques.chassis.travel(.1); // Pour que le chassis change automatiquement les vitesses des moteurs
@@ -121,6 +127,9 @@ public class Pilote {
 				do {
 					trouve = tournerJusqua(c, true, vitesse_roues, 0, angle);
 					trouve|= tournerJusqua(c, false, 50, 0, angle*2);
+					if(!trouve) {
+						trouve = tournerJusqua(c, true, vitesse_roues, 0, angle);
+					}
 				} while(!trouve && (angle = angle*2)!=0 && (vitesse_roues=(int)(vitesse_roues*1.5))!=0);
 				MouvementsBasiques.chassis.travel(Float.POSITIVE_INFINITY); // On relance le mouvement
 			}
@@ -172,10 +181,12 @@ public class Pilote {
 					
 					//gestion d'erreur le robot n'a pas pu se redresser sur une ligne de couleur et il est perdu. Il faut arrêter le mouvement
 					System.out.println("	entrée dans le code de correction");
-					MouvementsBasiques.chassis.travel(-15);
+					MouvementsBasiques.chassis.setLinearAcceleration(150);
+					MouvementsBasiques.chassis.travel(-10);
 					MouvementsBasiques.chassis.waitComplete();
 					cycles = 0;
 					seRedresserSurLigne(c, false, 90,180); // TODO à calibrer (l'angle max et la vitesse de rotation)
+					MouvementsBasiques.chassis.setLinearAcceleration(5);
 					MouvementsBasiques.chassis.travel(Float.POSITIVE_INFINITY); 	
 				}
 				else if (cycles<max_cycles && seDeplace) { // On incrémente le nombre de cycles passés sans trouver la couleur.
@@ -185,7 +196,6 @@ public class Pilote {
 			else {
 				cycles = 0; // dès qu'on voit la couleur, on met cycles à 0.
 			}
-			iterations++;
 		}
 		
 		// On arrête le déplacement, et on remet les valeurs par défaut.
@@ -234,7 +244,6 @@ public class Pilote {
 		while(Couleur.getLastCouleur() != c && seDeplace && iterations < max_iterations) {
 			trouve = tournerJusqua(c, !gauche_bouge, (int)vitesse_angulaire, 0, (int)max_angle);
 			if (!trouve && seDeplace) {
-//				trouve = tournerToCouleur(c, gauche_bouge, -max_angle);
 				trouve = tournerJusqua(c, !gauche_bouge, (int)vitesse_angulaire, 0, (int)max_angle);
 				if(!trouve && seDeplace) {
 					gauche_bouge = !gauche_bouge;
@@ -306,9 +315,11 @@ public class Pilote {
 			MouvementsBasiques.chassis.travel(Double.POSITIVE_INFINITY);
 			while(!(vide=Couleur.videTouche()) && ((t=Couleur.getLastCouleur())==CouleurLigne.GRIS || !c.contains(t)));
 			if (vide) {
-				MouvementsBasiques.chassis.stop();
-				MouvementsBasiques.chassis.travel(-10);
-				MouvementsBasiques.chassis.rotate(180);
+				MouvementsBasiques.chassis.setLinearAcceleration(250);
+				MouvementsBasiques.chassis.stop(); MouvementsBasiques.chassis.waitComplete();
+				MouvementsBasiques.chassis.setLinearAcceleration(accelerationLineaire);
+				MouvementsBasiques.chassis.travel(-10); MouvementsBasiques.chassis.waitComplete();
+				MouvementsBasiques.chassis.rotate(180); MouvementsBasiques.chassis.waitComplete();
 			}
 			else {
 				MouvementsBasiques.chassis.travel(10); //avance de 10 cm
@@ -406,6 +417,124 @@ public class Pilote {
 		return coul==c;
 			
 	}
+	
+	private static Chassis chassis = MouvementsBasiques.chassis;
+	final private static float INF = Float.POSITIVE_INFINITY;
+	private static Vector<CouleurLigne> longues = new Vector<>(Arrays.asList(new CouleurLigne[] {CouleurLigne.ROUGE, CouleurLigne.JAUNE}));
+	private static Vector<CouleurLigne> courtes = new Vector<>(Arrays.asList(new CouleurLigne[] {CouleurLigne.VERTE, CouleurLigne.BLEUE, CouleurLigne.BLANCHE}));
+	
+	public static void main(String[] args) {
+		new capteurs.Capteur();
+		Couleur.startScanAtRate(0);
+		LCC res = l();
+		if (res==null) System.out.println("NULL"); else System.out.println();
+		
+	}
+	
+	public static LCC chercherPosition() {
+		seDeplace = true;
+		int vitesse = 15;
+		int acceleration = 10;
+		chassis.setLinearSpeed(vitesse);
+		chassis.setLinearAcceleration(acceleration);
+		Delay.msDelay(1000);
+		Couleur.videTouche(); Couleur.blacheTouchee();
+		
+		CouleurLigne ligne = null, inter1=null, inter2 = null;
+		
+		CouleurLigne c = Couleur.getLastCouleur();
+		if (c!=CouleurLigne.GRIS) {
+			return null;
+		}
+		
+		boolean bcouleur=false,bblanche=false,bvide=false;
+		int times=1;
+		do {
+			chassis.travel(INF);
+			while( !(bblanche=Couleur.blacheTouchee()) && (times==2 ||!(bvide=Couleur.videTouche()))  &&  ((bcouleur=(c=Couleur.getLastCouleur())==CouleurLigne.GRIS)||(bcouleur|=c==CouleurLigne.INCONNU)||(bcouleur=c==CouleurLigne.NOIRE)))
+				;
+			
+			if (times==1&&bvide) {
+				chassis.setLinearAcceleration(100); chassis.stop(); chassis.waitComplete(); chassis.setLinearAcceleration(acceleration);
+				chassis.travel(-10); chassis.waitComplete();
+				chassis.rotate(180); chassis.waitComplete();
+			}
+			else {
+				chassis.stop();
+			}
+			times++;
+		} while(bvide && times <=2);
+		
+		if (courtes.contains(c)||bblanche) {
+			inter1 = bblanche ? CouleurLigne.BLANCHE :c;
+			System.out.println("Inter 1 = "+inter1 + "(bvide="+ bvide+")");
+			chassis.travel(10);
+			chassis.waitComplete();
+			Pilote.tournerJusqua(inter1, true, 250, 30);
+			Pilote.tournerJusqua(inter1, false, 50, 30);
+			int coef = bvide ? (-1) : 1;
+			chassis.rotate(coef*90); chassis.waitComplete();
+			chassis.travel(15); chassis.waitComplete();
+			chassis.rotate(coef*-90); chassis.waitComplete();
+			boolean direction_rotation = true;
+			do {
+				c = Pilote.chercheLigne(longues, 15, 10, 180, direction_rotation);
+				direction_rotation = false;
+			} while(c==CouleurLigne.VIDE);
+			ligne = c;
+		}
+		
+		else if(longues.contains(c)) {
+			ligne = c;
+			chassis.travel(10); chassis.waitComplete();
+			Pilote.tournerJusqua(c, true, 250, 30);
+			Pilote.tournerJusqua(c, false, 50, 30);
+		}
+		
+		int trouvees = (inter1 == null? 0 : 1);
+		new Thread(new ArgRunnable(ligne) {
+			public void run() {
+				Pilote.suivreLigne((CouleurLigne)truc);
+			}
+		}).start();
+		Couleur.blacheTouchee(); Couleur.videTouche();
+		System.out.println("Ligne ="+ligne);
+		boolean cblanche = false;
+		while(trouvees<2) {
+			if((cblanche=Couleur.blacheTouchee()) || ligne.intersections.containsKey(c=Couleur.getLastCouleur())) {
+				if(trouvees==0) {
+					inter1 = cblanche ? CouleurLigne.BLANCHE : c;
+					if(cblanche) {
+						Pilote.SetSeDeplace(false); chassis.waitComplete();
+						Pilote.tournerJusqua(ligne, true, 250, 30);
+						Pilote.tournerJusqua(ligne, false, 50, 30); 
+						cblanche = Couleur.blacheTouchee()&Couleur.blacheTouchee();
+						new Thread(new ArgRunnable(ligne) {
+							public void run() {
+								Pilote.suivreLigne((CouleurLigne)truc);
+							}
+						}).start();
+					}
+					System.out.println("Inter 1 = "+inter1);
+				}
+				else if (inter1==c){
+					continue;
+				}
+				else {
+					inter2=cblanche ? CouleurLigne.BLANCHE : c;
+					System.out.println("Inter 2 = "+inter2);
+				}
+				trouvees++;
+			}
+		}
+		
+		Pilote.SetSeDeplace(false);
+		chassis.stop();
+		seDeplace = false;
+		return new LCC(carte.Ligne.hashLignes.get(ligne), inter1, inter2);
+			
+	}
+
 	
 
 }
