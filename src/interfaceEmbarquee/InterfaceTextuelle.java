@@ -239,12 +239,7 @@ public class InterfaceTextuelle {
 			//les fichiers.waw doivent etre mono,8000Hz et unsigned 8 bit
 			public void lancer() {
 				int button = -1;
-				try {
-					Musique.startMusic(); //lance la musique dans un thread
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} 
+				Musique.startMusic(); //lance la musique dans un thread 
 				Delay.msDelay(2000);
 				LCD.clear();
 				LCD.drawString("Arreter?", 3, 3);
@@ -265,12 +260,7 @@ public class InterfaceTextuelle {
 		Lancable lancerBruitage = new Lancable() {
 			//les fichiers.waw doivent etre mono,8000Hz et unsigned 8 bit
 			public void lancer() {
-				try {
-					Musique.startSound();
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+				Musique.startSound();
 			}
 
 			public String getTitre() {

@@ -57,13 +57,8 @@ public class Pilote {
 		float[] RGB = Couleur.getRGB();
 		if(RGB[0] < 2 &&RGB[1] < 2 &&RGB[2] < 2) {
 			//lance le bruitage dans un thread
-			try {
-				//Musique.startMusic("GoatScream.wav");
-				Musique.startMusic("Nani.wav");
-			} catch (InterruptedException e) {
-				System.out.println("Prob pour lancer musique");
-				e.printStackTrace();
-			}
+			//Musique.startMusic("GoatScream.wav");
+			Musique.startMusic("Nani.wav");
 			MouvementsBasiques.chassis.stop();
 			seDeplace=false;
 			videVu=true;
@@ -173,13 +168,7 @@ public class Pilote {
 				
 				// Si on n'a pas trouvé la couleur et qu'on cherche depuis max_cycles fois, on essaie de se redresser à l'arrêt.
 				if((last=Couleur.buffer.getLast()).couleur_x!=c && (cycles>= max_cycles) && seDeplace) {
-					//lance le bruitage dans un thread
-					try {
-						Musique.startMusic("OhNo.wav");
-					} catch (InterruptedException e) {
-						System.out.println("Prob pour lancer musique");
-						e.printStackTrace();
-					}
+					Musique.startMusic("OhNo.wav");
 					
 					//gestion d'erreur le robot n'a pas pu se redresser sur une ligne de couleur et il est perdu. Il faut arrêter le mouvement
 					System.out.println("	entrée dans le code de correction");
