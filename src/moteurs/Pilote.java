@@ -294,17 +294,10 @@ public class Pilote {
 	
 
 	
-	public static void chercheLigne(CouleurLigne c,double vitesseLineaire,double accelerationLineaire,double vitesseAngulaire, boolean adroite) {
-		MouvementsBasiques.chassis.setAngularSpeed(vitesseAngulaire);
-		MouvementsBasiques.chassis.setLinearSpeed(vitesseLineaire);
-		MouvementsBasiques.chassis.setLinearAcceleration(accelerationLineaire);
-		
-		MouvementsBasiques.chassis.travel(Double.POSITIVE_INFINITY);
-		while(Couleur.getLastCouleur()!=c);
-		MouvementsBasiques.chassis.travel(10); //avance de 10 cm
-		MouvementsBasiques.chassis.waitComplete();
-		tournerJusqua(c,adroite,250,200);
-		tournerJusqua(c, !adroite, 40);
+	public static CouleurLigne chercheLigne(CouleurLigne c,double vitesseLineaire,double accelerationLineaire,double vitesseAngulaire, boolean adroite) {
+		Vector<CouleurLigne> v = new Vector<>();
+		v.add(c);
+		return chercheLigne(v, vitesseLineaire, accelerationLineaire, vitesseAngulaire, adroite);
 		
 	}
 	
@@ -531,7 +524,54 @@ public class Pilote {
 		return new LCC(Ligne.hashLignes.get(ligne), inter1, inter2);
 			
 	}
+	
+	public static void allerVersPoint(float x, float y) {
+		if(robot.getPosition()==Point.INCONNU) {
+			carte.calibrerPosition();
+		}
+		Point position = robot.getPosition();
+		float direction = robot.getDirection();
+		float x_depart = position.getX(), y_depart = position.getY();
+		CouleurLigne ligne_arrivee = Ligne.xToLongues.get(x);
+		CouleurLigne inters_arrivee = Ligne.yToLongues.get(y);
+		int det = direction == 90 ? 1 : -1;
+		int bon_sens = det * (y >= y_depart ? 1 : -1); 
+		if (x != x_depart) {
+			int bonne_bifurquation = det*(x>x_depart ? -1 : 1);
+			chassis.rotate(bonne_bifurquation*90); chassis.waitComplete();
+			chercheLigne(ligne_arrivee, 20, 10, 180, (bonne_bifurquation*bon_sens)==1);
+		}
+		if(y!=y_depart) {
+			new Thread(new ArgRunnable(ligne_arrivee) {
+				public void run() {
+					Pilote.suivreLigne((CouleurLigne)truc);
+				}
+			}).start();
+		}
+		while(Couleur.getLastCouleur() != inters_arrivee);
+		seDeplace = false;
+		chassis.waitComplete();
+	}
+	
+	public static void rentrer(String direction) {
+		if(robot.getPosition()==Point.INCONNU) {
+			carte.calibrerPosition();
+		}
+		if(direction.equals("porte") && robot.getDirection()==90 || direction.equals("fenetre") && robot.getDirection() == 270) {
+			tournerJusqua(Couleur.getLastCouleur(), true, 250);
+			tournerJusqua(Couleur.getLastCouleur(), false, 50, 20);
+		}
+		if (Math.abs(robot.getPosition().getY())!=2) {
+			new Thread(new ArgRunnable(Ligne.xToLongues.get(robot.getPosition().getX())) {
+				public void run() {
+					Pilote.suivreLigne((CouleurLigne)truc);
+				}
+			}).start();
+			while(!Couleur.blacheTouchee());
+		}
+	}
 
+	
 	
 
 }
