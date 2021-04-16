@@ -1,12 +1,12 @@
 package tests;
 
-public class P4 implements interfaceEmbarquee.Lancable{
+public class NFA3 implements interfaceEmbarquee.Lancable{
 	
 	public void lancer() {
 	}
 	
 	public String getTitre() {
-		return "P4";
+		return "NFA3";
 	}
 	
 }

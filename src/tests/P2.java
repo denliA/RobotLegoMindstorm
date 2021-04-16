@@ -74,8 +74,10 @@ public class P2 implements interfaceEmbarquee.Lancable{
 				e.printStackTrace();
 			}
 			MouvementsBasiques.chassis.travel(Double.POSITIVE_INFINITY); //robot avance
+			Couleur.blacheTouchee();
 			while(!Couleur.blacheTouchee());
 			MouvementsBasiques.chassis.stop();
+			MouvementsBasiques.chassis.waitComplete();
 			try {
 				Pince.ouvrir();
 			} catch (OuvertureException e) {

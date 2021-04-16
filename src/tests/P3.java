@@ -6,7 +6,7 @@ import exceptions.*;
 import moteurs.*;
 
 /**
- * Le robot est pose sur la table mais pas sur une ligne, doit ramener le palet pose a une intersection dans le camp adverse
+ * <p>Le robot est pose sur la table mais pas sur une ligne, doit ramener le palet pose a une intersection dans le camp adverse</p>
  * 
  */
 public class P3 implements Lancable {
