@@ -284,7 +284,6 @@ public class Couleur {
 	private static Timer lanceur = new Timer(100, ecouteur
 			);
 	
-	
 
 	
 	//Avoir la valeur de la couleur suivant l'enumeration de leJOS
