@@ -182,6 +182,15 @@ public class InterfaceTextuelle {
 					else if (button == Button.ID_RIGHT) {
 						camp=false;
 					}
+					//placer le robot sur une des 6 positions de depart
+					LCD.clear();
+					LCD.drawString("poser robot sur 1", 1, 1);
+					LCD.drawString("position de depart", 1, 2);
+					LCD.drawString("pressez sur entree", 1, 5);
+					LCD.drawString("pour demarrer", 1, 6);
+					while(button!=Button.ID_ENTER) {
+						button = Button.waitForAnyPress();
+					}
 					//appeler la fonction a executer
 					try {
 						modeSolo.ModeSolo.ramasserPalet(9, camp);
@@ -213,6 +222,15 @@ public class InterfaceTextuelle {
 					}
 					else if (button == Button.ID_RIGHT) {
 						camp=false;
+					}
+					//placer le robot sur une des 6 positions de depart
+					LCD.clear();
+					LCD.drawString("poser robot sur 1", 1, 1);
+					LCD.drawString("position de depart", 1, 2);
+					LCD.drawString("pressez sur entree", 1, 5);
+					LCD.drawString("pour demarrer", 1, 6);
+					while(button!=Button.ID_ENTER) {
+						button = Button.waitForAnyPress();
 					}
 					//appeler la fonction a executer
 					try {
