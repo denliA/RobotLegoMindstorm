@@ -42,9 +42,9 @@ public class P2 implements interfaceEmbarquee.Lancable{
 		}
 		
 		CouleurLigne couleur;
-		CouleurLigne intersection;
 		boolean rougeAgauche;
 		boolean touche=false;
+		boolean goToBlack=false;
 		couleur = Couleur.getLastCouleur();
 		ExecutorService executor1 = Executors.newSingleThreadExecutor();
 		Runnable r = new ArgRunnable(couleur) {
@@ -52,35 +52,35 @@ public class P2 implements interfaceEmbarquee.Lancable{
 				Pilote.suivreLigne((CouleurLigne) truc);
 			}
 		};
-		//executor1.submit(r);
-		MouvementsBasiques.chassis.travel(70);
-		while(((intersection=Couleur.getLastCouleur())!=CouleurLigne.VERTE)&&(intersection!=CouleurLigne.BLEUE)) {
+		executor1.submit(r);
+		while(((Couleur.getLastCouleur())!=CouleurLigne.VERTE)) {
+			if(Couleur.getLastCouleur()==CouleurLigne.NOIRE) {
+				goToBlack=true;
+			}
 			if (Toucher.getTouche()==true) {
 				touche=true;
+				try {
+					Pince.fermer();
+				} catch (OuvertureException e) {
+					System.out.println("Prob pour fermer pince");
+					e.printStackTrace();
+				}
 			}
 		}
-		//Pilote.SetSeDeplace(false); //arrete le suivi de ligne
-		//MouvementsBasiques.chassis.waitComplete();
-		MouvementsBasiques.chassis.stop();
+		Pilote.SetSeDeplace(false); //arrete le suivi de ligne
+		MouvementsBasiques.chassis.waitComplete();
 		
-		if (intersection==CouleurLigne.BLEUE) {
+		if (goToBlack) {
 			rougeAgauche=true;
 		}
 		else {
 			rougeAgauche=false;
 		}
 		if (touche) {
-			try {
-				Pince.fermer();
-			} catch (OuvertureException e) {
-				System.out.println("Prob pour fermer pince");
-				e.printStackTrace();
-			}
-			MouvementsBasiques.chassis.travel(5); //robot avance
-			executor1.submit(r);
+			MouvementsBasiques.chassis.travel(100); //robot avance
 			while(!Couleur.blacheTouchee());
-			Pilote.SetSeDeplace(false); //arrete le suivi de ligne
-			MouvementsBasiques.chassis.waitComplete();
+			MouvementsBasiques.chassis.stop();
+			//MouvementsBasiques.chassis.waitComplete();
 			try {
 				Pince.ouvrir();
 			} catch (OuvertureException e) {
@@ -93,12 +93,13 @@ public class P2 implements interfaceEmbarquee.Lancable{
 			Pilote.stopVide();
 		}
 		else {
-			MouvementsBasiques.chassis.travel(-5); //robot recule
-			//se redresse sur la ligne de couleur du depart
-			Pilote.tournerJusqua(couleur, true,250);
-			Pilote.tournerJusqua(couleur, false, 50,50);
+			MouvementsBasiques.chassis.travel(30);
+			//faire demi-tour
+			Pilote.tournerJusqua(couleur,true,250); //tourne jusqu'à la couleur
+			Pilote.tournerJusqua(couleur, false, 50,50); //se remet bien sur la ligne si on la dépasse
 			try {
-				modeCompetition.ModeCompetition.ramasserPalet(1, rougeAgauche);
+				//appelle le ramasserPalet du modeSolo sachant qu'une ligne a été parcourue sans ramasser de palet
+				modeSolo.ModeSolo.ramasserPalet(1,1,true,false,!rougeAgauche);
 			} catch (OuvertureException e) {
 				System.out.println("Prob pour ouvrir pince");
 				e.printStackTrace();
