@@ -195,7 +195,7 @@ public class ModeSolo {
 		}
 		
 		//limite arbitraire pour evaluer notre niveau de satisfaction
-		if (scoredPalets>(nbPalets)/2) {
+		if (scoredPalets>=(nbPalets)/2) {
 			//partie gagnée
 			Musique.startMusic("VictorySong.wav"); //lance le bruitage dans un thread
 		}
