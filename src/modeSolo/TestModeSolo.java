@@ -13,9 +13,6 @@ public class TestModeSolo {
 		} catch (OuvertureException e) {
 			System.out.println("Prob pour ouvrir pince");
 			e.printStackTrace();
-		} catch (InterruptedException e) {
-			System.out.println("Prob pour lancer musique");
-			e.printStackTrace();
 		}
 	}
 }

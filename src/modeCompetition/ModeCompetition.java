@@ -31,7 +31,7 @@ import moteurs.Pince;
  *     </ul>
  * </p>
  * 
- * @see #modeSolo.ModeSolo.ramasserPalet
+ * @see modeSolo#ModeCompetition.ramasserPalets()
  * 
  */
 
@@ -46,10 +46,10 @@ public class ModeCompetition {
      *            Indique le camp de depart du robot. Si la ligne rouge est à gauche, ce boolean est vrai. Sinon, il est faux.
      *  
      * @throws OuvertureException      Si les pinces étaient dejà ouvertes quand on a demandé de les ouvrir. 
-	 * @throws InterruptedException 
+	 *
      */
 	
-	public static void ramasserPalet(int nbPalets,boolean rougeAgauche) throws OuvertureException, InterruptedException {
+	public static void ramasserPalet(int nbPalets,boolean rougeAgauche) throws OuvertureException {
 		
 		new Capteur(); //Charger la classe capteur pour pouvoir l'utiliser
 		//Debut des prises de mesures par les capteurs
