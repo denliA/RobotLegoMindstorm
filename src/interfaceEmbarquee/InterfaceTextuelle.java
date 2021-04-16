@@ -1,140 +1,45 @@
 package interfaceEmbarquee;
 
-import java.io.File;
-import java.util.HashMap;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
-
-import capteurs.CouleurLigne;
-import capteurs.CouleurLigne.ContextePID;
-import exceptions.EchecGarageException;
 import exceptions.OuvertureException;
 import lejos.hardware.Button;
-import lejos.hardware.Sound;
 import lejos.hardware.lcd.LCD;
 import lejos.utility.Delay;
-import moteurs.Pilote;
+
+import tests.*;
 
 public class InterfaceTextuelle {
 	
-	public static void main(String[] args) {
-		
+	public static void lancer() {
 		Menu basiques = new Menu("Basiques",new Lancable[] {
-				new Lancable() {
-					public void lancer() {}
-					public String getTitre() {
-						return "NFBM1 - Reconnaitre couleur";
-				
-					}
-				},
-				new Lancable() {
-					public void lancer() {}
-					public String getTitre() {
-						return "NFBA1 - Avancer tout droit";
-					}
-				},
-				new Lancable() {
-					public void lancer() {}
-					public String getTitre() {
-						return "NFBA2 - Faire angle droit";
-					}
-				},
-				new Lancable() {
-					public void lancer() {}
-					public String getTitre() {
-						return "NFBM2 - Reconnaître intersections";
-					}
-				},
-				new Lancable() {
-					public void lancer() {}
-					public String getTitre() {
-						return "NFBM3 - Détecter palet";
-					}
-				},
-				new Lancable() {
-					public void lancer() {}
-					public String getTitre() {
-						return "NFBA3 - Ramener palet";
-					}
-				},
-				new Lancable() {
-					public void lancer() {}
-					public String getTitre() {
-						return "NFBM4 - Detecter vide";
-					}
-				},
-				new Lancable() {
-					public void lancer() {}
-					public String getTitre() {
-						return "NFBM5 - Arret apres 5 min";
-					}
-				},
-				new Lancable() {
-					public void lancer() {}
-					public String getTitre() {
-						return "NFBM6 - Capteur ultrason";
-					}
-				}		
+				new NFBM1(),
+				new NFBA1(),
+				new NFBA2(),
+				new NFBM2(),
+				new NFBM3(),
+				new NFBA3(),
+				new NFBM4(),
+				new NFBM5(),
+				new NFBM6()		
 		});
 		
 		Menu avances = new Menu("Avances",new Lancable[] {
-				new Lancable() {
-					public void lancer() {}
-					public String getTitre() {
-						return "NFA0 - Ligne blanche adverse";
-				
-					}
-				},
-				new Lancable() {
-					public void lancer() {}
-					public String getTitre() {
-						return "NFA1 - Rectangle";
-					}
-				},
-				new Lancable() {
-					public void lancer() {}
-					public String getTitre() {
-						return "NFA2 - Creneau";
-					}
-				},
-				new Lancable() {
-					public void lancer() {}
-					public String getTitre() {
-						return "NFA3 - Intersection ligne";
-					}
-				},
-				new Lancable() {
-					public void lancer() {}
-					public String getTitre() {
-						return "NFA4 - Intersection partout";
-					}
-				},
-				new Lancable() {
-					public void lancer() {}
-					public String getTitre() {
-						return "NFA5 - Ramener palet position connue";
-					}
-				},
-				new Lancable() {
-					public void lancer() {}
-					public String getTitre() {
-						return "NFA6 - Ramener palet ultrason";
-					}
-				},
-				new Lancable() {
-					public void lancer() {}
-					public String getTitre() {
-						return "NFA7 - Chemin predefini 9 palets";
-					}
-				}		
+				new NFA0(),
+				new NFA1(),
+				new NFA2(),
+				new NFA3(),
+				new NFA4(),
+				new NFA5(),
+				new NFA6(),
+				new NFA7()	
 		});
 		
 		Menu optionnels = new Menu("Optionnels",new Lancable[] {
+				new OFA1(),
+				
 				new Lancable() {
 					public void lancer() {}
 					public String getTitre() {
 						return "OFBA1 - Angles et distances";
-				
 					}
 				},
 				new Lancable() {
@@ -312,6 +217,9 @@ public class InterfaceTextuelle {
 		
 		Menu menuPrincipal = new Menu("Menu Principal",new Lancable[] {modeSolo,modeCompetition,scenarios,statistiques,reglages});
 		menuPrincipal.lancer();
-
+	}
+	
+	public static void main(String[] args) {
+		lancer();
 	}
 }
