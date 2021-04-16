@@ -52,14 +52,17 @@ public class P2 implements interfaceEmbarquee.Lancable{
 				Pilote.suivreLigne((CouleurLigne) truc);
 			}
 		};
-		executor1.submit(r);
+		//executor1.submit(r);
+		MouvementsBasiques.chassis.travel(70);
 		while(((intersection=Couleur.getLastCouleur())!=CouleurLigne.VERTE)&&(intersection!=CouleurLigne.BLEUE)) {
 			if (Toucher.getTouche()==true) {
 				touche=true;
 			}
 		}
-		Pilote.SetSeDeplace(false); //arrete le suivi de ligne
-		MouvementsBasiques.chassis.waitComplete();
+		//Pilote.SetSeDeplace(false); //arrete le suivi de ligne
+		//MouvementsBasiques.chassis.waitComplete();
+		MouvementsBasiques.chassis.stop();
+		
 		if (intersection==CouleurLigne.BLEUE) {
 			rougeAgauche=true;
 		}
