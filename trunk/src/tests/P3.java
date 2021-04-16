@@ -2,6 +2,7 @@ package tests;
 
 import interfaceEmbarquee.Lancable;
 import capteurs.*;
+import carte.Ligne;
 import exceptions.*;
 import moteurs.*;
 
@@ -126,6 +127,18 @@ public class P3 implements Lancable {
 			break;
 		}
 		
+		
+	}
+	
+	public void lancer2() {
+		new Capteur();
+		Couleur.startScanAtRate(0);
+		carte.Carte.carteUsuelle.calibrerPosition();
+		boolean rougeAGauche = carte.Carte.carteUsuelle.getRobot().getDirection()==90;
+		moteurs.Pilote.rentrer("");
+		CouleurLigne c = Ligne.xToLongues.get(carte.Carte.carteUsuelle.getRobot().getPosition().getX());
+		Pilote.tournerJusqua(c, true, 250); Pilote.tournerJusqua(c, false, 50,20);
+		modeSolo.ModeSolo.ramasserPalet(1, 1, false, false, rougeAGauche);
 		
 	}
 
