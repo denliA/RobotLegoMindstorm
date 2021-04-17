@@ -506,6 +506,7 @@ public class Pilote {
 					inter1 = cblanche ? CouleurLigne.BLANCHE : c;
 					if(cblanche) {
 						Pilote.SetSeDeplace(false); chassis.waitComplete();
+						System.out.println("Blanche en 1??");
 						Pilote.tournerJusqua(ligne, true, 250, 30);
 						Pilote.tournerJusqua(ligne, false, 50, 30); 
 						cblanche = Couleur.blacheTouchee()&Couleur.blacheTouchee();
@@ -517,7 +518,8 @@ public class Pilote {
 					}
 					System.out.println("Inter 1 = "+inter1);
 				}
-				else if (inter1==c || cblanche&&(inter1==CouleurLigne.BLANCHE)){
+				else if (cblanche&&(inter1==CouleurLigne.BLANCHE)){
+					Pilote.SetSeDeplace(false);
 					Pilote.tournerJusqua(ligne, true, 250, 30);
 					Pilote.tournerJusqua(ligne, false, 50, 30); 
 					cblanche = Couleur.blacheTouchee()&Couleur.blacheTouchee();
@@ -583,7 +585,11 @@ public class Pilote {
 			if (Math.abs(y_depart)==2 || y_depart ==0) {chassis.travel(30); chassis.waitComplete();}
 			chassis.rotate(bonne_bifurquation*90); chassis.waitComplete();
 			chercheLigne(ligne_arrivee, 20, 50, 180, (inverse ? !(bonne_bifurquation==1) : (bonne_bifurquation==1)));
-			if ((Math.abs(y_depart)==2 || y_depart ==0)&&y==y_depart) { chassis.travel(18); chassis.waitComplete();}
+			if ((Math.abs(y_depart)==2 || y_depart ==0)&&y==y_depart) { 
+				chassis.travel(18); chassis.waitComplete();
+				Pilote.tournerJusqua(Ligne.xToLongues.get(x), true, 50, 20, 15);
+				Pilote.tournerJusqua(Ligne.xToLongues.get(x), false, 50, 20, 30);
+			}
 		}
 		if(y!=y_depart) {
 			new Thread(new ArgRunnable(ligne_arrivee) {
