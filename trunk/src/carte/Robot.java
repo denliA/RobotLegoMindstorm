@@ -33,8 +33,7 @@ public class Robot extends Rectangle {
 	}
 	
 	public void setPosition(float x, float y) {
-		this.position.setX(x);
-		this.position.setY(y);
+		this.position = new Point(x,y);
 		this.getBasGauche().setX(x-8f);
 		this.getBasGauche().setY(y-14.5f);
 		this.roueGauche.setPosition(x-8f, y-7.5f);
