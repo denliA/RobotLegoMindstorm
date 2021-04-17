@@ -1,15 +1,71 @@
 package tests;
 
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+
 import exceptions.OuvertureException;
+import lejos.hardware.Button;
+import lejos.hardware.lcd.LCD;
+import lejos.utility.Delay;
 
 public class NFA7 implements interfaceEmbarquee.Lancable{
 	
 	public void lancer() {
-		try {
-			modeSolo.ModeSolo.ramasserPalet(9, false);
-		} catch (OuvertureException e) {
-			System.out.println("Prob ouvrir pinces");
+		ExecutorService executor = Executors.newSingleThreadExecutor();
+		Future<Void> future;
+		
+		//choisir le camp de départ
+		boolean camp = true;
+		int button = -1;
+		LCD.clear();
+		LCD.drawString("RougeAGauche?", 3, 1);
+		LCD.drawString("vrai <<  >> faux", 1, 3);
+		while((button!=Button.ID_LEFT)&&(button!=Button.ID_RIGHT)) {
+			button = Button.waitForAnyPress();
+		}
+		if (button == Button.ID_LEFT) {
+			camp=true;
+		}
+		else if (button == Button.ID_RIGHT) {
+			camp=false;
+		}
+		final boolean cote = camp;
+		
+		//placer le robot sur une des 6 positions de depart
+		LCD.clear();
+		LCD.drawString("poser robot sur 1", 1, 1);
+		LCD.drawString("position de depart", 1, 2);
+		LCD.drawString("pressez sur entree", 1, 5);
+		LCD.drawString("pour demarrer", 1, 6);
+		while(button!=Button.ID_ENTER) {
+			button = Button.waitForAnyPress();
+		}
+		LCD.clear();
+		LCD.drawString("Debut match", 3, 1);
+		Delay.msDelay(3000); //laisser le temps de lire
+		
+		//appeler la fonction a executer dans un thread
+		future = executor.submit(new ArgCallable(cote));
+		
+		//verifier le temps
+		try {  
+		    future.get(5*60, TimeUnit.SECONDS); //interrompt le thread au bout de 5 min
+		} catch (TimeoutException e) {
+		    future.cancel(true);
+		    LCD.clear();
+			LCD.drawString("Fin match", 5, 4);
+		    System.out.println("cancelled: " + future.isCancelled() + "done: " + future.isDone()); 
+		} catch (InterruptedException e) {
 			e.printStackTrace();
+		} catch (ExecutionException e) {
+			e.printStackTrace();
+		} finally {
+			executor.shutdown();  
 		}
 	}
 	
@@ -18,3 +74,17 @@ public class NFA7 implements interfaceEmbarquee.Lancable{
 	}
 	
 }
+
+class ArgCallable implements Callable<Void> {
+	boolean truc;
+	public ArgCallable(boolean truc) {
+		this.truc = truc;
+	}
+	public Void call() throws OuvertureException {
+        while(!Thread.interrupted()) {
+        	modeSolo.ModeSolo.ramasserPalet(9, truc);
+        }
+        return null;
+    }
+}
+
