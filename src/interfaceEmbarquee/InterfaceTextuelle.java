@@ -4,8 +4,27 @@ import exceptions.OuvertureException;
 import lejos.hardware.Button;
 import lejos.hardware.lcd.LCD;
 import lejos.utility.Delay;
-
-import tests.*;
+import tests.NFA0;
+import tests.NFA1;
+import tests.NFA2;
+import tests.NFA3;
+import tests.NFA4;
+import tests.NFA5;
+import tests.NFA6;
+import tests.NFA7;
+import tests.NFBA1;
+import tests.NFBA2;
+import tests.NFBA3;
+import tests.NFBM1;
+import tests.NFBM2;
+import tests.NFBM3;
+import tests.NFBM4;
+import tests.NFBM5;
+import tests.NFBM6;
+import tests.OFA1;
+import tests.P3;
+import tests.P6;
+import tests.P7;
 
 public class InterfaceTextuelle {
 	
@@ -31,6 +50,12 @@ public class InterfaceTextuelle {
 				new NFA5(),
 				new NFA6(),
 				new NFA7()	
+		});
+		
+		Menu sotoTests = new Menu("sotests", new Lancable[] {
+				new P3(),
+				new P6(),
+				new P7()
 		});
 		
 		Menu optionnels = new Menu("Optionnels",new Lancable[] {
@@ -211,7 +236,7 @@ public class InterfaceTextuelle {
 		
 		Menu modeSolo = new Menu("Mode Solo",new Lancable[] {lancerSolo,strategieSolo});
 		Menu modeCompetition = new Menu("Mode Competition",new Lancable[] {lancerDuo,strategieDuo});
-		Menu scenarios = new Menu("Scenarios",new Lancable[] {basiques,avances,optionnels});
+		Menu scenarios = new Menu("Scenarios",new Lancable[] {basiques,avances,optionnels, sotoTests});
 		Menu statistiques = new Menu("Statistiques"); //pas le temps de les faire?
 		Menu reglages = new Menu("Reglages",new Lancable[] {songs,sounds,expressions});
 		

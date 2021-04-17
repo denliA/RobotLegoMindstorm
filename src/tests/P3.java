@@ -1,10 +1,12 @@
 package tests;
 
-import interfaceEmbarquee.Lancable;
-import capteurs.*;
+import capteurs.Capteur;
+import capteurs.Couleur;
+import capteurs.CouleurLigne;
 import carte.Ligne;
-import exceptions.*;
-import moteurs.*;
+import exceptions.OuvertureException;
+import interfaceEmbarquee.Lancable;
+import moteurs.Pilote;
 
 /**
  * <p>Le robot est pose sur la table mais pas sur une ligne, doit ramener le palet pose a une intersection dans le camp adverse</p>
@@ -19,8 +21,7 @@ public class P3 implements Lancable {
 
 	@Override
 	public String getTitre() {
-		// TODO Auto-generated method stub
-		return null;
+		return ("P3");
 	}
 
 	/**
@@ -45,92 +46,92 @@ public class P3 implements Lancable {
 	 * <li> Le robot se dirige vers le camp adverse
 	 * </ul>
 	 */
-	@Override
-	public void lancer(){
-		//le vert est a l'ouest et le bleu a l'est
-		CouleurLigne ouest = CouleurLigne.VERTE;
-		CouleurLigne est = CouleurLigne.BLEUE;
-		//repere et attrape le palet
-		try {
-			PaletUltrason.dichotomique();
-		}
-		catch(OuvertureException e) {
-			System.out.println("nsm les pinces de ");
-		}
-		//repere une couleur en avancant
-		/**
-		 * <p>
-		 * Le robot avance jusqu'a une ligne de couleur puis adapte son comportement.
-		 * Les lignes noires sont ignorees car elles n'apportent pas d'information.
-		 * </p>
-		 */
-		MouvementsBasiques.avancer();
-		while(Couleur.getLastCouleur()==CouleurLigne.GRIS||Couleur.getLastCouleur()==CouleurLigne.NOIRE);
-		MouvementsBasiques.arreter();
-		
-		switch(Couleur.getLastCouleur()) {
-		//Cas 1 : on capte du vert
-		case VERTE: 
-			//si l'adversaire est a l'ouest : bingo
-			if(campAdverse==0) {
-				MouvementsBasiques.avancer();
-				while(Couleur.getLastCouleur()!=CouleurLigne.BLANCHE);
-				MouvementsBasiques.arreter();
-				try{
-					Pince.ouvrir();
-				}
-				catch(OuvertureException e) {
-					//osef en vrai
-				}
-			}
-			//si l'adversaire est a l'est : demi-tour
-			else {
-				MouvementsBasiques.tourner(180);
-				MouvementsBasiques.avancer();
-				while(Couleur.getLastCouleur()!=CouleurLigne.BLANCHE);
-				MouvementsBasiques.arreter();
-				try {
-					Pince.ouvrir();
-				}
-				catch(OuvertureException e) {
-					//belek
-				}
-			}
-			break;
-		//Cas 2 : on capte du bleu
-		case BLEUE:
-			//si l'aversaire est a l'est : bingo
-			if(campAdverse==1) {
-				MouvementsBasiques.avancer();
-				while(Couleur.getLastCouleur()!=CouleurLigne.BLANCHE);
-				MouvementsBasiques.arreter();
-				try{
-					Pince.ouvrir();
-				}
-				catch(OuvertureException e) {
-					//osef en vrai
-				}
-			}
-			//si l'adversaire est a l'ouest : demi-tour
-			else {
-				MouvementsBasiques.tourner(180);
-				MouvementsBasiques.avancer();
-				while(Couleur.getLastCouleur()!=CouleurLigne.BLANCHE);
-				MouvementsBasiques.arreter();
-				try {
-					Pince.ouvrir();
-				}
-				catch(OuvertureException e) {
-					//belek
-				}
-			}
-			break;
-		}
-		
-		
-	}
+//	@Override
+//	public void lancer(){
+//		//le vert est a l'ouest et le bleu a l'est
+//		CouleurLigne ouest = CouleurLigne.VERTE;
+//		CouleurLigne est = CouleurLigne.BLEUE;
+//		//repere et attrape le palet
+//		try {
+//			PaletUltrason.dichotomique();
+//		}
+//		catch(OuvertureException e) {
+//			System.out.println("nsm les pinces de ");
+//		}
+//		//repere une couleur en avancant
+//		/**
+//		 * <p>
+//		 * Le robot avance jusqu'a une ligne de couleur puis adapte son comportement.
+//		 * Les lignes noires sont ignorees car elles n'apportent pas d'information.
+//		 * </p>
+//		 */
+//		MouvementsBasiques.avancer();
+//		while(Couleur.getLastCouleur()==CouleurLigne.GRIS||Couleur.getLastCouleur()==CouleurLigne.NOIRE);
+//		MouvementsBasiques.arreter();
+//		
+//		switch(Couleur.getLastCouleur()) {
+//		//Cas 1 : on capte du vert
+//		case VERTE: 
+//			//si l'adversaire est a l'ouest : bingo
+//			if(campAdverse==0) {
+//				MouvementsBasiques.avancer();
+//				while(Couleur.getLastCouleur()!=CouleurLigne.BLANCHE);
+//				MouvementsBasiques.arreter();
+//				try{
+//					Pince.ouvrir();
+//				}
+//				catch(OuvertureException e) {
+//					//osef en vrai
+//				}
+//			}
+//			//si l'adversaire est a l'est : demi-tour
+//			else {
+//				MouvementsBasiques.tourner(180);
+//				MouvementsBasiques.avancer();
+//				while(Couleur.getLastCouleur()!=CouleurLigne.BLANCHE);
+//				MouvementsBasiques.arreter();
+//				try {
+//					Pince.ouvrir();
+//				}
+//				catch(OuvertureException e) {
+//					//belek
+//				}
+//			}
+//			break;
+//		//Cas 2 : on capte du bleu
+//		case BLEUE:
+//			//si l'aversaire est a l'est : bingo
+//			if(campAdverse==1) {
+//				MouvementsBasiques.avancer();
+//				while(Couleur.getLastCouleur()!=CouleurLigne.BLANCHE);
+//				MouvementsBasiques.arreter();
+//				try{
+//					Pince.ouvrir();
+//				}
+//				catch(OuvertureException e) {
+//					//osef en vrai
+//				}
+//			}
+//			//si l'adversaire est a l'ouest : demi-tour
+//			else {
+//				MouvementsBasiques.tourner(180);
+//				MouvementsBasiques.avancer();
+//				while(Couleur.getLastCouleur()!=CouleurLigne.BLANCHE);
+//				MouvementsBasiques.arreter();
+//				try {
+//					Pince.ouvrir();
+//				}
+//				catch(OuvertureException e) {
+//					//belek
+//				}
+//			}
+//			break;
+//		}
+//		
+//		
+//	}
 	
-	public void lancer2() {
+	public void lancer() {
 		new Capteur();
 		Couleur.startScanAtRate(0);
 		carte.Carte.carteUsuelle.calibrerPosition();
@@ -144,6 +145,10 @@ public class P3 implements Lancable {
 			System.out.println("Prob d'ouverture de pince");
 			e.printStackTrace();
 		}
+		
+	}
+	public static void main(String[] args) {
+		new P3().lancer();
 		
 	}
 

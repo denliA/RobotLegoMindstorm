@@ -145,8 +145,8 @@ public class Ligne{
 		hashPerdu.put(new LCC(hashLignes.get(CouleurLigne.NOIRE), CouleurLigne.VERTE, CouleurLigne.NOIRE), new Etat(new Point(0,0),270f));
 		hashPerdu.put(new LCC(hashLignes.get(CouleurLigne.NOIRE), CouleurLigne.NOIRE, CouleurLigne.BLEUE), new Etat(new Point(0,-1),270f));
 		hashPerdu.put(new LCC(hashLignes.get(CouleurLigne.NOIRE), CouleurLigne.BLEUE, CouleurLigne.BLANCHE), new Etat(new Point(0,-2),270f));
-		hashPerdu.put(new LCC(hashLignes.get(CouleurLigne.NOIRE),CouleurLigne.BLANCHE, CouleurLigne.VERTE), new Etat(new Point(1,1),270f));
-		hashPerdu.put(new LCC(hashLignes.get(CouleurLigne.NOIRE),CouleurLigne.BLANCHE, CouleurLigne.BLEUE), new Etat(new Point(1,-1),90f));
+		hashPerdu.put(new LCC(hashLignes.get(CouleurLigne.NOIRE),CouleurLigne.BLANCHE, CouleurLigne.VERTE), new Etat(new Point(0,1),270f));
+		hashPerdu.put(new LCC(hashLignes.get(CouleurLigne.NOIRE),CouleurLigne.BLANCHE, CouleurLigne.BLEUE), new Etat(new Point(0,-1),90f));
 		
 		hashPerdu.put(new LCC(hashLignes.get(CouleurLigne.ROUGE), CouleurLigne.BLEUE, CouleurLigne.NOIRE), new Etat(new Point(-1,0),90f));
 		hashPerdu.put(new LCC(hashLignes.get(CouleurLigne.ROUGE), CouleurLigne.NOIRE, CouleurLigne.VERTE), new Etat(new Point(-1,1),90f));
@@ -154,8 +154,8 @@ public class Ligne{
 		hashPerdu.put(new LCC(hashLignes.get(CouleurLigne.ROUGE), CouleurLigne.VERTE, CouleurLigne.NOIRE), new Etat(new Point(-1,0),270f));
 		hashPerdu.put(new LCC(hashLignes.get(CouleurLigne.ROUGE), CouleurLigne.NOIRE, CouleurLigne.BLEUE), new Etat(new Point(-1,-1),270f));
 		hashPerdu.put(new LCC(hashLignes.get(CouleurLigne.ROUGE), CouleurLigne.BLEUE, CouleurLigne.BLANCHE), new Etat(new Point(-1,-2),270f));
-		hashPerdu.put(new LCC(hashLignes.get(CouleurLigne.ROUGE),CouleurLigne.BLANCHE, CouleurLigne.VERTE), new Etat(new Point(1,1),270f));
-		hashPerdu.put(new LCC(hashLignes.get(CouleurLigne.ROUGE),CouleurLigne.BLANCHE, CouleurLigne.BLEUE), new Etat(new Point(1,-1),90f));
+		hashPerdu.put(new LCC(hashLignes.get(CouleurLigne.ROUGE),CouleurLigne.BLANCHE, CouleurLigne.VERTE), new Etat(new Point(-1,1),270f));
+		hashPerdu.put(new LCC(hashLignes.get(CouleurLigne.ROUGE),CouleurLigne.BLANCHE, CouleurLigne.BLEUE), new Etat(new Point(-1,-1),90f));
 	}
 	
 	static public ConcurrentHashMap<Float, CouleurLigne> xToLongues = new ConcurrentHashMap<>();
