@@ -9,7 +9,8 @@ public enum Configurations{
 	
 	musique("megalovania",new String[] {"megalovania","victory","losing"}),
 	bruitage("wow",new String[] {"wow","easy","ohNo","nani","missionFailed","whilhelmScream","goatScream","nope","ennemySpotted","targetAcquired","targetLocked"}),
-	expression("sourire",new String[] {"sourire","larmes"});
+	expression("sourire",new String[] {"sourire","larmes"}),
+	danse("victoire",new String[] {"victoire","defaite"});
 	
 	private String val; //valeur selectionnée
 	public Vector <String> s;
