@@ -567,11 +567,19 @@ public class Pilote {
 					Pilote.suivreLigne((CouleurLigne)truc);
 				}
 			}).start();
+			Couleur.blacheTouchee();
 			while(!Couleur.blacheTouchee());
+			seDeplace = false;
 		}
 	}
 
-	
-	
 
+}
+
+
+abstract class ArgRunnable implements Runnable {
+	Object truc;
+	public ArgRunnable(Object truc) {
+		this.truc = truc;
+	}
 }
