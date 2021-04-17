@@ -4,7 +4,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import capteurs.CouleurLigne;
 import carte.Ligne.Etat;
-import moteurs.Calibreur;
+import moteurs.Pilote;
 
 public class Carte {
 	/**
@@ -96,7 +96,7 @@ public class Carte {
 	}
 	
 	public void calibrerPosition() {
-		Etat etat = Ligne.hashPerdu.get(Calibreur.l());
+		Etat etat = Ligne.hashPerdu.get(Pilote.chercherPosition());
 		robot.setPosition(etat.position.getX(), etat.position.getY());
 		robot.setDirection(etat.direction);
 	}
