@@ -58,4 +58,9 @@ public class Point {
 		return((float) Math.sqrt(Math.pow(this.x-A.getX(), 2)+Math.pow(this.y-A.getY(),2)));
 	}
 	
+	
+	public String toString() {
+		return "("+x+", "+y+")";
+	}
+	
 }

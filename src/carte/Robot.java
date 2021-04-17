@@ -66,4 +66,8 @@ public class Robot extends Rectangle {
 		this.avancer(distance);
 	}
 	
+	public String toString() {
+		return "Position : " + position + ". Direction : "+direction; 
+	}
+	
 }
