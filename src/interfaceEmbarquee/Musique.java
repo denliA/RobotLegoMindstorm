@@ -21,7 +21,7 @@ public class Musique{
 	public static void startMusic(final String name) {
 		t = new Thread(new Runnable() {
 			public void run(){
-				while(!t.isInterrupted()){
+				while(!Thread.interrupted()){
 					LCD.clear();
 					int res;
 					File fichier= new File(name);
