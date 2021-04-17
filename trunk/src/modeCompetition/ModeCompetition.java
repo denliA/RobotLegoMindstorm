@@ -56,7 +56,6 @@ public class ModeCompetition {
 		Toucher.startScan();
 		Ultrason.startScan();
 		Couleur.startScanAtRate(0);
-		Pilote.startVideAtRate(0); //Gestion du vide
 		
 		double angle;
 		boolean droite=false;

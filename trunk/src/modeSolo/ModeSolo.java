@@ -37,7 +37,6 @@ public class ModeSolo {
 			Toucher.startScan();
 			Ultrason.startScan();
 			Couleur.startScanAtRate(0);
-			//Pilote.startVideAtRate(0);
 		}
 		ExecutorService executor = Executors.newSingleThreadExecutor();
 		final double vitesse = 25;
@@ -221,7 +220,6 @@ public class ModeSolo {
 		Toucher.stopScan();
 		Ultrason.stopScan();
 		Couleur.stopScan();
-		Pilote.stopVide();
 		executor.shutdown();
 	}
 }

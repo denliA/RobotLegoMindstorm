@@ -87,7 +87,6 @@ public class P2 implements interfaceEmbarquee.Lancable{
 			Toucher.stopScan();
 			Ultrason.stopScan();
 			Couleur.stopScan();
-			Pilote.stopVide();
 		}
 		else {
 			MouvementsBasiques.chassis.travel(-5); //robot recule

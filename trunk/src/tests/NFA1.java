@@ -15,7 +15,6 @@ public class NFA1 implements interfaceEmbarquee.Lancable{
 	public void lancer() {
 		new Capteur();
 		Couleur.startScanAtRate(0);
-		Pilote.startVideAtRate(0);
 		
 		//choisir le camp de départ
 		boolean rougeAgauche = true;
@@ -78,7 +77,6 @@ public class NFA1 implements interfaceEmbarquee.Lancable{
 		MouvementsBasiques.chassis.travel(50); MouvementsBasiques.chassis.waitComplete();
 		
 		Couleur.stopScan();
-		Pilote.stopVide();
 		
 	}
 	

@@ -166,6 +166,30 @@ public class InterfaceTextuelle {
 		}
 	};
 	
+	Lancable lancerDanse = new Lancable() {
+		//les fichiers.waw doivent etre mono,8000Hz et unsigned 8 bit
+		public void lancer() {
+			int button = -1;
+			Danse.startDance(); //lance la danse dans un thread 
+			Delay.msDelay(2000);
+			LCD.clear();
+			LCD.drawString("Arreter?", 3, 3);
+			LCD.drawString("Pressez sur Entree", 3, 4);
+			while((button!=Button.ID_ENTER)&&(button!=Button.ID_ESCAPE)) {
+				button = Button.waitForAnyPress();
+			}
+			if (button==Button.ID_ENTER) {
+				Danse.stopDance();	
+			}
+		}
+			
+		
+		
+		public String getTitre() {
+			return "Lancer";
+		}
+	};
+	
 	
 	
 	Picker strategieSolo = new Picker("Strategies",Configurations.strategieSolo);
@@ -173,19 +197,20 @@ public class InterfaceTextuelle {
 	Picker visages = new Picker("Visages",Configurations.expression);
 	Picker musiques = new Picker("Musiques",Configurations.musique);
 	Picker bruitages = new Picker("Bruitages",Configurations.bruitage);
+	Picker dances = new Picker("Danses",Configurations.danse);
 	
 	
 	Menu songs = new Menu("Musiques",new Lancable[] {lancerMusique,musiques});
 	Menu sounds = new Menu("Bruitages",new Lancable[] {lancerBruitage,bruitages});
 	Menu expressions = new Menu("Expressions",new Lancable[] {lancerExpression,visages});
+	Menu danses = new Menu("Danses",new Lancable[] {lancerDanse,dances});
 	
 	Menu modeSolo = new Menu("Mode Solo",new Lancable[] {lancerSolo,strategieSolo});
 	Menu modeCompetition = new Menu("Mode Competition",new Lancable[] {lancerDuo,strategieDuo});
 	public Menu scenarios = new Menu("Scenarios",new Lancable[] {imposes,basiques,avances,optionnels});
-	Menu statistiques = new Menu("Statistiques"); //pas le temps de les faire?
-	Menu reglages = new Menu("Reglages",new Lancable[] {songs,sounds,expressions});
+	Menu reglages = new Menu("Reglages",new Lancable[] {songs,sounds,expressions,danses});
 	
-	Menu menuPrincipal = new Menu("Menu Principal",new Lancable[] {modeSolo,modeCompetition,scenarios,statistiques,reglages});
+	Menu menuPrincipal = new Menu("Menu Principal",new Lancable[] {modeSolo,modeCompetition,scenarios,reglages});
 	
 	public void lancer() {
 		menuPrincipal.lancer();
