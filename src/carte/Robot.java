@@ -6,7 +6,7 @@ public class Robot extends Rectangle {
 	final float largeur = 16f;
 	private float direction;
 	private Rectangle roueDroite;  //A voir quoi faire des roues exactement mais je cherche comme faire tourner le robot (le rectangle) et quand je l'aurai 
-	private Rectangle roueGauche;  //on pourra faire tourner les roue pour toujours savoir ou est quel élément, mais en vrai elles ne me semble pas indispensable
+	private Rectangle roueGauche;  //on pourra faire tourner les roue pour toujours savoir ou est quel ï¿½lï¿½ment, mais en vrai elles ne me semble pas indispensable
 	private Cercle capteurCouleur;
 	
 	public Robot(Point position, float direction) {
@@ -18,7 +18,7 @@ public class Robot extends Rectangle {
 		this.capteurCouleur = new Cercle(new Point(position.getX(), position.getY()+10.5f), 0.5f);
 	}
 	
-	static Robot robotUsuel = new Robot(new Point(Float.NaN,Float.NaN), Float.NaN);
+	static Robot robotUsuel = new Robot(Point.INCONNU, Float.NaN);
 	
 	public Point getPosition() {
 		return(this.position);

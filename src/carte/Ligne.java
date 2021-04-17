@@ -6,10 +6,10 @@ import capteurs.CouleurLigne;
 
 public class Ligne{
 	/**
-	 * On considère la classe Ligne comme une droite parallèle à un axe du plan.
-	 * Il suffit de connaître sa coordonnée fixée puis de ne pas prendre compte de l'autre.
+	 * On considï¿½re la classe Ligne comme une droite parallï¿½le ï¿½ un axe du plan.
+	 * Il suffit de connaï¿½tre sa coordonnï¿½e fixï¿½e puis de ne pas prendre compte de l'autre.
 	 * Puisqu'on peut simplement dire si elle est horizontale ou verticale.
-	 * De plus on la définit par une couleur pour faciliter l'association aux données récupérée par le capteur de couleurs.
+	 * De plus on la dï¿½finit par une couleur pour faciliter l'association aux donnï¿½es rï¿½cupï¿½rï¿½e par le capteur de couleurs.
 	 */
 	private boolean horizontale;
 	private float coord;
@@ -29,7 +29,7 @@ public class Ligne{
 	
 	/**
 	 * Les getters.
-	 * @return L'information d'interêt sur la Ligne.
+	 * @return L'information d'interï¿½t sur la Ligne.
 	 */
 	
 	public boolean getDirection() {
@@ -45,7 +45,7 @@ public class Ligne{
 	}
 	
 	/**
-	 * Calcul du point d'intersection entre la Ligne appelant cette méthode et la Ligne A passée en paramètre.
+	 * Calcul du point d'intersection entre la Ligne appelant cette mï¿½thode et la Ligne A passï¿½e en paramï¿½tre.
 	 * @param A
 	 * @return Le point en lequel s'intersectent les 2 Lignes
 	 */
@@ -57,7 +57,7 @@ public class Ligne{
 	}
 	
 	/**
-	 * Utilisation d'une hashMap pour faciliter la compréhension de la Ligne d'interêt lors de la récupération d'une couleur par le capteur.
+	 * Utilisation d'une hashMap pour faciliter la comprï¿½hension de la Ligne d'interï¿½t lors de la rï¿½cupï¿½ration d'une couleur par le capteur.
 	 */
 	static public ConcurrentHashMap<CouleurLigne, Ligne> hashLignes = new ConcurrentHashMap<>();
 	static {
@@ -65,23 +65,25 @@ public class Ligne{
 		hashLignes.put(CouleurLigne.BLEUE, new Ligne(-1f,true,CouleurLigne.BLEUE));
 		hashLignes.put(CouleurLigne.JAUNE, new Ligne(1f,false,CouleurLigne.JAUNE));
 		hashLignes.put(CouleurLigne.ROUGE, new Ligne(-1f,false,CouleurLigne.ROUGE));
+		hashLignes.put(CouleurLigne.BLANCHE, new Ligne(-2f,true,CouleurLigne.BLANCHE));
 		hashLignes.put(CouleurLigne.BLANCHE_BLEUE, new Ligne(-2f,true,CouleurLigne.BLANCHE));
 		hashLignes.put(CouleurLigne.BLANCHE_VERTE, new Ligne(2f,true,CouleurLigne.BLANCHE));
 		hashLignes.put(CouleurLigne.NOIREH, new Ligne(0f,true,CouleurLigne.NOIRE));
+		hashLignes.put(CouleurLigne.NOIRE, new Ligne(0f,true,CouleurLigne.NOIRE));
 		hashLignes.put(CouleurLigne.NOIREV, new Ligne(0f,false,CouleurLigne.NOIRE));
 	}
 	
 	/**
-	 * Création de 2 classes interne : 
+	 * Crï¿½ation de 2 classes interne : 
 	 * - LCC (Ligne, Couleur, Couleur) 
 	 * - Etat (Position, direction) 
-	 * pour pouvoir utiliser une hashMap où l'on fait se correspondre ces 2 informations.
-	 * L'idée derrière cela est que la LCC représente la Ligne que le robot suit, et les couleurs ici sont celle de 2 intersections qu'il traverse.
-	 * Cela permet de facilité l'identification de sa position et de sa direction au robot. En effet le terrain étant connu, il suffit de :
-	 * - Connaître la Ligne que l'on suit pour avoir le x (si la Ligne est verticale) ou le y (si elle est horizontale)
-	 * - Connaître l'intersection pour avoir la coordonnée manquante
-	 * (ici c'est à la deuxième intersection que le robot connaît sa position car on n'a que faire de la première vu que l'on ne s'y arrête pas.)
-	 * - Savoir dans quel ordre on a traversé 2 Lignes pour savoir dans quelle direction on va.
+	 * pour pouvoir utiliser une hashMap oï¿½ l'on fait se correspondre ces 2 informations.
+	 * L'idï¿½e derriï¿½re cela est que la LCC reprï¿½sente la Ligne que le robot suit, et les couleurs ici sont celle de 2 intersections qu'il traverse.
+	 * Cela permet de facilitï¿½ l'identification de sa position et de sa direction au robot. En effet le terrain ï¿½tant connu, il suffit de :
+	 * - Connaï¿½tre la Ligne que l'on suit pour avoir le x (si la Ligne est verticale) ou le y (si elle est horizontale)
+	 * - Connaï¿½tre l'intersection pour avoir la coordonnï¿½e manquante
+	 * (ici c'est ï¿½ la deuxiï¿½me intersection que le robot connaï¿½t sa position car on n'a que faire de la premiï¿½re vu que l'on ne s'y arrï¿½te pas.)
+	 * - Savoir dans quel ordre on a traversï¿½ 2 Lignes pour savoir dans quelle direction on va.
 	 */
 	public static class LCC{
 		private Ligne ligne;
@@ -96,12 +98,17 @@ public class Ligne{
 		public int hashCode() {
 			return(ligne.hashCode()+cl1.hashCode()+cl2.hashCode());
 		}
+		
+		public String toString() {
+			return "Ligne : "+ligne.getCouleur()+"\n"+"Intersection 1: "+cl1+"\n"+"Intersection 2: "+cl2;
+		}
+		
 	}
 	
 	@SuppressWarnings("unused")
 	public static class Etat{
-		private Point position;
-		private float direction;
+		public Point position;
+		public float direction;
 		public Etat(Point position, float direction) {
 			this.position = position;
 			this.direction = direction;
@@ -109,7 +116,7 @@ public class Ligne{
 	}
 	
 	/**
-	 * Dans cette hashMap on compte utiliser le robot de manière à ce qu'il aille sur une ligne verticale pour se repérer, car cela nous facilite la tâche.
+	 * Dans cette hashMap on compte utiliser le robot de maniï¿½re ï¿½ ce qu'il aille sur une ligne verticale pour se repï¿½rer, car cela nous facilite la tï¿½che.
 	 */
 	static public ConcurrentHashMap<LCC, Etat> hashPerdu = new ConcurrentHashMap<>();
 	static {
@@ -133,6 +140,22 @@ public class Ligne{
 		hashPerdu.put(new LCC(hashLignes.get(CouleurLigne.ROUGE), CouleurLigne.VERTE, CouleurLigne.NOIRE), new Etat(new Point(-1,0),270f));
 		hashPerdu.put(new LCC(hashLignes.get(CouleurLigne.ROUGE), CouleurLigne.NOIRE, CouleurLigne.BLEUE), new Etat(new Point(-1,-1),270f));
 		hashPerdu.put(new LCC(hashLignes.get(CouleurLigne.ROUGE), CouleurLigne.BLEUE, CouleurLigne.BLANCHE), new Etat(new Point(-1,-2),270f));
+	}
+	
+	static public ConcurrentHashMap<Float, CouleurLigne> xToLongues = new ConcurrentHashMap<>();
+	static {
+		xToLongues.put(-1.0f, CouleurLigne.ROUGE);
+		xToLongues.put(0f, CouleurLigne.NOIRE);
+		xToLongues.put(1f, CouleurLigne.JAUNE);
+	}
+	
+	static public ConcurrentHashMap<Float, CouleurLigne> yToLongues = new ConcurrentHashMap<>();
+	static {
+		yToLongues.put(-2f, CouleurLigne.BLANCHE);
+		yToLongues.put(-1f, CouleurLigne.BLEUE);
+		yToLongues.put(0f, CouleurLigne.NOIRE);
+		yToLongues.put(1f, CouleurLigne.VERTE);
+		yToLongues.put(2f, CouleurLigne.BLANCHE);
 	}
 	
 }
