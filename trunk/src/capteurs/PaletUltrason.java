@@ -1,8 +1,8 @@
 package capteurs;
 
 import exceptions.OuvertureException;
-import moteurs.Pince;
 import moteurs.MouvementsBasiques;
+import moteurs.Pince;
 /**
  * Classe statique dont les methodes permettent la recherche d'un palet grace au capteur ultrason
  * @see Capteur
@@ -11,6 +11,15 @@ import moteurs.MouvementsBasiques;
  */
 public class PaletUltrason {
 	
+	private static int angleTotal;
+	private static float dDepart;
+	
+	public static int getAngle() {
+		return(angleTotal);
+	}
+	public static float getDistance() {
+		return dDepart;
+	}
 	/**
 	 * methode de recherche de palet reposant sur la recherche sequentielle du minimum dans un vecteur de distances
 	 * @throws OuvertureException
@@ -110,17 +119,21 @@ public class PaletUltrason {
 	
 	/**
 	 * methode de recherche de palet reposant sur la recherche dichotomique de la distance minimale
+	 * @param range le rayon de recherche en metre
+	 * @return 0 s'il trouve le palet, 1 s'il rencontre le vide (cas du mur), 2 si pas de palet en vue
 	 * @throws OuvertureException
 	 */
-	public static void dichotomique() throws OuvertureException {
+	public static int dichotomique(int range) throws OuvertureException {
 		
-		/**
-		 * ouverture des pinces si besoin
-		 */
-		if(!Pince.getOuvert()) {
-			Pince.ouvrir();
-		}
-				
+//		/**
+//		 * ouverture des pinces si besoin
+//		 */
+//		try {
+//			Pince.ouvrir();
+//		}
+//		catch(OuvertureException e) {
+//			;
+//		}
 		/**
 		 * Lancer les capteurs
 		 */
@@ -141,15 +154,19 @@ public class PaletUltrason {
 		 *  jusqu'a ce que d soit inferieure a 2m (succes) ou jusqu'a avoir fait un tour sur lui-meme (echec).</p>
 		 */
 			int angle = 0;
-			while((d>2||d<=0)&&angle<360) {
+			while((d>range||d<=0)&&angle<360) {
 				angle+=10;
 				MouvementsBasiques.tourner(10);
 				Ultrason.setDistance();
 				d = Ultrason.getDistance();
 				System.out.println(d);
 			}
+			if(angle==350) {
+				return 2;
+			}
+			angleTotal = angle;
 
-		if(d<2) {	
+		if(d<range) {	
 			/**
 			 * L'algorithme d'affinement de l'angle 
 			 * <p>Il ne s'ex�cute que si le robot a capte un palet (d!=infini). 
@@ -164,7 +181,7 @@ public class PaletUltrason {
 			 * </ul>
 			 * </ul>
 			 */
-			float dDepart = d;
+			dDepart = d;
 			System.out.println("dDepart vaut : "+dDepart);
 			
 			int tour = 10;
@@ -175,6 +192,7 @@ public class PaletUltrason {
 				if(d<=dDepart) {
 					dDepart=d;
 					System.out.println("oui : "+d);
+					angleTotal+=tour;
 				}
 				else {
 					MouvementsBasiques.tourner(-tour);
@@ -184,9 +202,17 @@ public class PaletUltrason {
 			}
 			
 			//*100 parce que le capteur mesure en m et que la fonction prend en cm
-			MouvementsBasiques.avancerTravel(dDepart*100);
+			MouvementsBasiques.chassis.travel(dDepart*100);
+			//cas ou le robot capte le vide : arret de dichotomique
+			while(MouvementsBasiques.chassis.isMoving()) {
+				if(Couleur.videTouche()) {
+					MouvementsBasiques.chassis.stop();
+					return(1);
+				}
+			}
 		}
-			Pince.fermer();
+//			Pince.fermer();
+			return(0);
 			
 	}
 	
