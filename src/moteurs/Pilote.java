@@ -550,21 +550,32 @@ public class Pilote {
 		Point position = robot.getPosition();
 		float direction = robot.getDirection();
 		float x_depart = position.getX(), y_depart = position.getY();
-		System.out.println("Position juste après le mouvement : " + robot);
+//		System.out.println("Position juste AVANT le mouvement : " + robot);
 		if (x == 0 && y==0 && y_depart != y) {
 			allerVersPoint(1, y);
 			allerVersPoint(0, y);
+			return;
 		}
 		CouleurLigne ligne_arrivee = Ligne.xToLongues.get(x);
-		CouleurLigne inters_arrivee = Ligne.yToLongues.get(y);
-		int det = direction == 90 ? 1 : -1;
-		int bon_sens = det * (y > y_depart ? 1 : -1); 
+		CouleurLigne inters_arrivee = Ligne.yToLongues.get(y); 
+		boolean det = direction ==270;
+		boolean inverse;
+		if(y>= y_depart) {
+			inverse= !det; 
+		}
+		else if(y<= y_depart) {
+			inverse = det;
+		}
+		else {
+			inverse = true;
+		}
+		System.out.println("det: " + det + "y>y_depart:  " + (y>y_depart) + "Inverse? : "+inverse);
 		if (x != x_depart) {
-			int bonne_bifurquation = det*(x>x_depart ? -1 : 1);
-			if (Math.abs(y_depart)==2 || y_depart ==0) {chassis.travel(20); chassis.waitComplete();}
+			int bonne_bifurquation = (det ? -1 : 1)*(x>x_depart ? -1 : 1);
+			if (Math.abs(y_depart)==2 || y_depart ==0) {chassis.travel(30); chassis.waitComplete();}
 			chassis.rotate(bonne_bifurquation*90); chassis.waitComplete();
-			chercheLigne(ligne_arrivee, 20, 50, 180, (-bonne_bifurquation*bon_sens)==1);
-			if (Math.abs(y_depart)==2 || y_depart ==0) { chassis.travel(-20); chassis.waitComplete();}
+			chercheLigne(ligne_arrivee, 20, 50, 180, (inverse ? !(bonne_bifurquation==1) : (bonne_bifurquation==1)));
+			if ((Math.abs(y_depart)==2 || y_depart ==0)&&y==y_depart) { chassis.travel(18); chassis.waitComplete();}
 		}
 		if(y!=y_depart) {
 			new Thread(new ArgRunnable(ligne_arrivee) {
@@ -583,7 +594,7 @@ public class Pilote {
 		else if(y>y_depart) {
 			robot.setDirection(270);
 		}
-		System.out.println("Position juste après le mouvement : " + robot);
+//		System.out.println("Position juste après le mouvement : " + robot);
 	}
 	
 	public static void rentrer(String direction) {
