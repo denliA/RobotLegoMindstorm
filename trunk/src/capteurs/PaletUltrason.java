@@ -1,10 +1,8 @@
 package capteurs;
 
 import exceptions.OuvertureException;
-import lejos.utility.Delay;
 import moteurs.Pince;
 import moteurs.MouvementsBasiques;
-import lejos.hardware.Button;
 /**
  * Classe statique dont les methodes permettent la recherche d'un palet grace au capteur ultrason
  * @see Capteur
@@ -22,7 +20,7 @@ public class PaletUltrason {
 		
 		/**
 		 * initialiser l'infini
-		 * <p> Il sera utilise pour verifier que le robot trouve un palet. Condition d'arrêt d'une boucle while.</p>
+		 * <p> Il sera utilise pour verifier que le robot trouve un palet. Condition d'arrï¿½t d'une boucle while.</p>
 		 */
 		float infini = Float.POSITIVE_INFINITY;
 		
@@ -154,7 +152,7 @@ public class PaletUltrason {
 		if(d<2) {	
 			/**
 			 * L'algorithme d'affinement de l'angle 
-			 * <p>Il ne s'exécute que si le robot a capte un palet (d!=infini). 
+			 * <p>Il ne s'exï¿½cute que si le robot a capte un palet (d!=infini). 
 			 * Il consiste en une serie de comparaisons de distances mesurees.</p>
 			 * <ul>
 			 * <li> Etape 1 : sauvegarder la premiere distance captee dans dDepart.

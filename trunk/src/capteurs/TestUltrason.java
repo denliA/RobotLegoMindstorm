@@ -3,7 +3,6 @@ package capteurs;
 import exceptions.OuvertureException;
 import lejos.hardware.Button;
 import lejos.hardware.lcd.LCD;
-import lejos.utility.Delay;
 
 public class TestUltrason {
 	public static void main(String[] args) throws OuvertureException {

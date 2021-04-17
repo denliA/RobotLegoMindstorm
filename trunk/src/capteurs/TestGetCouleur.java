@@ -1,7 +1,6 @@
 package capteurs;
 
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Date;
 
 import lejos.hardware.Button;
@@ -10,12 +9,12 @@ public class TestGetCouleur {
 
 	public static void main(String[] args) {
 		int button = -1;
-		boolean buffer = false;
+		boolean buffer = true;
 		while(button != Button.ID_ESCAPE) {
 			if (buffer)
 				testGetLastCouleur();
 			else 
-				collectionnerDonnees("./Scans/20210414/TournerJauneVert_", true);
+				collectionnerDonnees("./Scans/20210415/NoirePorteFenetre_", false, 20);
 			buffer=!buffer;
 			button = Button.waitForAnyPress();
 		}
@@ -50,7 +49,6 @@ public class TestGetCouleur {
 	
 	public static void testGetLastCouleur() {
 		int button = -1;
-		CouleurLigne couleur;
 		Couleur.BufferContexte contexte;
 		Couleur.setScanMode((byte) (Couleur.BUFFERING|Couleur.RGBMODE));
 		Couleur.startScanAtRate(0);
@@ -66,22 +64,22 @@ public class TestGetCouleur {
 		}
 	}
 	
-	public static void collectionnerDonnees(String prefixeFichier, boolean tourner) {
+	public static void collectionnerDonnees(String prefixeFichier, boolean tourner, int vitesse) {
 		new Capteur();
 		Couleur.setScanMode((byte) (Couleur.BUFFERING|Couleur.RGBMODE));
 		Couleur.startScanAtRate(0);
 		Date date = new Date() ;
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss") ;
 		//SimpleDateFormat dateFormat2 = new SimpleDateFormat("yyyymmdd");
-		MouvementsBasiques.pilot.setLinearSpeed(10);
-		MouvementsBasiques.pilot.setAngularAcceleration(10);
+		MouvementsBasiques.chassis.setLinearSpeed(vitesse);
+		MouvementsBasiques.chassis.setAngularAcceleration(10);
 		if(tourner)
-			MouvementsBasiques.tourner(400, true);
+			MouvementsBasiques.chassis.rotate(360);
 		else
-			MouvementsBasiques.avancer();
+			MouvementsBasiques.chassis.travel(Float.POSITIVE_INFINITY);
 		while(Button.ENTER.isUp())
 			;
-		MouvementsBasiques.arreter();
+		MouvementsBasiques.chassis.stop(); MouvementsBasiques.chassis.waitComplete();
 		Couleur.buffer.toCSV(prefixeFichier+dateFormat.format(date));
 	}
 
