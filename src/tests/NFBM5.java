@@ -15,10 +15,10 @@ public class NFBM5 implements interfaceEmbarquee.Lancable{
 		while(System.currentTimeMillis()-debut<fin) {
 			//fais quelque chose
 			LCD.clear();
-			LCD.drawString("En cours", 0, 0);
+			LCD.drawString("En cours", 4, 2);
 		}
 		LCD.clear();
-		LCD.drawString("Fin match", 3, 3);
+		LCD.drawString("Fin match", 5, 4);
 	}
 	
 	public String getTitre() {
