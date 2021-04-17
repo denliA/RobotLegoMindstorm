@@ -110,7 +110,6 @@ public class Ligne{
 				return false;
 			}
 			LCC oth = (LCC)othe;
-			System.out.println(ligne == oth.ligne && cl1 == oth.cl1 && cl2 == oth.cl2);
 			return (ligne == oth.ligne && cl1 == oth.cl1 && cl2 == oth.cl2);
 		}
 		

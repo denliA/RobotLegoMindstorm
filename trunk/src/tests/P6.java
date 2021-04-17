@@ -1,5 +1,6 @@
 package tests;
 
+import capteurs.Couleur;
 import capteurs.PaletUltrason;
 import carte.Carte;
 import exceptions.OuvertureException;
@@ -44,6 +45,7 @@ public class P6 implements interfaceEmbarquee.Lancable{
 			;
 		}
 		int palet = PaletUltrason.dichotomique(1);
+		System.out.println(palet);
 		String camp = null;
 		int angleCamp = 90;
 		boolean succes = false;
@@ -67,8 +69,13 @@ public class P6 implements interfaceEmbarquee.Lancable{
 				}
 				//On redresse le robot de maniere a ce qu'il soit face au camp ou il souhaite aller
 				MouvementsBasiques.chassis.rotate(angleCamp-(Carte.carteUsuelle.getRobot().getDirection()+PaletUltrason.getAngle())%360);
-				Pilote.rentrer(camp);
+				MouvementsBasiques.chassis.travel(Float.POSITIVE_INFINITY);
+				while(Couleur.blacheTouchee()) {
+					;
+				}
+				MouvementsBasiques.chassis.stop();
 				succes = true;
+				break;
 			//vide
 			case 1:
 				MouvementsBasiques.chassis.setLinearAcceleration(200);
@@ -77,6 +84,7 @@ public class P6 implements interfaceEmbarquee.Lancable{
 				MouvementsBasiques.chassis.travel(-PaletUltrason.getDistance()); MouvementsBasiques.chassis.waitComplete();
 				MouvementsBasiques.chassis.rotate(-PaletUltrason.getAngle()+180);MouvementsBasiques.chassis.waitComplete();
 				palet = PaletUltrason.dichotomique(1);
+				break;
 			//rieng
 			case 2:
 				try {
@@ -86,14 +94,15 @@ public class P6 implements interfaceEmbarquee.Lancable{
 					;
 				}
 				Pilote.allerVersPoint(1, 0);
+				try {
+					Pince.ouvrir();
+				}
+				catch(OuvertureException e) {
+					;
+				}
 				palet = PaletUltrason.dichotomique(1);
 			}
-			try {
-				Pince.fermer();
-			}
-			catch(OuvertureException e) {
-				;
-			}
+			
 		}while(!succes);
 		//gestion du "pas de palet" : cas ou le robot est trop proche du palet pour le voir avec le capteur ultrason
 		

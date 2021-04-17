@@ -1,5 +1,6 @@
 package tests;
 
+import capteurs.Couleur;
 import capteurs.PaletUltrason;
 import carte.Carte;
 import exceptions.OuvertureException;
@@ -62,7 +63,7 @@ public class P7 implements interfaceEmbarquee.Lancable{
 			;
 		}
 		int palet = PaletUltrason.dichotomique(1);
-		
+		System.out.println("palet : "+palet);
 		boolean succes = false;
 		//gestion du vide : cas ou le robot capte le mur
 		do{
@@ -76,8 +77,24 @@ public class P7 implements interfaceEmbarquee.Lancable{
 					;
 				}
 				//On redresse le robot de maniere a ce qu'il soit face au camp ou il souhaite aller
-				MouvementsBasiques.chassis.rotate(angleCamp-(Carte.carteUsuelle.getRobot().getDirection()+PaletUltrason.getAngle())%360);
+				System.out.println("debut angle");
+				MouvementsBasiques.chassis.rotate(angleCamp-(Carte.carteUsuelle.getRobot().getDirection()+PaletUltrason.getAngle())%360); MouvementsBasiques.chassis.waitComplete();
+				System.out.println("fin angle");
+				MouvementsBasiques.chassis.travel(Float.POSITIVE_INFINITY);
+				System.out.println("Avance");
+				Couleur.blacheTouchee();
+				while(!Couleur.blacheTouchee()) {
+					;
+				}
+				MouvementsBasiques.chassis.stop();
+				try{
+					Pince.ouvrir();
+				}
+				catch(OuvertureException e) {
+					;
+				}
 				succes = true;
+				break;
 			//vide
 			case 1:
 				MouvementsBasiques.chassis.setLinearAcceleration(200);
@@ -86,6 +103,7 @@ public class P7 implements interfaceEmbarquee.Lancable{
 				MouvementsBasiques.chassis.travel(-PaletUltrason.getDistance()); MouvementsBasiques.chassis.waitComplete();
 				MouvementsBasiques.chassis.rotate(-PaletUltrason.getAngle()+180);MouvementsBasiques.chassis.waitComplete();
 				palet = PaletUltrason.dichotomique(1);
+				break;
 			//gestion du "pas de palet" : cas ou le robot est trop proche du palet pour le voir avec le capteur ultrason
 			case 2:
 				try {
@@ -95,14 +113,15 @@ public class P7 implements interfaceEmbarquee.Lancable{
 					;
 				}
 				MouvementsBasiques.chassis.travel(60); MouvementsBasiques.chassis.waitComplete();
+				try {
+					Pince.ouvrir();
+				}
+				catch(OuvertureException e) {
+					;
+				}
 				palet = PaletUltrason.dichotomique(1);
 			}
-			try {
-				Pince.fermer();
-			}
-			catch(OuvertureException e) {
-				;
-			}
+			
 		}while(!succes);
 		
 	}
