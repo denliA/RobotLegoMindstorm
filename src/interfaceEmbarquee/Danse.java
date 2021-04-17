@@ -14,7 +14,7 @@ import moteurs.Pince;
 import interfaceEmbarquee.Musique;
 
 public class Danse {
-static Thread t;
+static Thread d;
 	
 	//lance le bruitage choisi dans le picker
 	public static void startDance(){
@@ -23,26 +23,15 @@ static Thread t;
 	
 	//lance le son dont le fichier.wav est passé en paramètre
 	public static void startDance(final String name) {
-		t = new Thread(new Runnable() {
-			public void run(){
-				while(!Thread.interrupted()){
-					LCD.clear();
-					LCD.drawString("Dance time", 3, 3);
-					if (name=="victoire") {
-						victoire();
-					}
-					else if(name=="defaite") {
-						defaite();
-					}
-				}
-			}
-		});
-		t.start();		
+		LCD.clear();
+		LCD.drawString("Dance time", 3, 3);
+		if (name=="victoire") {
+			victoire();
+		}
+		else if(name=="defaite") {
+			defaite();
+		}		
 	}
-	
-	public static void stopDance(){
-		t.interrupt(); //va tenter d'arreter le thread en cours d'execution
-    }
 	
 	public static void victoire() {
 		long debut;
@@ -101,21 +90,22 @@ static Thread t;
 	}
 	
 	public static void defaite() {
+		new capteurs.Capteur();
 		Musique.startMusic("LosingSong.wav");
 		Couleur.startScanAtRate(10);
-		Couleur.videTouche();
 		double speed = MouvementsBasiques.chassis.getLinearSpeed();
+		double acceleration = MouvementsBasiques.chassis.getLinearAcceleration();
+		double accAng = MouvementsBasiques.chassis.getAngularAcceleration();
 		MouvementsBasiques.chassis.setLinearSpeed(speed/4);
+		Couleur.videTouche();
 		MouvementsBasiques.chassis.travel(Double.POSITIVE_INFINITY);
 		while(!Couleur.videTouche()) {
 			//on continue d'avancer tout droit
 		}
-		Musique.startMusic("Nani.wav");
+		MouvementsBasiques.chassis.setLinearAcceleration(200);
 		MouvementsBasiques.chassis.stop(); MouvementsBasiques.chassis.waitComplete();
 		MouvementsBasiques.chassis.travel(-10); MouvementsBasiques.chassis.waitComplete();
 		MouvementsBasiques.chassis.rotate(180); MouvementsBasiques.chassis.waitComplete();
-		
-		Pilote.stopVide();
 		Couleur.stopScan();
 	}
 }

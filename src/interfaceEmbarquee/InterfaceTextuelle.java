@@ -178,8 +178,7 @@ public class InterfaceTextuelle {
 			while((button!=Button.ID_ENTER)&&(button!=Button.ID_ESCAPE)) {
 				button = Button.waitForAnyPress();
 			}
-			if (button==Button.ID_ENTER) {
-				Danse.stopDance();	
+			if (button==Button.ID_ENTER) {	
 			}
 		}
 			
