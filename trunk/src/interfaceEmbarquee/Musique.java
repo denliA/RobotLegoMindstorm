@@ -1,8 +1,16 @@
 package interfaceEmbarquee;
 
 import java.io.File;
+
+import lejos.hardware.Audio;
+import lejos.hardware.BrickFinder;
 import lejos.hardware.Sound;
 import lejos.hardware.lcd.LCD;
+import lejos.internal.ev3.EV3Audio;
+
+
+
+
 
 public class Musique{
 	static Thread t;
@@ -34,11 +42,9 @@ public class Musique{
 					}
 					else {
 						LCD.drawString("Musique finie", 3, 5);
+						return;
 					}
-					return;
 				}
-				LCD.clear();
-	        	LCD.drawString("Musique interrompue",3,6);
 			}
 		});
 		t.start();		
