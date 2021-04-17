@@ -550,7 +550,11 @@ public class Pilote {
 		Point position = robot.getPosition();
 		float direction = robot.getDirection();
 		float x_depart = position.getX(), y_depart = position.getY();
-//		System.out.println("Position juste AVANT le mouvement : " + robot);
+		if(y_depart == 2 && direction == 90 || y_depart == -2 && direction == 270) {
+			tournerJusqua(Ligne.xToLongues.get(x_depart), true, 250);
+			tournerJusqua(Ligne.xToLongues.get(x_depart), false, 50, 20);
+		}
+		//		System.out.println("Position juste AVANT le mouvement : " + robot);
 		if (x == 0 && y==0 && y_depart != y) {
 			allerVersPoint(1, y);
 			allerVersPoint(0, y);
@@ -598,6 +602,10 @@ public class Pilote {
 	}
 	
 	public static void rentrer(String direction) {
+		rentrer(direction, true);
+	}
+	
+	public static void rentrer(String direction, boolean se_retourner) {
 		assert (direction.equals("porte") || direction.equals("fenetre") || direction.equals("")) : "direction doit indiquer une direction, ou être une chaîne vide";
 		float x = robot.getPosition().getX();
 		float y = robot.getPosition().getY();
@@ -606,26 +614,26 @@ public class Pilote {
 			carte.calibrerPosition();
 		}
 		
-		if(y==2&&direction.equals("porte")) {
+		if(y==2&&(direction.equals("porte")&&se_retourner || direction.equals("fenetre")&&!se_retourner)) {
 			if(robot.getDirection() == 90) {
 				tournerJusqua(Ligne.xToLongues.get(x), true, 250);
 				tournerJusqua(Ligne.xToLongues.get(x), false, 50, 20);
 			}
 		}
-		else if (y==-2&&direction.equals("fenetre")) {
+		else if (y==-2&&(direction.equals("fenetre")&&se_retourner || direction.equals("porte")&&!se_retourner)) {
 			if(robot.getDirection() == 270) {
 				tournerJusqua(Ligne.xToLongues.get(x), true, 250);
 				tournerJusqua(Ligne.xToLongues.get(x), false, 50, 20);
 			}
 		}
 		else if(y==2) {
-			if (robot.getDirection() == 90) {
+			if (robot.getDirection() == 90 && se_retourner) {
 				tournerJusqua(Ligne.xToLongues.get(x), true, 250);
 				tournerJusqua(Ligne.xToLongues.get(x), false, 50, 20);
 			}
 		}
 		else if(y==-2) {
-			if(robot.getDirection() == 270) {
+			if(robot.getDirection() == 270 && se_retourner) {
 				tournerJusqua(Ligne.xToLongues.get(x), true, 250);
 				tournerJusqua(Ligne.xToLongues.get(x), false, 50, 20);
 			}
