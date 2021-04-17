@@ -19,6 +19,7 @@ public class NFBM1 implements interfaceEmbarquee.Lancable{
 			}
 			Button.waitForAnyEvent();
 		}
+		Couleur.stopScan();
 	}
 	
 	public String getTitre() {
