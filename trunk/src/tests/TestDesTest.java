@@ -7,7 +7,7 @@ import interfaceEmbarquee.Lancable;
 public class TestDesTest {
 
 	public static void main(String[] args) {
-		Lancable [] sotoTests = {new P1(),new P2(),new P3(),new P4(),new P5(),new P6(),new P7()};
+		Lancable [] imposes = {new P1(),new P2(),new P3(),new P4(),new P5(),new P6(),new P7()};
 		Lancable [] basiques = {new NFBM1(),new NFBA1(),new NFBA2(),new NFBM2(),new NFBM3(),new NFBA3(),new NFBM4(),new NFBM5(),new NFBM6()};
 		Lancable [] avancees = {new NFA0(),new NFA1(),new NFA2(),new NFA3(),new NFA4(),new NFA5(),new NFA6(),new NFA7()};
 		Lancable [] optionnels = {new IN(),new OFA1()};
@@ -20,7 +20,7 @@ public class TestDesTest {
 		indice = lectureClavier.nextInt();
 		indice--;
 		switch (groupe) {
-        case 1:  sotoTests[indice].lancer();
+        case 1:  imposes[indice].lancer();
                  break;
         case 2:  basiques[indice].lancer();
                  break;
