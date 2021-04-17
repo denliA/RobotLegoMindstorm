@@ -4,7 +4,7 @@ import exceptions.OuvertureException;
 import lejos.hardware.Button;
 import lejos.hardware.lcd.LCD;
 
-public class P5 {
+public class P5 implements interfaceEmbarquee.Lancable {
 	
 	public void lancer() {
 		//choisir le camp de départ
