@@ -63,22 +63,23 @@ static Thread t;
 			MouvementsBasiques.chassis.travel(3); MouvementsBasiques.chassis.waitComplete();
 			Delay.msDelay(1000);
 			MouvementsBasiques.chassis.travel(-3); MouvementsBasiques.chassis.waitComplete();
-			//vitesses normales
-			MouvementsBasiques.chassis.setLinearSpeed(speed/2);
-			MouvementsBasiques.chassis.setLinearAcceleration(acceleration/4);
+			//mouvements lents
+			MouvementsBasiques.chassis.setLinearSpeed(speed/10);
+			MouvementsBasiques.chassis.setLinearAcceleration(acceleration/10);
 			Pince.ouvrir();
 			MouvementsBasiques.chassis.rotate(360);
 			Delay.msDelay(1000);
 			
 			//l'autre sens
+			//mouvements brusques
 			MouvementsBasiques.chassis.setLinearSpeed(speed*2);
 			MouvementsBasiques.chassis.setLinearAcceleration(acceleration*4);
 			MouvementsBasiques.chassis.travel(3); MouvementsBasiques.chassis.waitComplete();
 			Delay.msDelay(1000);
 			MouvementsBasiques.chassis.travel(-3); MouvementsBasiques.chassis.waitComplete();
-			//vitesses normales
-			MouvementsBasiques.chassis.setLinearSpeed(speed/2);
-			MouvementsBasiques.chassis.setLinearAcceleration(acceleration/4);
+			//mouvements lents
+			MouvementsBasiques.chassis.setLinearSpeed(speed/10);
+			MouvementsBasiques.chassis.setLinearAcceleration(acceleration/10);
 			Pince.fermer();
 			MouvementsBasiques.chassis.rotate(-360);
 			Delay.msDelay(1000);
