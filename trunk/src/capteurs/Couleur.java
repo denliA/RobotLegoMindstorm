@@ -1,7 +1,6 @@
 package capteurs;
 
 import lejos.hardware.Sound;
-import lejos.hardware.Sounds;
 import lejos.utility.Delay;
 import lejos.utility.Timer;
 import lejos.utility.TimerListener;
