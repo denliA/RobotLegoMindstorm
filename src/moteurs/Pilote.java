@@ -11,6 +11,7 @@ import carte.Robot;
 import carte.Ligne;
 import carte.Ligne.LCC;
 import interfaceEmbarquee.Musique;
+import lejos.hardware.Sound;
 import lejos.robotics.chassis.Chassis;
 import lejos.utility.Delay;
 import lejos.utility.Timer;
@@ -551,8 +552,11 @@ public class Pilote {
 		float direction = robot.getDirection();
 		float x_depart = position.getX(), y_depart = position.getY();
 		if(y_depart == 2 && direction == 90 || y_depart == -2 && direction == 270) {
+			Sound.beep();
 			tournerJusqua(Ligne.xToLongues.get(x_depart), true, 250);
 			tournerJusqua(Ligne.xToLongues.get(x_depart), false, 50, 20);
+			direction = (direction+180)%360;
+			robot.setDirection(direction);
 		}
 		//		System.out.println("Position juste AVANT le mouvement : " + robot);
 		if (x == 0 && y==0 && y_depart != y) {
@@ -573,7 +577,7 @@ public class Pilote {
 		else {
 			inverse = true;
 		}
-		System.out.println("det: " + det + "y>y_depart:  " + (y>y_depart) + "Inverse? : "+inverse);
+//		System.out.println("det: " + det + "y>y_depart:  " + (y>y_depart) + "Inverse? : "+inverse);
 		if (x != x_depart) {
 			int bonne_bifurquation = (det ? -1 : 1)*(x>x_depart ? -1 : 1);
 			if (Math.abs(y_depart)==2 || y_depart ==0) {chassis.travel(30); chassis.waitComplete();}
