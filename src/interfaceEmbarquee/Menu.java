@@ -71,15 +71,15 @@ public class Menu implements Lancable{
 				choix = (choix == 1) ? Math.min(tab.length-6*page, 6) :(choix-1);
 			}
 			else if (button == Button.ID_ENTER) {
-				tab[choix-1].lancer();
+				tab[choix+6*page-1].lancer();
 			}
 			else if (button == Button.ID_RIGHT) {
-				if (tab[choix-1].getTitre().length()>15) { //si le titre est trop grand pour l'ecran
+				if (tab[choix+6*page-1].getTitre().length()>15) { //si le titre est trop grand pour l'ecran
 					debutColonne = (debutColonne == tab[choix-1].getTitre().length())?debutColonne:++debutColonne;
 				}
 			}
 			else if (button == Button.ID_LEFT) {
-				if (tab[choix-1].getTitre().length()>15) { //si le titre est trop grand pour l'ecran
+				if (tab[choix+6*page-1].getTitre().length()>15) { //si le titre est trop grand pour l'ecran
 					debutColonne = (debutColonne == 0)?debutColonne:--debutColonne;
 				}
 			}

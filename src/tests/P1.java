@@ -14,7 +14,6 @@ public class P1 implements interfaceEmbarquee.Lancable{
 	public void lancer() {
 		int button = -1;
 		CouleurLigne couleur;
-		Couleur.setScanMode(Couleur.RGBMODE);
 		Couleur.startScanAtRate(10);
 		while (button != Button.ID_ESCAPE) {
 			button = Button.waitForAnyPress();

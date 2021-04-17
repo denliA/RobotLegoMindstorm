@@ -153,20 +153,20 @@ public class PaletUltrason {
 		 * <p>Le but de cette boucle est de capter le palet : le robot tourne de 10 degres dans le sens trigonometrique
 		 *  jusqu'a ce que d soit inferieure a 2m (succes) ou jusqu'a avoir fait un tour sur lui-meme (echec).</p>
 		 */
-			int angle = 0;
-			while((d>range||d<=0)&&angle<360) {
-				angle+=10;
-				MouvementsBasiques.tourner(10);
-				Ultrason.setDistance();
-				d = Ultrason.getDistance();
-				System.out.println(d);
-			}
-			if(angle==350) {
-				return 2;
-			}
-			angleTotal = angle;
-
-		if(d<range) {	
+		int angle = 0;
+		while((d>range||d<=0)&&angle<360) {
+			angle+=10;
+			MouvementsBasiques.tourner(10);
+			Ultrason.setDistance();
+			d = Ultrason.getDistance();
+			System.out.println(d);
+		}
+//			if(angle==350) {
+//				return 2;
+//			}
+		angleTotal = angle;
+		boolean trouve = false;
+		if(d<range) {
 			/**
 			 * L'algorithme d'affinement de l'angle 
 			 * <p>Il ne s'ex�cute que si le robot a capte un palet (d!=infini). 
@@ -181,6 +181,7 @@ public class PaletUltrason {
 			 * </ul>
 			 * </ul>
 			 */
+			trouve = true;
 			dDepart = d;
 			System.out.println("dDepart vaut : "+dDepart);
 			
@@ -212,7 +213,10 @@ public class PaletUltrason {
 			}
 		}
 //			Pince.fermer();
+		if(trouve) {
 			return(0);
+		}
+		return(2);
 			
 	}
 	
