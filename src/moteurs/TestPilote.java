@@ -70,7 +70,7 @@ public class TestPilote {
 			int button = Button.waitForAnyPress();
 			if (button == Button.ID_LEFT || button == Button.ID_RIGHT) {
 				try {
-					Pilote.seRedresserSurLigne(ligne, button==Button.ID_LEFT, 90, 90);
+					Pilote.seRedresserSurLigne(ligne, button==Button.ID_LEFT, 90, 180);
 				}
 				catch (Exception e) {
 					Sound.beep();
