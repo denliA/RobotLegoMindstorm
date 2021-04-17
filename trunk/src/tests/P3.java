@@ -138,7 +138,12 @@ public class P3 implements Lancable {
 		moteurs.Pilote.rentrer("");
 		CouleurLigne c = Ligne.xToLongues.get(carte.Carte.carteUsuelle.getRobot().getPosition().getX());
 		Pilote.tournerJusqua(c, true, 250); Pilote.tournerJusqua(c, false, 50,20);
-		modeSolo.ModeSolo.ramasserPalet(1, 1, false, false, rougeAGauche);
+		try {
+			modeSolo.ModeSolo.ramasserPalet(1, 1, false, false, rougeAGauche);
+		} catch (OuvertureException e) {
+			System.out.println("Prob d'ouverture de pince");
+			e.printStackTrace();
+		}
 		
 	}
 
