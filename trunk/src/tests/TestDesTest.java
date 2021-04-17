@@ -13,7 +13,7 @@ public class TestDesTest {
 		Lancable [] optionnels = {new IN(),new OFA1()};
 		int indice;
 		int groupe;
-		System.out.println("Quel test a lancer ? {1 : sotoTests, 2 : basiques, 3 : avancees, 4 : optionnels}");
+		System.out.println("Quel test a lancer ? {1 : imposes, 2 : basiques, 3 : avancees, 4 : optionnels}");
 		Scanner lectureClavier = new Scanner(System.in);
 		groupe = lectureClavier.nextInt();
 		System.out.println("Numero du test ? (Commence à 1)");
