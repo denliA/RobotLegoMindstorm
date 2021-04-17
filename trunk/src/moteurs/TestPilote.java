@@ -1,8 +1,5 @@
 package moteurs;
 
-import java.util.Vector;
-
-import javax.swing.event.ListSelectionEvent;
 
 import capteurs.Capteur;
 import capteurs.Couleur;
@@ -12,6 +9,7 @@ import lejos.hardware.Sound;
 import lejos.hardware.Sounds;
 import lejos.robotics.chassis.WheeledChassis;
 import lejos.utility.Delay;
+import carte.*;
 
 public class TestPilote {
 	static WheeledChassis chassis = MouvementsBasiques.chassis;
@@ -25,11 +23,12 @@ public class TestPilote {
 		
 		//MouvementsBasiques.setAccelerationRobot(MouvementsBasiques.getAccelerationRobot()/5);
 		//MouvementsBasiques.setVitesseRobot(MouvementsBasiques.getVitesseRobot()/2);
-		testSeRedresserSurLigne(CouleurLigne.JAUNE) ;
+		//testSeRedresserSurLigne(CouleurLigne.JAUNE) ;
 		//testSuivreLigne(CouleurLigne.JAUNE);
 		//testPID(CouleurLigne.JAUNE, 25);
 		//testSuivreLigne(CouleurLigne.JAUNE);
 		//Pilote.tournerJusqua(CouleurLigne.JAUNE, true, 100, 0,90);
+		testPositions();
 		
 		
 		
@@ -97,4 +96,13 @@ public class TestPilote {
 	public static void testSuivreLigne(CouleurLigne c) {
 		Pilote.suivreLigne(c);
 	}
+	
+	public static void testPositions() {
+		Carte c = carte.Carte.carteUsuelle;
+		Robot r = c.getRobot();
+		System.out.println("Avant calibration : " + r);
+		c.calibrerPosition();
+		System.out.println("Après calibration : "+r);
+	}
+	
 }

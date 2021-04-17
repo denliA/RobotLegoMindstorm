@@ -85,7 +85,7 @@ public class Ligne{
 	 * (ici c'est � la deuxi�me intersection que le robot conna�t sa position car on n'a que faire de la premi�re vu que l'on ne s'y arr�te pas.)
 	 * - Savoir dans quel ordre on a travers� 2 Lignes pour savoir dans quelle direction on va.
 	 */
-	public static class LCC{
+	public static class LCC {
 		private Ligne ligne;
 		private CouleurLigne cl1;
 		private CouleurLigne cl2;
@@ -96,11 +96,22 @@ public class Ligne{
 		}
 		@Override
 		public int hashCode() {
+			System.out.println(ligne + " " + cl1 + " " + cl2 + "   " +(ligne.hashCode()+cl1.hashCode()+cl2.hashCode()) );
 			return(ligne.hashCode()+cl1.hashCode()+cl2.hashCode());
 		}
 		
 		public String toString() {
 			return "Ligne : "+ligne.getCouleur()+"\n"+"Intersection 1: "+cl1+"\n"+"Intersection 2: "+cl2;
+		}
+		
+		public boolean equals(Object othe) {
+			if(!(othe instanceof LCC)) {
+				System.err.println("EEEEEEEHOOOOOOOH");
+				return false;
+			}
+			LCC oth = (LCC)othe;
+			System.out.println(ligne == oth.ligne && cl1 == oth.cl1 && cl2 == oth.cl2);
+			return (ligne == oth.ligne && cl1 == oth.cl1 && cl2 == oth.cl2);
 		}
 		
 	}

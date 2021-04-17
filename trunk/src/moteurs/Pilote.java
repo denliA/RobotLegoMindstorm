@@ -310,6 +310,7 @@ public class Pilote {
 		boolean vide;
 		do {
 			MouvementsBasiques.chassis.travel(Double.POSITIVE_INFINITY);
+			vide = Couleur.videTouche();
 			while(!(vide=Couleur.videTouche()) && (!c.contains(t=Couleur.getLastCouleur())));
 			if (vide) {
 				MouvementsBasiques.chassis.setLinearAcceleration(250);
@@ -317,7 +318,7 @@ public class Pilote {
 				MouvementsBasiques.chassis.setLinearAcceleration(accelerationLineaire);
 				MouvementsBasiques.chassis.travel(-10); MouvementsBasiques.chassis.waitComplete();
 				MouvementsBasiques.chassis.rotate(180); MouvementsBasiques.chassis.waitComplete();
-				return t;
+				return CouleurLigne.VIDE;
 			}
 			else {
 				MouvementsBasiques.chassis.travel(10); //avance de 10 cm
@@ -468,9 +469,16 @@ public class Pilote {
 			chassis.travel(15); chassis.waitComplete();
 			chassis.rotate(coef*-90); chassis.waitComplete();
 			boolean direction_rotation = true;
+			int iter = 0;
 			do {
+				if (iter==2) {
+					chassis.rotate(coef*-90); chassis.waitComplete();
+					chassis.travel(30); chassis.waitComplete();
+					chassis.rotate(coef*90); chassis.waitComplete();
+				}
 				c = Pilote.chercheLigne(longues, 15, 10, 180, direction_rotation);
 				direction_rotation = false;
+				iter++;
 			} while(c==CouleurLigne.VIDE);
 			ligne = c;
 		}
@@ -508,9 +516,19 @@ public class Pilote {
 					}
 					System.out.println("Inter 1 = "+inter1);
 				}
-				else if (inter1==c){
+//				else if (inter1==c || cblanche&&(inter1==CouleurLigne.BLANCHE)){
+//					Pilote.tournerJusqua(ligne, true, 250, 30);
+//					Pilote.tournerJusqua(ligne, false, 50, 30); 
+//					cblanche = Couleur.blacheTouchee()&Couleur.blacheTouchee();
+//					new Thread(new ArgRunnable(ligne) {
+//						public void run() {
+//							Pilote.suivreLigne((CouleurLigne)truc);
+//						}
+//					}).start();
+//					continue;
+//				}
+				else if(inter1==c)
 					continue;
-				}
 				else {
 					inter2=cblanche ? CouleurLigne.BLANCHE : c;
 					System.out.println("Inter 2 = "+inter2);
