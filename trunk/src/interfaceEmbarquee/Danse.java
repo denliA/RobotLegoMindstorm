@@ -3,6 +3,7 @@ package interfaceEmbarquee;
 import java.io.File;
 
 import capteurs.Couleur;
+import exceptions.OuvertureException;
 import lejos.hardware.Button;
 import lejos.hardware.Sound;
 import lejos.hardware.lcd.LCD;
@@ -50,37 +51,47 @@ static Thread t;
 		double acceleration = MouvementsBasiques.chassis.getLinearAcceleration();
 		MouvementsBasiques.chassis.setLinearSpeed(speed);
 		//on l'eloigne de la ligne blanche
-		
-		Pilote.allerVersPoint(0, 0);
-		debut = System.currentTimeMillis();
+		MouvementsBasiques.chassis.travel(100);
+		//Pilote.allerVersPoint(0, 0);
 		Musique.startMusic("VictorySong.wav");
+		debut = System.currentTimeMillis();
 		//on attend le debut de la musique
 		Delay.msDelay(2000);
 		while(System.currentTimeMillis()-debut<fin) {
 			//mouvements brusques
 			MouvementsBasiques.chassis.setLinearSpeed(speed*2);
-			MouvementsBasiques.chassis.setLinearAcceleration(acceleration*4);
-			MouvementsBasiques.chassis.travel(3); MouvementsBasiques.chassis.waitComplete();
+			MouvementsBasiques.chassis.setLinearAcceleration(acceleration*2);
+			MouvementsBasiques.chassis.travel(5); MouvementsBasiques.chassis.waitComplete();
 			Delay.msDelay(1000);
-			MouvementsBasiques.chassis.travel(-3); MouvementsBasiques.chassis.waitComplete();
+			MouvementsBasiques.chassis.travel(-5); MouvementsBasiques.chassis.waitComplete();
 			//mouvements lents
 			MouvementsBasiques.chassis.setLinearSpeed(speed/10);
 			MouvementsBasiques.chassis.setLinearAcceleration(acceleration/10);
-			Pince.ouvrir();
+			try {
+				Pince.ouvrir();
+			}
+			catch(OuvertureException e) {
+				;
+			}
 			MouvementsBasiques.chassis.rotate(360);
 			Delay.msDelay(1000);
 			
 			//l'autre sens
 			//mouvements brusques
 			MouvementsBasiques.chassis.setLinearSpeed(speed*2);
-			MouvementsBasiques.chassis.setLinearAcceleration(acceleration*4);
+			MouvementsBasiques.chassis.setLinearAcceleration(acceleration*2);
 			MouvementsBasiques.chassis.travel(3); MouvementsBasiques.chassis.waitComplete();
 			Delay.msDelay(1000);
 			MouvementsBasiques.chassis.travel(-3); MouvementsBasiques.chassis.waitComplete();
 			//mouvements lents
 			MouvementsBasiques.chassis.setLinearSpeed(speed/10);
 			MouvementsBasiques.chassis.setLinearAcceleration(acceleration/10);
-			Pince.fermer();
+			try {
+				Pince.fermer();
+			}
+			catch(OuvertureException e) {
+				;
+			}
 			MouvementsBasiques.chassis.rotate(-360);
 			Delay.msDelay(1000);
 		}
@@ -90,6 +101,7 @@ static Thread t;
 	}
 	
 	public static void defaite() {
+		Musique.startMusic("LosingSong.wav");
 		Couleur.startScanAtRate(10);
 		Couleur.videTouche();
 		double speed = MouvementsBasiques.chassis.getLinearSpeed();
