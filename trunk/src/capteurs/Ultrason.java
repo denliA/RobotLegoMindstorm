@@ -2,11 +2,21 @@ package capteurs;
 
 import lejos.utility.Timer;
 import lejos.utility.TimerListener;
-
+/**
+ * Gestion du capteur ultrason.
+ * <p>Fonctions assurees :</p>
+ * <ul>
+ * <li> Prise periodique de mesure 
+ * <li> Enregistrement des valeurs
+ * <li> Transmission des mesures aux autres classes pour traitement
+ * </ul>
+ * @see Capteur
+ * @see PaletUltrason
+ */
 public class Ultrason {
 	
 	//Attributs 
-	//float car utilis� par leJOS
+	//float car utilise par leJOS
 	private static float distance;
 	private static boolean bruitDetecte;
 	//pour savoir si le capteur est effectivement actif
@@ -17,54 +27,69 @@ public class Ultrason {
 			//cr�ation d'un objet Timer qui lancera les scans toutes les 100ms
 			new Timer(100, new TimerListener() {
 				public void timedOut() {
-					//appel aux deux fonctions lan�ant les scans n�cessaire � la classe
+					//appel aux deux fonctions lancant les scans necessaire a la classe
 					setDistance();
-					//setBruitDetecte(); Est très lent, on en a pas besoin pour le moment 
+					//setBruitDetecte(); ralentit le scan, inutilise pour le moment 
 				}
 			}
 		);
 	
-	//M�thodes
-		
-	//Lancent des scans p�riodiques avec lanceur et modifient status de mani�re ad�quate
+	//Methodes
+	/**
+	 * Lance des scans periodiques avec lanceur et modifie l'attribut <i>status</i> de maniere adequate
+	 */
 	public static void startScan() {
 		//scan toutes les 20 ms
 		lanceur.setDelay(0);
 		lanceur.start();
 		status = true;
 	}
+	/**
+	 * Arrete le scan
+	 */
 	public static void stopScan() {
 		lanceur.stop();
 		status = false;
 	}
 	
-	//Donne la valeur de status
+	/**
+	 * Permet d'obtenir la valeur de <i>status</i>.
+	 * @return status (true si un scan est en cours, false sinon)
+	 */
 	public static boolean getStatus() {
 		return status;
 	}
 	
-	//Gestion de la distance mesur�e par le capteur
+	/**
+	 * Permet de stocker la distance calculee par le capteur ultrason dans l'attribut <i>distance</i>.
+	 */
 	public static void setDistance() {
-		//cr�ation du tableau qui stockera les valeurs renvoy�es par le sampler
+		//creation du tableau qui stockera les valeurs renvoyees par le sampler
 		float[] tabDistance = new float[1];
 		//remplissage du tableau
 		Capteur.ULTRASON.fetchSample(tabDistance, 0);
 		distance = tabDistance[0];
 		//System.out.println(tabDistance[0]);
 	}
+	/**
+	 * getter de l'attribut <i>distance</i>.
+	 * @return distance (float representant une distance en metres)
+	 */
 	public static float getDistance() {
 		return distance;
 	}
 	
-	//D�tection de la pr�sence d'un autre robot
+	/**
+	 * setter de boolean bruitDetecte (true si presence d'un autre robot, false sinon).
+	 */
 	public static void setBruitDetecte() {
 		bruitDetecte=false;
 		
-		//le sampler contient normalement un seul �l�ment : 1 si il y a un autre robot, 0 sinon
+		//le sampler contient normalement un seul element : 1 si il y a un autre robot, 0 sinon
 		float[] autreRobot = new float[1];
 		Capteur.ECOUTE.fetchSample(autreRobot, 0);
 		
-		if(autreRobot[0]==1) {bruitDetecte=true;}
+		bruitDetecte = autreRobot[0]==1;
 	}
 	public static boolean getBruitDetecte() {
 		return bruitDetecte;
