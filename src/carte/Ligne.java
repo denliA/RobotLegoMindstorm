@@ -96,7 +96,7 @@ public class Ligne{
 		}
 		@Override
 		public int hashCode() {
-			System.out.println(ligne + " " + cl1 + " " + cl2 + "   " +(ligne.hashCode()+cl1.hashCode()+cl2.hashCode()) );
+//			System.out.println(ligne + " " + cl1 + " " + cl2 + "   " +(ligne.hashCode()+cl1.hashCode()+cl2.hashCode()) );
 			return(ligne.hashCode()+cl1.hashCode()+cl2.hashCode());
 		}
 		
@@ -110,6 +110,7 @@ public class Ligne{
 				return false;
 			}
 			LCC oth = (LCC)othe;
+			return (ligne == oth.ligne && cl1 == oth.cl1 && cl2 == oth.cl2);
 			return (ligne == oth.ligne && cl1 == oth.cl1 && cl2 == oth.cl2);
 		}
 		
