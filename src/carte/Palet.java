@@ -2,7 +2,7 @@ package carte;
 
 public class Palet extends Cercle {
 	/**
-	 * Classe héritant de la classe @see Cercle. L'ajout à cette dernière est l'état du palet : marqué ou non.
+	 * Classe heritant de la classe @see Cercle. L'ajout a cette derniere est l'etat du palet : marque ou non.
 	 */
 
 	private boolean marque = false;
@@ -17,15 +17,15 @@ public class Palet extends Cercle {
 	}
 	
 	/**
-	 * Le getter de l'état du palet (marqué ou non).
-	 * @return L'état du palet
+	 * Le getter de l'etat du palet (marque ou non).
+	 * @return L'etat du palet
 	 */
 	public boolean getMarque() {
 		return(marque);
 	}
 	
 	/**
-	 * Méthode indiquant le déplacement. Appelle simplement la méthode @see Cercle#setCentre(Point).
+	 * Methode indiquant le deplacement. Appelle simplement la methode @see Cercle#setCentre(Point).
 	 * @param x
 	 * @param y
 	 */
@@ -34,7 +34,7 @@ public class Palet extends Cercle {
 	}
 	
 	/**
-	 * Modifie, lorsqu'un palet est marqué, son état.
+	 * Modifie, lorsqu'un palet est marque, son etat.
 	 */
 	public void but() {
 		marque = true;
