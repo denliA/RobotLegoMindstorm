@@ -7,9 +7,9 @@ import capteurs.CouleurLigne;
 public class Ligne{
 	/**
 	 * On consid�re la classe Ligne comme une droite parall�le � un axe du plan.
-	 * Il suffit de conna�tre sa coordonn�e fix�e puis de ne pas prendre compte de l'autre.
+	 * Il suffit de connaitre sa coordonnee fixee puis de ne pas prendre compte de l'autre.
 	 * Puisqu'on peut simplement dire si elle est horizontale ou verticale.
-	 * De plus on la d�finit par une couleur pour faciliter l'association aux donn�es r�cup�r�e par le capteur de couleurs.
+	 * De plus on la definit par une couleur pour faciliter l'association aux donnees recuperee par le capteur de couleurs.
 	 */
 	private boolean horizontale;
 	private float coord;
@@ -29,7 +29,7 @@ public class Ligne{
 	
 	/**
 	 * Les getters.
-	 * @return L'information d'inter�t sur la Ligne.
+	 * @return L'information d'interet sur la Ligne.
 	 */
 	
 	public boolean getDirection() {
@@ -45,7 +45,7 @@ public class Ligne{
 	}
 	
 	/**
-	 * Calcul du point d'intersection entre la Ligne appelant cette m�thode et la Ligne A pass�e en param�tre.
+	 * Calcul du point d'intersection entre la Ligne appelant cette methode et la Ligne A passee en parametre.
 	 * @param A
 	 * @return Le point en lequel s'intersectent les 2 Lignes
 	 */
@@ -57,7 +57,7 @@ public class Ligne{
 	}
 	
 	/**
-	 * Utilisation d'une hashMap pour faciliter la compr�hension de la Ligne d'inter�t lors de la r�cup�ration d'une couleur par le capteur.
+	 * Utilisation d'une hashMap pour faciliter la comprehension de la Ligne d'interet lors de la recuperation d'une couleur par le capteur.
 	 */
 	static public ConcurrentHashMap<CouleurLigne, Ligne> hashLignes = new ConcurrentHashMap<>();
 	static {
@@ -77,13 +77,13 @@ public class Ligne{
 	 * Cr�ation de 2 classes interne : 
 	 * - LCC (Ligne, Couleur, Couleur) 
 	 * - Etat (Position, direction) 
-	 * pour pouvoir utiliser une hashMap o� l'on fait se correspondre ces 2 informations.
-	 * L'id�e derri�re cela est que la LCC repr�sente la Ligne que le robot suit, et les couleurs ici sont celle de 2 intersections qu'il traverse.
-	 * Cela permet de facilit� l'identification de sa position et de sa direction au robot. En effet le terrain �tant connu, il suffit de :
-	 * - Conna�tre la Ligne que l'on suit pour avoir le x (si la Ligne est verticale) ou le y (si elle est horizontale)
-	 * - Conna�tre l'intersection pour avoir la coordonn�e manquante
-	 * (ici c'est � la deuxi�me intersection que le robot conna�t sa position car on n'a que faire de la premi�re vu que l'on ne s'y arr�te pas.)
-	 * - Savoir dans quel ordre on a travers� 2 Lignes pour savoir dans quelle direction on va.
+	 * pour pouvoir utiliser une hashMap ou l'on fait se correspondre ces 2 informations.
+	 * L'idee derriere cela est que la LCC represente la Ligne que le robot suit, et les couleurs ici sont celle de 2 intersections qu'il traverse.
+	 * Cela permet de faciliter l'identification de sa position et de sa direction au robot. En effet le terrain etant connu, il suffit de :
+	 * - Connaitre la Ligne que l'on suit pour avoir le x (si la Ligne est verticale) ou le y (si elle est horizontale)
+	 * - Connaitre l'intersection pour avoir la coordonnee manquante
+	 * (ici c'est a la deuxieme intersection que le robot connait sa position car on n'a que faire de la premiere vu que l'on ne s'y arrete pas.)
+	 * - Savoir dans quel ordre on a traverse 2 Lignes pour savoir dans quelle direction on va.
 	 */
 	public static class LCC {
 		private Ligne ligne;
@@ -111,7 +111,6 @@ public class Ligne{
 			}
 			LCC oth = (LCC)othe;
 			return (ligne == oth.ligne && cl1 == oth.cl1 && cl2 == oth.cl2);
-			return (ligne == oth.ligne && cl1 == oth.cl1 && cl2 == oth.cl2);
 		}
 		
 	}
@@ -126,7 +125,7 @@ public class Ligne{
 	}
 	
 	/**
-	 * Dans cette hashMap on compte utiliser le robot de mani�re � ce qu'il aille sur une ligne verticale pour se rep�rer, car cela nous facilite la t�che.
+	 * Dans cette hashMap on compte utiliser le robot de maniere e ce qu'il aille sur une ligne verticale pour se reperer, car cela nous facilite la tache.
 	 */
 	static public ConcurrentHashMap<LCC, Etat> hashPerdu = new ConcurrentHashMap<>();
 	static {

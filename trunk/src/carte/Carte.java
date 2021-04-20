@@ -8,22 +8,22 @@ import moteurs.Pilote;
 
 public class Carte {
 	/**
-	 * La classe principale du package carte. Cette classe sert à simuler le terrain de la manière la plus précise possible.
-	 * On calibre cette Carte à chaque fois que le robot travers une ligne, une intersection, ou revoit une information comme le contact, ou encore l'abscence d'un palet.
-	 * On a décidé de mettre de coder de manière dure les palets et les intersections pour s'éviter des algorithmes de calculs et de positionnement inutiles.
-	 * De plus on utilise carteUsuelle pour créer une instance de Carte dès le chargement de cette Classe et l'on l'utilisera comme la carte d'interêt de notre partie.
-	 * L'utilité de cette classe est que lorsque le robot a besoin d'une information, il peut se baser sur la dernière version de la carte qu'il a (la dernière mise à jour qu'il a effectuée).
-	 * Cela permet d'avoir une connaissance en temps réel de la position approximative du robot et de sa direction.
-	 * De plus cela permet d'avoir une connaissance de l'état du terrain pour éviter de rechercher une deuxième fois un palet ou autre.
+	 * La classe principale du package carte. Cette classe sert a simuler le terrain de la maniere la plus precise possible.
+	 * On calibre cette Carte a chaque fois que le robot travers une ligne, une intersection, ou revoit une information comme le contact, ou encore l'abscence d'un palet.
+	 * On a decide de hardcoded les palets et les intersections pour s'eviter des algorithmes de calculs et de positionnement inutiles.
+	 * De plus on utilise carteUsuelle pour creer une instance de Carte des le chargement de cette Classe et l'on l'utilisera comme la carte d'interet de notre partie.
+	 * L'utilite de cette classe est que lorsque le robot a besoin d'une information, il peut se baser sur la derniere version de la carte qu'il a (la derniere mise a jour qu'il a effectuee).
+	 * Cela permet d'avoir une connaissance en temps reel de la position approximative du robot et de sa direction.
+	 * De plus cela permet d'avoir une connaissance de l'etat du terrain pour eviter de rechercher une deuxieme fois un palet ou autre.
 	 */
 	
 	/**
 	 * Ici sont les arguments de la classe :
-	 * - robot qui référence l'entité au nom éponyme
+	 * - robot qui reference l'entite au nom eponyme
 	 * - lignes : notre hashMap de correspondance entre la couleur d'une Ligne et la Ligne en question
 	 * - intersections : la liste, hardcoded, des intersections du terrain qu'on manipule
-	 * - terrain : qui pose les limites du terrain, par son coin inférieur et son coin supérieur
-	 * - palets : la liste, encore une fois hardcoded, des palets présents sur une table au début d'un match ou d'une partie solo
+	 * - terrain : qui pose les limites du terrain, par son coin inferieur et son coin superieur
+	 * - palets : la liste, encore une fois hardcoded, des palets presents sur une table au debut d'un match ou d'une partie solo
 	 */
 	private Robot robot;
 	private ConcurrentHashMap<CouleurLigne, Ligne> lignes;
@@ -53,14 +53,14 @@ public class Carte {
 	
 	/**
 	 * Une initialisation de la carte qui a lieu lors du chargement de cette classe.
-	 * Elle sera utilisée comme une carte classique que l'on modifiera, on esp�re gagner en temps d'initialisation de notre carte par ce procédé.
+	 * Elle sera utilisee comme une carte classique que l'on modifiera, on espere gagner en temps d'initialisation de notre carte par ce procede.
 	 */
 	static public Carte carteUsuelle = new Carte(Robot.robotUsuel, Ligne.hashLignes, new Rectangle(new Point(-2f,-2.5f), new Point(2f,2.5f)));	
 	
 	
 	/**
 	 * Les getters.
-	 * @return La données d'interêt sur la carte appelante : le robot, la hashMap des Lignes (même si elle est hardcoded dans @see Ligne, pour la récuperer dans une variable au besoin), les intersections ou encore le terrain.
+	 * @return La donnees d'interet sur la carte appelante : le robot, la hashMap des Lignes (meme si elle est hardcoded dans @see Ligne, pour la recuperer dans une variable au besoin), les intersections ou encore le terrain.
 	 */
 	public Robot getRobot() {
 		return(robot);
@@ -79,8 +79,8 @@ public class Carte {
 	}
 	
 	/**
-	 * Méthode permettant de trouver le palet le plus proche du robot en calculant la distance entre le "centre" du robot et le centre du palet.
-	 * Cela nous permet au robot d'avoir un début de "stratégie" qui est d'aller au plus proche de lui.
+	 * Methode permettant de trouver le palet le plus proche du robot en calculant la distance entre le "centre" du robot et le centre du palet.
+	 * Cela nous permet au robot d'avoir un debut de "strategie" qui est d'aller au plus proche de lui.
 	 * @return Le palet le plus proche du robot
 	 */
 	public Palet paletProche() {
