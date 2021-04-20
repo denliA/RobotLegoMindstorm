@@ -28,9 +28,11 @@ public class TestPilote {
 		//testPID(CouleurLigne.JAUNE, 25);
 		//testSuivreLigne(CouleurLigne.JAUNE);
 		//Pilote.tournerJusqua(CouleurLigne.JAUNE, true, 100, 0,90);
-		testPositions();
-		
-		
+		//testPositions();
+		//testRentrer(1, 2, 270, "fenetre", true, -1,0);
+//		new tests.P3().lancer();
+		carte.Carte.carteUsuelle.calibrerPosition();
+		Pilote.allerVersPoint(0, 0);
 		
 		//testPID(CouleurLigne.VERTE);
 		
@@ -103,6 +105,22 @@ public class TestPilote {
 		System.out.println("Avant calibration : " + r);
 		c.calibrerPosition();
 		System.out.println("Après calibration : "+r);
+	}
+	
+	public static void testRentrer(int x, int y, int dir, String direction, boolean avancee, int xf, int yf) {
+		new Capteur();
+		Couleur.startScanAtRate(0);
+		Carte c = carte.Carte.carteUsuelle;
+		Robot r = c.getRobot();
+		System.out.println("Avant : " + r);
+		r.setPosition(x, y);
+		r.setDirection(270);
+		if(!avancee)
+			Pilote.rentrer(direction);
+		else
+			Pilote.allerVersPoint(xf, yf);
+		System.out.println("Après : " + r);
+		
 	}
 	
 }

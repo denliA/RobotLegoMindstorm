@@ -17,8 +17,22 @@ import lejos.utility.Delay;
 import lejos.utility.Timer;
 import lejos.utility.TimerListener;
 
-
+/**
+ * Classe contrôlant tous les déplacements intermédiaires utilisés par différents algorithmes de décision.
+ * Elle permet à partir de mouvements basiques (avancer, tourner, changer la vitesse des moteurs) d'éffectuer plusieurs types de trajectoires et de déplacements:
+ * <ul>
+ * <li> Suivre une ligne de couleur
+ * <li> Se redresser sur une ligne de couleur
+ * <li> Effectuer la trajectoire nécessaire pour collecter les informations se repérer sur la table (ces informations sont renvoyées à la carte qui les interprète)
+ * <li> Dans le cas ou le robot connaît sa position, rentrer dans un des deux camps, et/ou se déplacer vers une intersection précise
+ * </ul>
+ * Note: Une amélioration possible du pilote serait d'y intégrer la classe Deplacement, qu'on a pas pu intégrer faute de temps et qui pourrait rendre
+ * la gestion des déplacements composés, et des arrêts de déplacements beaucoup plus efficaces.
+ *  
+ *
+ */
 public class Pilote {
+	
 	static private Carte carte = Carte.carteUsuelle;
 	static private Robot robot = carte.getRobot();
 	private static Chassis chassis = MouvementsBasiques.chassis;
@@ -27,61 +41,25 @@ public class Pilote {
 	
 	static private boolean seDeplace = false;
 	static private boolean suiviLigne = false;
-	static private boolean videVu = false;
-	
-	public static boolean getVideVu() {
-		return videVu;
-	}
-	
-	public static void setVideVu() {
-		videVu=false;
-	}
 
+	/**
+	 * Permet de savoir si le robot est en cours de déplacement
+	 * @return true ssi le robot se déplace
+	 */
 	public static boolean getSeDeplace(){
 		return seDeplace;
 	}
 	
+	/**
+	 * permet d'arrêter un certain déplacement avant sa fin
+	 * @param b false pour arrêter le robot
+	 */
 	public static void SetSeDeplace(boolean b){
 		seDeplace=b;
 	}
 	
-	// Pour lancer périodiquement une fonction qui test si le robot detecte du vide
-	private static Timer videListener = new Timer(100, 
-			new TimerListener() {
-		public void timedOut() {
-				vide();
-		}
-	});
-	
-	public static void startVideAtRate(int delay) {
-		videListener.setDelay(delay);
-		videListener.start();
-	}
-	
-	/**
-	 * Arrête la prise de mesure périodique.
-	 */
-	public static void stopVide() {
-		videListener.stop();
-	}
-	
-	public static void vide() {
-		float[] RGB = Couleur.getRGB();
-		if(RGB[0] < 2 &&RGB[1] < 2 &&RGB[2] < 2) {
-			//lance le bruitage dans un thread
-			//Musique.startMusic("GoatScream.wav");
-			Musique.startMusic("Nani.wav");
-			MouvementsBasiques.chassis.stop();
-			seDeplace=false;
-			videVu=true;
-			MouvementsBasiques.chassis.travel(-10); //robot recule
-			//demi-tour
-			//MouvementsBasiques.tourner(180); 
-			
-		}
-	}
-	
-	
+
+
 	/**
 	 * Fonction pour suivre une ligne de couleur sans s'en décaler
 	 * 
@@ -97,8 +75,8 @@ public class Pilote {
 		
 		//Paramètres de calibration
 		final float coef_gauche = 1.23f;
-		final float coef_droit = 1.20f;//TODO calibrer
-		final long dureeRotation = 250; //TODO calibrer, en fonction de la vitesse? (200 bien mais se décale vers la gauche des fois)
+		final float coef_droit = 1.20f;
+		final long dureeRotation = 250; //possibilité de mieux calibrer, en fonction de la vitesse? (200 bien mais se décale vers la gauche des fois)
 		MouvementsBasiques.chassis.setLinearSpeed(20);
 		MouvementsBasiques.chassis.setLinearAcceleration(5);
 		final int max_cycles = 2; //nombre de fois ou il ne trouve pas la couleur avant d'appeler seRedresserSurLigne. Cycles commence à 0.
@@ -153,7 +131,6 @@ public class Pilote {
 				// On tourne d'abord vers la droite, et ce jusqu'à ce qu'on tombe sur la ligne ou que dureeRotation millisecondes se soient écoulées
 				debut = System.currentTimeMillis();
 				Moteur.MOTEUR_DROIT.setSpeed(defaultSpeedDroit*coef_droit); // On augmente la vitesse de la roue droite
-				//System.out.println("	Entrée dans le premier while et cycles="+cycles+"et couleur="+last.couleur_x);
 				while((last=Couleur.buffer.getLast()).couleur_x!=c && (((System.currentTimeMillis() - debut) < dureeRotation) || Couleur.variationDistanceDe(c)<0)&& seDeplace) {
 					if(c.intersections.containsKey(last.couleur_x)) { // Si on est dans une intersection de la couleur recherchée, arrêter de tourner
 						cycles--; dec = true; // Si on est sur l'intersection, on ne compte pas ça comme un cycle sans trouver de couleur.
@@ -167,8 +144,7 @@ public class Pilote {
 					int nb_pas_bien = 0; boolean pas_bien;
 					debut = System.currentTimeMillis();
 					Moteur.MOTEUR_GAUCHE.setSpeed(defaultSpeedGauche*coef_gauche);
-					//System.out.println("	Entrée dans le second while et cycles="+cycles+"et couleur="+last.couleur_x);
-					while((last=Couleur.buffer.getLast()).couleur_x!=c &&(((System.currentTimeMillis() - debut) < (dureeRotation*2.5))||Couleur.variationDistanceDe(c)<0)&& seDeplace) {
+					while((last=Couleur.buffer.getLast()).couleur_x!=c     &&    (((System.currentTimeMillis() - debut) < (dureeRotation*2.5))||Couleur.variationDistanceDe(c)<0)&& seDeplace) {
 						if(c.intersections.containsKey(last.couleur_x)) {// Si on est dans une intersection de la couleur recherchée, arrêter de tourner
 							if(!dec) cycles--;
 							break;
@@ -211,7 +187,11 @@ public class Pilote {
 		
 	}
 	
-	//Le robot doit etre posé sur une ligne à suivre
+	
+	/**
+	 * Suit la ligne sur laquelle il est déjà
+	 * @see #suivreLigne(CouleurLigne)
+	 */
 	public static void suivreLigne() {
 		suivreLigne(Couleur.getLastCouleur());
 	}
@@ -219,12 +199,9 @@ public class Pilote {
 	
 	
 	
-	
-	
 	public static boolean seRedresserSurLigne(CouleurLigne c, boolean gauche_bouge, float max_angle, int vitesse_angulaire) {
 		return seRedresserSurLigne(c, gauche_bouge, max_angle, vitesse_angulaire, 2);
 	}
-	
 	
 	
 	public static boolean seRedresserSurLigne(CouleurLigne c, boolean gauche_bouge, double max_angle, double vitesse_angulaire, int max_iterations) {
@@ -435,7 +412,12 @@ public class Pilote {
 		
 		CouleurLigne c = Couleur.getLastCouleur();
 		if (c!=CouleurLigne.GRIS) {
-			return null;
+			if(longues.contains(c)||courtes.contains(c)) {
+				chassis.travel(10); chassis.waitComplete();
+				Pilote.tournerJusqua(c, true, 250, 30);
+				Pilote.tournerJusqua(c, false, 50, 30);
+			}
+			else return null;
 		}
 		
 		boolean bcouleur=false,bblanche=false,bvide=false;
@@ -487,8 +469,8 @@ public class Pilote {
 		else if(longues.contains(c)) {
 			ligne = c;
 			chassis.travel(10); chassis.waitComplete();
-			Pilote.tournerJusqua(c, true, 250, 30);
-			Pilote.tournerJusqua(c, false, 50, 30);
+			Pilote.tournerJusqua(c, true, 250, 0);
+			Pilote.tournerJusqua(c, false, 50, 0);
 		}
 		
 		int trouvees = (inter1 == null? 0 : 1);
