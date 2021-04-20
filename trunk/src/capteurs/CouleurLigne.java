@@ -40,6 +40,9 @@ import java.util.HashMap;
 public enum CouleurLigne { 
 	
 	
+	/*
+	 * énumération des couleurs de la table.
+	 */
 	GRIS(new float[] {19f, 29f, 27.5f, 37f, 15f, 22f}, new float[] {.66f, .825f, 0.5f, 0.62f, .67f, .85f},true),
 	VERTE (new float[] {8f, 16f, 28.5f, 42f, 4.5f, 11f}, 1, -.75f,  new float[] {0.30f, 0.40f, 0.20f, 0.25f, 0.58f, 0.70f},1,-.75f),
 	BLEUE (new float[] {4.5f, 10f, 27f , 40f , 17.75f, 29.25f}, 1,-.75f, new float[] {0.17f, 0.28f, 0.61f, 0.78f, 2.50f, 4.00f},1,-.75f),
@@ -53,7 +56,11 @@ public enum CouleurLigne {
 	NOIREV(null,null),
 	BLANCHE_BLEUE(null,null),
 	BLANCHE_VERTE(null,null);
-	static CouleurLigne[] principales = new CouleurLigne[] {ROUGE, VERTE, BLEUE, BLANCHE, NOIRE, JAUNE, GRIS};
+	
+	/**
+	 * Les couleurs principales, c'est à dire en excluant les cas particuliers de l'énumération (VIDE, INCONNU...)
+	 */
+	public static CouleurLigne[] principales = new CouleurLigne[] {ROUGE, VERTE, BLEUE, BLANCHE, NOIRE, JAUNE, GRIS};
 	
 	Intervalle IRGB;
 	float pos_confiance_IRGB;
@@ -133,8 +140,8 @@ public enum CouleurLigne {
 		this(bc, pos_confiance_bc, neg_confiance_bc, br, pos_confiance_br, neg_confiance_br);
 		this.forcerIRGB = forcerIRGB;
 		for (CouleurLigne c : intersections) {
-			ContextePID contexte = construireContexte(c);
-			this.intersections.put(c, contexte);
+			ContextePID contexte = construireContexte(c); // On calcule le contexte pour chaque couleur intersectant this
+			this.intersections.put(c, contexte); // On met le contexte dans le dictionnaire d'intersections
 		}
 	}
 
@@ -232,11 +239,25 @@ public enum CouleurLigne {
 	}
 	
 	
-	
+	/**
+	 * Contient toutes les informations nécessaires pour effectuer un suivi de ligne en PID. Est associé à un couple (couleurLigne, couleurLigne)
+	 */
 	public class ContextePID {
-		public boolean mode_rgb; // 0 pour le mode RGB et 1 pour le mode Ratios
+		/**
+		 * Vaut false si ces informations concernent les ratios, et true si elles concernent le rgb
+		 */
+		public boolean mode_rgb;
+		/**
+		 * Indice de la composante la plus appropriée pour faire le suivi 
+		 */
 		public int indice;
+		/**
+		 * Valeur target pour cette composante
+		 */
 		public float target;
+		/**
+		 * Erreur maximale possiblement détectée. Si on dépasse cette erreur, c'est qu'on est vraisemblablement pas entre les deux couleurs
+		 */
 		public float range;
 		protected ContextePID(boolean mode_rgb, int indice, float target, float range) {
 			this.mode_rgb = mode_rgb; 
@@ -325,6 +346,13 @@ class Intervalle {
 		return true;
 	}
 	
+	
+	/**
+	 * Permet de savoir si une certaine composante est dans l'intervalle associé. Parfois utile quand on veut regarder une seule couleur au lieu de la globalité.
+	 * @param point la mesure
+	 * @param indice l'indice de la composante à vérifier
+	 * @return true si la i-ème composante du point est contenue dans le i-ème intervalle
+	 */
 	public boolean containsTerme(float point, int indice) {
 		assert (indice <= taille);
 		return (point<=max[indice] && point>=min[indice]);
@@ -332,7 +360,12 @@ class Intervalle {
 	
 	
 	
-	
+	/**
+	 * Calcule l'intersection entre deux intervalles, définie par l'intersection de chaque intervalle composant.
+	 * Si l'intersection d'une composante est vide, elle est représentée par l'intervalle [-1;1]
+	 * @param I deuxième intervalle
+	 * @return intersection entre this et I
+	 */
 	public Intervalle intersection(Intervalle I) {
 		assert I.taille == this.taille : "Intervalles incompatibles";
 		float [] minimum = new float[taille];
@@ -346,6 +379,12 @@ class Intervalle {
 		return new Intervalle(minimum, maximum);
 	}
 	
+	/**
+	 * Pour deux intervalles se s'intersectant pas, retourne l'intervalle qui est entre les deux. 
+	 * <p> Si les deux intervalles s'intersectent, le résultat de l'entre deux est vide ([-1,1])
+	 * @param I deuxième intervalle
+	 * @return intervalle se trouvant entre this et I
+	 */
 	public Intervalle entreDeux(Intervalle I) {
 		assert I.taille == this.taille : "Intervalles incompatibles";
 		float [] minimum = new float[taille];
@@ -359,6 +398,12 @@ class Intervalle {
 		return new Intervalle(minimum, maximum);
 	}
 	
+	
+	/**
+	 * Calcule l'union entre deux couleurs dans ce sens : pour chaque composante, l'union des deux intervalles A et B est [min(inf(A), inf(B)); max(sup(A), sup(B))]
+	 * @param I deuxième intervalle 
+	 * @return union de I avec this
+	 */
 	public Intervalle unionColoree(Intervalle I) {
 		assert I.taille == taille : "Intevalles incompatibles";
 		float minimum[] = new float[taille];
@@ -373,10 +418,23 @@ class Intervalle {
 	}
 	
 	
+	/**
+	 * Retourne la distance en valeur absolue entre deux intervalles (terme à terme)
+	 * @param I deuxième intervalle
+	 * @return distance entre I et this
+	 * @see #distance(Intervalle, boolean)
+	 */
 	float[] distance(Intervalle I) {
 		return distance(I, false);
 	}
 	
+	
+	/**
+	 * Retourne la distance entre deux intervalles au sens de la distance entre chaque intervalle composant 
+	 * @param I deuxième intervalle
+	 * @param signee si à true, la distance est signée et est négative si l'intervalle de I domine l'intervalle de this
+	 * @return distance (signée ou non) entre les deux intervalles
+	 */
 	float[] distance(Intervalle I, boolean signee) {
 		assert I.taille == taille : "Intervalles incompatibles";
 		Intervalle difference = entreDeux(I);
@@ -391,6 +449,11 @@ class Intervalle {
 		return res;
 	}
 	
+	/**
+	 * Distance (non signée) entre un point et un intervalle, au sens des distances composante par composante
+	 * @param point mesure
+	 * @return distance entre this et la mesure
+	 */
 	float[] distance(float[] point) {
 		assert point.length==taille : "Point non compatible avec l'intervalle";
 		float [] res = new float[taille];
@@ -405,7 +468,12 @@ class Intervalle {
 		return res;
 	}
 	
-	
+	/**
+	 * Distance entre une certaine composante et l'intervalle associé à cette composante
+	 * @param scalaire 
+	 * @param indice indice de la composante pour laquelle on doit calculer la distance
+	 * @return
+	 */
 	float distanceAt(float scalaire, int indice) {
 		if(scalaire > max[indice])
 			return scalaire - max[indice];
@@ -415,6 +483,15 @@ class Intervalle {
 			return 0;
 	}
 	
+	
+	/**
+	 * Vérifie si une certaine mesure est dans l'entre deux de deux intervalles avec une précision par défaut de .25
+	 * @param I deuxième intervalle 
+	 * @param p mesure
+	 * @return true si elle est entre les deux
+	 * @see #entreDeux(Intervalle)
+	 * @see #estEntreDeux(Intervalle, float[], float[])
+	 */
 	public boolean estEntreDeux(Intervalle I, float[] p) {
 		float precision[] = new float[taille];
 		for (int i=0;i<taille;i++) 
@@ -422,6 +499,14 @@ class Intervalle {
 		return estEntreDeux(I, p, precision);
 	}
 	
+	/**
+	 * Vérifie si une certaine mesure est dans l'entre deux de deux intervalles
+	 * @param I deuxième intervalle 
+	 * @param p mesure
+	 * @param precision erreur acceptée
+	 * @return true si elle est entre les deux
+	 * @see #entreDeux(Intervalle)
+	 */
 	public boolean estEntreDeux(Intervalle I, float[] p, float[] precision ) {
 		
 		Intervalle entre_deux = entreDeux(I);
@@ -443,12 +528,23 @@ class Intervalle {
 		return true;
 	}
 	
+	
+	/**
+	 * Calcule le centre de chaque intervalle
+	 * @return tableau contenant le centre pour chaque composante
+	 */
 	public float[] centre() {
 		float[] res = new float[taille];
 		for (int i=0; i<taille; i++) res[i] = (min[i]+max[i])/2;
 		return res;
 	}
 	
+	
+	/**
+	 * Calcule les distances géométriques des composantes d'une certaine mesure par rapport aux centres des intervalles
+	 * @param point mesure 
+	 * @return distances géométriques du centre
+	 */
 	public float[] rapportsAuCentre(float[] point) {
 		float[] res = centre();
 		for (int i=0; i<taille; i++) {

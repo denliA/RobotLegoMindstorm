@@ -5,7 +5,10 @@ import lejos.hardware.ev3.LocalEV3;
 import lejos.hardware.sensor.*;
 import lejos.robotics.SampleProvider;
 
-
+/**
+ * Contient toutes les constantes des capteurs nécessaires au robot. Et permet de les ouvrir en gérant les erreurs éventuelles comme un 
+ * capteur qui a du mal à s'ouvrir (arrive souvent avec l'ultrason)
+ */
 public class Capteur {
 	
 	//on initialise les objets Sensor de leJos en precisant le port de branchement
@@ -35,7 +38,9 @@ public class Capteur {
 		ouvrirCapteurCouleur();
 	}
 	
-	//ouvrir capteur
+	/**
+	 * Permet d'ouvrir tous les capteurs tout en gérant les possibles erreurs
+	 */
 	public static void ouvrirCapteurCouleur() {
 		while (COLOR_SENSOR==null || TOUCH_SENSOR==null || ULTRASONIC_SENSOR==null) {
 			try {
@@ -60,7 +65,9 @@ public class Capteur {
 		}
 	}
 	
-	//Methode pour fermer les capteurs ouverts au debut de la classe. 
+	/**
+	 * Permet de fermer tous les capteurs. à executer uniquement à la fin de toute opération. 
+	 */
 	public static void fermerCapteurs() {
 		COLOR_SENSOR.close();
 		TOUCH_SENSOR.close();
