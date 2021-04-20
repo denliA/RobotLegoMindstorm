@@ -53,9 +53,9 @@ public class Couleur {
 	private static BufferContexte previous;
 	public static BufferCouleurs buffer = new BufferCouleurs(5000);
 	static CouleurLigne lastCouleur;
-	static boolean blanche;
-	static float[] blanche_bornesInf = CouleurLigne.BLANCHE.IRGB.min;
-	static boolean vide;
+	private static boolean blanche;
+	private static float[] blanche_bornesInf = CouleurLigne.BLANCHE.IRGB.min;
+	private static boolean vide;
 	
 	
 	// Constantes pour le modeFlag
@@ -207,7 +207,10 @@ public class Couleur {
 			buffer[index].intersection_x = intersection;
 		}
 
-		
+		/**
+		 * Retourne la dernière mesure sauvegardée dans le buffer
+		 * @return le dernier bufferContexte enregistré
+		 */
 		public BufferContexte getLast() {
 			synchronized(buffer_lock) {
 				return buffer[index];
@@ -285,33 +288,48 @@ public class Couleur {
 	
 
 	
-	//Avoir la valeur de la couleur suivant l'enumeration de leJOS
+	/**
+	 * Dernière valeur de couleur ID détectée (valeur déterminée par un algorithme natif LeJOS)
+	 * @return entier représentant la couleur
+	 */
 	public static float getColorID() {
 		synchronized(lock) {
 			return(IDCouleur);
 		}
 	}
 	
-	//Avoir la valeur de la couleur suivant un encodage RGB
+	/**
+	 * Dernière mesure RGB
+	 * @return tableau contenant les 3 valeurs RGB
+	 */
 	public static float[] getRGB() {
 		return(new float[] {rouge,vert,bleu});
 	}
 	
-	//Ratios R/G, B/G et B/R
+	/**
+	 * Dernière valeur des ratios calculée
+	 * @return tableau des ratios r/g--b/g--b/r
+	 */
 	public static float[] getRatios() {
 		synchronized(lock) {
 			return (new float[] {rouge/vert, bleu/vert, bleu/rouge});
 		}
 	}
 	
-	//Recuperer une valeur definissant l'intensite de la lumiere ambiante
+	/**
+	 * Dernière lumière ambiante mesurée
+	 * @return
+	 */
 	public static float getAmbiantLight() {
 		synchronized(lock) {
 			return(lumiere);
 		}
 	}
 	
-	// Récupérer une valeur définissant l'intensité de la lumière rouge
+	/**
+	 * Dernière intensité du rouge mesurée
+	 * @return intensité du rouge
+	 */
 	public static float getRedMode() {
 		synchronized(lock) {
 			return(intensiteRouge);
@@ -533,23 +551,43 @@ public class Couleur {
 		float[] dists_origine_passe = origine.IRGB.distance(passe.rgb_x);
 		float[] dists_arrivee_present = arrivee.IRGB.distance(present.rgb_x);
 		float[] dists_arrivee_passe = arrivee.IRGB.distance(passe.rgb_x);
-		
+		 /*
+		  * Pour chacune des deux couleurs et pour chaque composante de couleur, on calcule la variation de la distance de celle-ci par rapport au centre
+		  * de la couleur pour cette composante ; et on regarde si cette variation est positive ou négative
+		  */
 		for (int i=0;i<3;i++) {
 			variation_origine[i] = Math.signum(dists_origine_present[i] - dists_origine_passe[i]);
 			variation_arrivee[i] = Math.signum(dists_arrivee_present[i] - dists_arrivee_passe[i]);
 		}
 		
-		float direction_presumee = variation_origine[0];
+		float direction_presumee = variation_origine[0]; // Comment varie la distance de la première composante de la couleur source ?
+		
+		/*
+		 * On vérifie que toutes les composantes de chacune des couleurs varie dans la bonne direction : 
+		 *   Pour la couleur source, si la première composante s'éloigne, on veut que les deux autres composantes s'éloignent aussi
+		 *   Pour la couleur d'arrivée, on veut que les trois composantes aillent dans la direction opposées de la couleur source
+		 */
 		for (int i=0; i<3;i++) {
+			// Si au moins une composante ne va pas dans la bonne direction, on retourne 0
 			if(variation_origine[i]*direction_presumee<0)
 				return 0;
 			if(variation_arrivee[i]*direction_presumee > 0)
 				return 0;
 		}
+		// Si toutes les composantes vont dans la même direction, on retourne cette direction
 		return direction_presumee;
 		
 	}
 	
+	
+	/**
+	 * Permet d'estimer si on s'appoche ou on s'éloigne d'une couleur donnée. Utile pour le suivi de ligne.
+	 * <p> IMPORTANT : Cette mesure n'a de sens que si on sait qu'on est près de cette couleur, sinon
+	 * la variation de la distance ne veut pas dire grand chose.
+	 * 
+	 * @param repere couleurLigne de laquelle on veut calculer la variation de la distance
+	 * @return variation de la distance entre les deux dernières mesures
+	 */
 	public static float variationDistanceDe(CouleurLigne repere) {
 		BufferContexte passe = previous, present = last;
 		float distance_passe = repere.distanceDe(passe.rgb_x, true);
@@ -557,6 +595,13 @@ public class Couleur {
 		return Math.signum(distance_present-distance_passe);
 	}
 	
+	
+	/**
+	 * Moyen plus réactif et plus sur de vérifier si l'on a touché la ligne blanche.
+	 * Dès que le blanc est touché, une variable est mise à true, et garde l'information jusuqu'à ce qu'une méthode demande l'information, auquel 
+	 * cas la variable est remiseà faux
+	 * @return true si le robot a détecté le blanc à un moment donné et que l'information n'a pas encore été traitée
+	 */
 	public static boolean blacheTouchee() {
 		if (blanche) {
 			blanche=false;
@@ -565,6 +610,13 @@ public class Couleur {
 		else return false;
 	}
 	
+	
+	/**
+	 * Moyen plus réactif et plus sur de vérifier si l'on voit le vide.
+	 * Dès que vide est détecté, une variable est mise à true, et garde l'information jusuqu'à ce qu'une méthode demande l'information, auquel 
+	 * cas la variable est remise faux, considérant que l'information va être traitée par le code appelant
+	 * @return true si le robot a détecté le vide à un moment donné et que l'information n'a pas encore été traitée, false sinon
+	 */
 	public static boolean videTouche() {
 		if (vide) {
 			vide = false; 
