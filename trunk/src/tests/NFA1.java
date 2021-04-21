@@ -3,12 +3,16 @@ package tests;
 import capteurs.Capteur;
 import capteurs.Couleur;
 import capteurs.CouleurLigne;
-import capteurs.Toucher;
-import capteurs.Ultrason;
 import lejos.hardware.Button;
 import lejos.hardware.lcd.LCD;
-import moteurs.Pilote;
 import moteurs.MouvementsBasiques;
+
+/**
+ * <p>Situation initiale : le robot est déposé sur n’importe quelle intersection de lignes de couleurs</p>
+ * <p>Situation finale : le robot réalise un carré et revient sur son intersection de départ</p>
+ * @see capteurs#Couleur
+ * @see MouvementsBasiques#chassis
+ */
 
 public class NFA1 implements interfaceEmbarquee.Lancable{
 	

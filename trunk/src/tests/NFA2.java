@@ -1,11 +1,16 @@
 package tests;
 
 import java.util.Vector;
-
 import capteurs.Capteur;
 import capteurs.Couleur;
 import capteurs.CouleurLigne;
 import moteurs.Pilote;
+
+/**
+ * <p>Situation initiale : le robot est déposé sur une zone grise de la table</p>
+ * <p>Situation finale : le robot se gare sur une ligne de couleur</p>
+ * @see capteurs#Couleur
+ */
 
 public class NFA2 implements interfaceEmbarquee.Lancable{
 	

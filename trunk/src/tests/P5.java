@@ -4,6 +4,19 @@ import exceptions.OuvertureException;
 import lejos.hardware.Button;
 import lejos.hardware.lcd.LCD;
 
+/**
+ * <p>Situation initiale :
+ * 		<ol>
+ * 			<li>Le camp adverse est désigné au robot : Est ou Ouest</li>
+ * 			<li>Les 9 palets sont déposés sur les 9 intersections de la table</li>
+ * 			<li>Le robot est déposé au hasard n'importe sur une des 3 positions départ du camp qui lui a été désignée</li>
+ * 		</ol>
+ * </p>
+ * 
+ * <p>Situation finale : Le robot dépose chacun des palets derrière la ligne blanche du camp adverse puis s'arrête et ouvre ses pinces.</p>
+ * @see modeCompetition#ModeCompetition
+ */
+
 public class P5 implements interfaceEmbarquee.Lancable {
 	
 	public void lancer() {

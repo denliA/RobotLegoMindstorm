@@ -7,11 +7,16 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-
 import exceptions.OuvertureException;
 import lejos.hardware.Button;
 import lejos.hardware.lcd.LCD;
 import lejos.utility.Delay;
+
+/**
+ * <p>Situation initiale : le robot est déposé sur un des six points de départ de la table</p>
+ * <p>Situation finale : le robot dépose les 9 palets derrière la ligne blanche de l'adversaire et il ouvre ses pinces.</p>
+ * @see modeSolo#ModeSolo
+ */
 
 public class NFA7 implements interfaceEmbarquee.Lancable{
 	
