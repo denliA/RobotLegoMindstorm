@@ -4,6 +4,13 @@ import capteurs.Couleur;
 import capteurs.CouleurLigne;
 import lejos.hardware.Button;
 
+
+/**
+ * <p>Situation initiale : le robot est déposé n'importe où sur la table</p>
+ * <p>Situation finale : le robot affiche la couleur sur laquelle il est posé et quitte le programme quand l'utilisateur appuie sur "ESCAPE".</p>
+ * @see capteurs#Couleur
+ */
+
 public class NFBM1 implements interfaceEmbarquee.Lancable{
 	
 	public void lancer() {

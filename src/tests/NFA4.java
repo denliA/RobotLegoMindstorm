@@ -1,5 +1,11 @@
 package tests;
 
+/**
+ * <p>Situation initiale : le robot est déposé n'importe où sur la table</p>
+ * <p>Situation finale : le robot trouve l'intersection demandée</p>
+ * @see capteurs#Couleur
+ */
+
 public class NFA4 implements interfaceEmbarquee.Lancable{
 	
 	public void lancer() {

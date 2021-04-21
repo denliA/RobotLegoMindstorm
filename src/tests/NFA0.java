@@ -4,6 +4,13 @@ import capteurs.Capteur;
 import capteurs.Couleur;
 import moteurs.Pilote;
 
+/**
+ * <p>Situation initiale : le robot est déposé sur la table derrière une ligne blanche</p>
+ * <p>Situation finale : le robot avance en ligne droite et franchit la ligne blanche du camp adverse</p>
+ * <p>Ce test doit être réalisé en moins de 3 min.</p>
+ * @see capteurs#Couleur
+ */
+
 public class NFA0 implements interfaceEmbarquee.Lancable{
 	
 	public void lancer() {

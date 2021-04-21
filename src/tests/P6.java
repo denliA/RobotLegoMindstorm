@@ -11,15 +11,16 @@ import moteurs.Pince;
 public class P6 implements interfaceEmbarquee.Lancable{
 	/**
 	 * <p>
-	 * <ul>
-	 * <li> Un palet est déposé au hasard n'importe où sur la table, excepté sur une des 9 intersections de la table et excepté sur une ligne.
-	 * <li> Le robot est déposé au hasard n'importe où sur la table, excepté sur une ligne.
-	 * </ul>
+	 * 		<ol>
+	 * 			<li>Un palet est dÃ©posÃ© au hasard n'importe oÃ¹ sur la table, exceptÃ© sur une des 9 intersections de la table et exceptÃ© sur une ligne</li>
+	 * 			<li>Le robot est dÃ©posÃ© au hasard n'importe oÃ¹ sur la table, exceptÃ© sur une ligne.</li>
+	 * 		</ol>
 	 * </p>
 	 * 
 	 * <p>
-	 * Le robot franchit une des deux lignes blanches avec le palet, s'arrête et ouvre ses pinces.
+	 * Le robot franchit une des deux lignes blanches avec le palet, s'arrÃªte et ouvre ses pinces.
 	 * </p>
+	 * @see capteurs#Ultrason
 	 * 
 	 */
 	public void lancer() {

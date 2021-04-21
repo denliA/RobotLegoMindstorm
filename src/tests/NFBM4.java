@@ -1,11 +1,16 @@
 package tests;
 
 import capteurs.Couleur;
-import capteurs.CouleurLigne;
 import interfaceEmbarquee.Musique;
 import lejos.hardware.Button;
 import moteurs.MouvementsBasiques;
-import moteurs.Pilote;
+
+/**
+ * <p>Situation initiale : le robot est déposé au début d'une ligne de couleur</p>
+ * <p>Situation finale : le robot avance jusqu'à ce qu'il détecte du vide. Il  s’arrête et recule de 10 cm puis tourne de 180 degrés.</p>
+ * @see MouvementsBasiques#chassis
+ * @see capteurs#Couleur
+ */
 
 public class NFBM4 implements interfaceEmbarquee.Lancable{
 	

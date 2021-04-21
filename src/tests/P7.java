@@ -13,23 +13,25 @@ import moteurs.Pince;
 public class P7 implements interfaceEmbarquee.Lancable{
 	/**
 	 * <p>
-	 * <ul>
-	 * <li> Le camp adverse est désigné au robot : Est ou Ouest.
-	 * <li>Un palet est déposé au hasard n'importe où sur la table, excepté sur une des 9 intersections de la table et excepté sur une ligne.
-	 * <li>Le robot est déposé au hasard n'importe où sur la table, excepté sur une ligne.
-	 * </ul>
+	 * 		<ol>
+	 * 			<li>Le camp adverse est dÃ©signÃ© au robot : Est ou Ouest</li>
+	 * 			<li>Un palet est dÃ©posÃ© au hasard n'importe oÃ¹ sur la table, exceptÃ© sur une des 9 intersections de la table et exceptÃ© sur une ligne</li>
+	 * 			<li>Le robot est dÃ©posÃ© au hasard n'importe oÃ¹ sur la table, exceptÃ© sur une ligne</li>
+	 * 		</ol>
 	 * </p>
 	 * 
 	 * <p>
-	 * Le robot franchit la ligne blanche du camp adverse avec le palet, s'arrête et ouvre ses pinces.
+	 * Le robot franchit la ligne blanche du camp adverse avec le palet, s'arrÃªte et ouvre ses pinces.
 	 * </p>
+	 * @see capteurs
 	 * 
 	 */
+	
 	public void lancer() {
 		int button = -1;
 		LCD.clear();
-		LCD.drawString("Porte ou fenêtre?", 3, 1);
-		LCD.drawString("Porte <<  >> Fenêtre", 1, 3);
+		LCD.drawString("Porte ou fenï¿½tre?", 3, 1);
+		LCD.drawString("Porte <<  >> Fenï¿½tre", 1, 3);
 		int angleCamp = 90;
 		//Choix du camp ou deposer le palet
 		while((button!=Button.ID_LEFT)&&(button!=Button.ID_RIGHT)) {

@@ -201,13 +201,12 @@ public class InterfaceTextuelle {
 	
 	Menu songs = new Menu("Musiques",new Lancable[] {lancerMusique,musiques});
 	Menu sounds = new Menu("Bruitages",new Lancable[] {lancerBruitage,bruitages});
-	Menu expressions = new Menu("Expressions",new Lancable[] {lancerExpression,visages});
 	Menu danses = new Menu("Danses",new Lancable[] {lancerDanse,dances});
 	
 	Menu modeSolo = new Menu("Mode Solo",new Lancable[] {lancerSolo,strategieSolo});
 	Menu modeCompetition = new Menu("Mode Competition",new Lancable[] {lancerDuo,strategieDuo});
 	public Menu scenarios = new Menu("Scenarios",new Lancable[] {imposes,basiques,avances,optionnels});
-	Menu reglages = new Menu("Reglages",new Lancable[] {songs,sounds,expressions,danses});
+	Menu reglages = new Menu("Reglages",new Lancable[] {songs,sounds,danses});
 	
 	Menu menuPrincipal = new Menu("Menu Principal",new Lancable[] {modeSolo,modeCompetition,scenarios,reglages});
 	
