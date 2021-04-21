@@ -6,59 +6,74 @@ import lejos.utility.Timer;
 import lejos.utility.TimerListener;
 
 public class Toucher{
-	
-	//Atrributs de la classe Toucher
-	//status indique si la capteur est actif
+	/**
+	 * Classe gerant le capteur de contact.
+	 * L'attribut status indique si le capteur est actif et touche indique si le capteur touche un palet.
+	 */
 	private static boolean status;
-	//touche contient True si le capteur est activï¿½ par un palet
 	private static boolean touche;
 	
-	//Pour lancer des analyses de maniere periodique et eviter l'activation permanente du capteur
+	/**
+	 * Le timer permet de lancer des analyse de manière périodique (à chaque fois qu'un certain temps s'ecoule).
+	 */
 	private static Timer lanceur = 
 		new Timer(100, new TimerListener() {
 			//au bout du temps imparti (100 ms)
 				public void timedOut() {
-					//appel ï¿½ la foction qui scanne effectivement
+					//appel a la foction qui scanne effectivement
 					setTouche();
 				}
 		}
 	);
 	
+	/**
+	 * Getters de la classe Toucher.
+	 * @return L'attribut d'interet : touche ou status.
+	 */
 	public static boolean getTouche() {
 		return(touche);
 	}
 	
-	//change la valeur de touche en fonction du scan
+	public static boolean getStatus() {
+		return(status);
+	}
+	
+	/**
+	 * Setter de l'attribut touche
+	 */
 	public static void setTouche() {
-		//creation du tableau recueillant les donnï¿½es du sampler
+		//creation du tableau recueillant les donnees du sampler
 		float[] touched = new float[Capteur.TOUCHER.sampleSize()];
-		//rï¿½cupï¿½ration des donnï¿½es
+		//recuperation des donnees
 		Capteur.TOUCHER.fetchSample(touched, 0);
 		touche = (touched[0]==1);
 		
 	}
 	
-	//Pour activer la lecture de la valeur envoyï¿½e par le scanner
+	/**
+	 * startScan() permet d'activer la lecture de l'information envoyee par le scanner.
+	 */
 	public static void startScan() {
-		//le temps passe ï¿½ 50 ms entre chaque scan
 		lanceur.setDelay(50);
 		lanceur.start();
 		status = true;
 	}
 	
-	//Pour dï¿½sactiver la lecture de la valeur envoyï¿½e par le scanner
+	/**
+	 * stopScan() Permet d'arreter le scanner lance par la methode @see Toucher#startScan().
+	 */
 	public static void stopScan() {
 		lanceur.stop();
 		status = false;
 		touche = false;
 	}
-	
-	//Retourne le status pour savoir l'ï¿½tat actuel
-	public static boolean getStatus() {
-		return(status);
-	}
 }
 
+
+/**
+ * Une simple classe permettant de tester le capteur de contact manuellement.
+ * Elle lance le capteur puis affiche a l'ecran LCD si le palet touche ou non.
+ */
 class testToucher{
 	public static void main(String[] args) {
 		Toucher.startScan();

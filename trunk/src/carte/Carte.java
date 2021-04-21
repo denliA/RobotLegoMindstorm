@@ -4,6 +4,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import capteurs.CouleurLigne;
 import carte.Ligne.Etat;
+import exceptions.CalibrageException;
 import moteurs.Pilote;
 
 public class Carte {
@@ -95,10 +96,49 @@ public class Carte {
 		return(res);
 	}
 	
+	/**
+	 * Cette methode permet d'utiliser la hashMap {@link Ligne#hashPerdu} pour trouver la position exacte du robot.
+	 * En effet on appel la methode @see Pilote#chercherPosition() de maniere à recuperer un objet du type @see LCC.
+	 * Ensuite en utilisant la hashMap {@link Ligne#hashPerdu} on fait la correspondance entre ce LCC et un objet du type @see Etat qui est juste la position et la direction du robot.
+	 */
 	public void calibrerPosition() {
 		Etat etat = Ligne.hashPerdu.get(Pilote.chercherPosition());
 		robot.setPosition(etat.position.getX(), etat.position.getY());
 		robot.setDirection(etat.direction);
 	}
 	
+	/**
+	 * Cette methode permet de calibrer la position du robot sur la carte lorsque ce dernier traverse une ligne.
+	 * Cela permet d'eviter les imprecision qui s'accumulent duent a des approximations.
+	 * Le parametre entre est la ligne en question. 
+	 * @param l
+	 */
+	public void traverseLigne(Ligne l) {
+		if(l.getDirection()) {
+			robot.setPosition(robot.getPosition().getX(), l.getPosition());
+		}
+		else {
+			robot.setPosition(l.getPosition(), robot.getPosition().getY());
+		}
+	}
+	
+	/**
+	 * Cette methode permet de calibrer la position du robot lorsqu'il traverse une intersection.
+	 * Elle renvoie une erreur lorsque les 2 lignes sont parallèles.
+	 * @param l1
+	 * @param l2
+	 */
+	public void traverseIntersection(Ligne l1, Ligne l2) throws CalibrageException{
+		if(!(l1.getDirection()^l2.getDirection())) {
+			throw new CalibrageException("Les deux lignes sont parallèles, elles n'ont pas d'interseciton.");
+		}
+		else {
+			if(l1.getDirection()) {
+				robot.setPosition(l2.getPosition(), l1.getPosition());
+			}
+			else {
+				robot.setPosition(l1.getPosition(), l2.getPosition());
+			}
+		}
+	}
 }

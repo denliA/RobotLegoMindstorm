@@ -6,7 +6,7 @@ import capteurs.CouleurLigne;
 
 public class Ligne{
 	/**
-	 * On consid�re la classe Ligne comme une droite parall�le � un axe du plan.
+	 * On considere la classe Ligne comme une droite parallele a un axe du plan.
 	 * Il suffit de connaitre sa coordonnee fixee puis de ne pas prendre compte de l'autre.
 	 * Puisqu'on peut simplement dire si elle est horizontale ou verticale.
 	 * De plus on la definit par une couleur pour faciliter l'association aux donnees recuperee par le capteur de couleurs.
@@ -29,7 +29,7 @@ public class Ligne{
 	
 	/**
 	 * Les getters.
-	 * @return L'information d'interet sur la Ligne.
+	 * @return L'information d'interet sur la Ligne (direction = horizontale ou non, position = coordonnee fixee, couleur).
 	 */
 	
 	public boolean getDirection() {
@@ -74,7 +74,7 @@ public class Ligne{
 	}
 	
 	/**
-	 * Cr�ation de 2 classes interne : 
+	 * Creation de 2 classes interne : 
 	 * - LCC (Ligne, Couleur, Couleur) 
 	 * - Etat (Position, direction) 
 	 * pour pouvoir utiliser une hashMap ou l'on fait se correspondre ces 2 informations.
@@ -125,7 +125,7 @@ public class Ligne{
 	}
 	
 	/**
-	 * Dans cette hashMap on compte utiliser le robot de maniere e ce qu'il aille sur une ligne verticale pour se reperer, car cela nous facilite la tache.
+	 * Dans cette hashMap on compte utiliser le robot de maniere a ce qu'il aille sur une ligne verticale pour se reperer, car cela nous facilite la tache.
 	 */
 	static public ConcurrentHashMap<LCC, Etat> hashPerdu = new ConcurrentHashMap<>();
 	static {
@@ -157,6 +157,9 @@ public class Ligne{
 		hashPerdu.put(new LCC(hashLignes.get(CouleurLigne.ROUGE),CouleurLigne.BLANCHE, CouleurLigne.BLEUE), new Etat(new Point(-1,-1),90f));
 	}
 	
+	/**
+	 * Cette hashMap permet de faire la correspondance entre une coordonnee (relative a notre repere) en abscisse et la ligne qui lui est associee.
+	 */
 	static public ConcurrentHashMap<Float, CouleurLigne> xToLongues = new ConcurrentHashMap<>();
 	static {
 		xToLongues.put(-1.0f, CouleurLigne.ROUGE);
@@ -164,6 +167,9 @@ public class Ligne{
 		xToLongues.put(1f, CouleurLigne.JAUNE);
 	}
 	
+	/**
+	 * Cette hashMap permet de faire la correspondance entre une coordonnee (relative a notre repere) en ordonnee et la ligne qui lui est associee.
+	 */
 	static public ConcurrentHashMap<Float, CouleurLigne> yToLongues = new ConcurrentHashMap<>();
 	static {
 		yToLongues.put(-2f, CouleurLigne.BLANCHE);
