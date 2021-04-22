@@ -193,7 +193,6 @@ public class InterfaceTextuelle {
 	
 	Picker strategieSolo = new Picker("Strategies",Configurations.strategieSolo);
 	Picker strategieDuo = new Picker("Strategies",Configurations.strategieDuo);
-	Picker visages = new Picker("Visages",Configurations.expression);
 	Picker musiques = new Picker("Musiques",Configurations.musique);
 	Picker bruitages = new Picker("Bruitages",Configurations.bruitage);
 	Picker dances = new Picker("Danses",Configurations.danse);
