@@ -103,29 +103,38 @@ public class Menu implements Lancable{
 			// on attend que l'utilisateur appuie sur un bouton du clavier du robot
 			button = Button.waitForAnyPress();
 			if (button == Button.ID_DOWN) {
+				//si la flèche pointe sur le dernier Lancable de la page
 				if (choix==Math.min(tab.length-6*page, 6)) {
-					if (page==Math.floor(tab.length/ 6))
+					if (page==Math.floor(tab.length/ 6)) { //si on est à la dernière page
+						//on revient à la première page
 						page=0;
-					else
-						//on affichera la page suivante
+					}else { //sinon
+						//page suivante
 						page++;
-					choix = 1;
+						//on reinitialise le choix
+						choix = 1;
+					}
 				}
 				else
+				//on passe au Lancable suivant
 					choix = (choix%Math.min(tab.length-6*page, 6))+1;
 			}
 			else if (button == Button.ID_UP) {
 				if(choix==1) {
 					if(page>0)
-						//on affichera la page précédente
+						//page précédente
 						page--;
 					else {
+						//dernière page
 						page = (int) Math.floor(tab.length/6);
 					}
 				}
+				//si la flèche pointe sur le 1er Lancable de la page, elle devra pointer sur le dernier Lancable de la page précédente
+				//sinon, on selectionne le Lancable précédent
 				choix = (choix == 1) ? Math.min(tab.length-6*page, 6) :(choix-1);
 			}
 			else if (button == Button.ID_ENTER) {
+				//on lance le menu ou le picker sur lequel la flèche pointe
 				tab[choix+6*page-1].lancer();
 			}
 			else if (button == Button.ID_RIGHT) {
