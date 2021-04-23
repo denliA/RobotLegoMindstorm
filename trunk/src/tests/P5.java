@@ -3,6 +3,7 @@ package tests;
 import exceptions.OuvertureException;
 import lejos.hardware.Button;
 import lejos.hardware.lcd.LCD;
+import modeCompetition.ModeCompetition;
 
 /**
  * <p>Situation initiale :
@@ -14,7 +15,7 @@ import lejos.hardware.lcd.LCD;
  * </p>
  * 
  * <p>Situation finale : Le robot dépose chacun des palets derrière la ligne blanche du camp adverse puis s'arrête et ouvre ses pinces.</p>
- * @see modeCompetition#ModeCompetition
+ * @see ModeCompetition
  */
 
 public class P5 implements interfaceEmbarquee.Lancable {

@@ -1,6 +1,7 @@
 package tests;
 
 import capteurs.Couleur;
+import capteurs.Ultrason;
 import capteurs.PaletUltrason;
 import capteurs.Toucher;
 import carte.Carte;
@@ -11,22 +12,25 @@ import moteurs.MouvementsBasiques;
 import moteurs.Pilote;
 import moteurs.Pince;
 
+/**
+ * <p>
+ * 		<ol>
+ * 			<li>Le camp adverse est désigné au robot : Est ou Ouest</li>
+ * 			<li>Un palet est déposé au hasard n'importe où sur la table, excepté sur une des 9 intersections de la table et excepté sur une ligne</li>
+ * 			<li>Le robot est déposé au hasard n'importe où sur la table, excepté sur une ligne</li>
+ * 		</ol>
+ * </p>
+ * 
+ * <p>
+ * Le robot franchit la ligne blanche du camp adverse avec le palet, s'arrête et ouvre ses pinces.
+ * </p>
+ * @see Couleur
+ * @see Toucher
+ * @see Ultrason
+ * 
+ */
+
 public class P7 implements interfaceEmbarquee.Lancable{
-	/**
-	 * <p>
-	 * 		<ol>
-	 * 			<li>Le camp adverse est désigné au robot : Est ou Ouest</li>
-	 * 			<li>Un palet est déposé au hasard n'importe où sur la table, excepté sur une des 9 intersections de la table et excepté sur une ligne</li>
-	 * 			<li>Le robot est déposé au hasard n'importe où sur la table, excepté sur une ligne</li>
-	 * 		</ol>
-	 * </p>
-	 * 
-	 * <p>
-	 * Le robot franchit la ligne blanche du camp adverse avec le palet, s'arrête et ouvre ses pinces.
-	 * </p>
-	 * @see capteurs
-	 * 
-	 */
 	
 	public void lancer() {
 		int button = -1;

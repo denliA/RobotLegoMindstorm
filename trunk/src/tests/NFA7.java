@@ -1,5 +1,5 @@
 package tests;
-
+import modeSolo.ModeSolo;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -15,7 +15,7 @@ import lejos.utility.Delay;
 /**
  * <p>Situation initiale : le robot est déposé sur un des six points de départ de la table</p>
  * <p>Situation finale : le robot dépose les 9 palets derrière la ligne blanche de l'adversaire et il ouvre ses pinces.</p>
- * @see modeSolo#ModeSolo
+ * @see ModeSolo
  */
 
 public class NFA7 implements interfaceEmbarquee.Lancable{
@@ -79,6 +79,13 @@ public class NFA7 implements interfaceEmbarquee.Lancable{
 	}
 	
 }
+
+/**
+ * <p>Dans un thread, on n'a pas acces a des variables d'instances d'autres classes or ici, on a besoin de passer la couleur en parametre
+ *  de suivreLigne() qui sera executée dans la methode call() du thread</p>
+ * 
+ * <p>Pour contourner ça, voici une classe qui permet de passer un parametre à un Callable</p>
+ */
 
 class ArgCallable implements Callable<Void> {
 	boolean truc;

@@ -22,7 +22,7 @@ import exceptions.OuvertureException;
  * </p>
  * <p>Situation finale : le robot ramène le palet derrière la ligne blanche spécifiée par l'utilisateur et reculer de 5 cm.</p>
  * @see MouvementsBasiques#chassis
- * @see capteurs#Couleur
+ * @see Couleur
  */
 
 public class NFBA3 implements interfaceEmbarquee.Lancable{

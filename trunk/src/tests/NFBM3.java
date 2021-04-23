@@ -1,5 +1,5 @@
 package tests;
-
+import capteurs.Toucher;
 import moteurs.MouvementsBasiques;
 
 /**
@@ -11,7 +11,7 @@ import moteurs.MouvementsBasiques;
  * </p>
  * <p>Situation finale : le robot avance tout droit jusqu’à ce qu’il touche le palet et s’arrête instantanément.</p>
  * @see MouvementsBasiques#chassis
- * @see capteurs#Toucher
+ * @see Toucher
  */
 
 public class NFBM3 implements interfaceEmbarquee.Lancable{

@@ -10,7 +10,7 @@ package tests;
  * 			<li>Le robot se remet sur le centre de la table, en pointant vers la direction à 0°. Il s'arrête.</li>
  * 		</ol>
  * </p>
- * @see carte
+ * 
  */
 
 public class OFA1 implements interfaceEmbarquee.Lancable{

@@ -1,5 +1,5 @@
 package tests;
-
+import capteurs.Ultrason;
 import capteurs.Couleur;
 import capteurs.PaletUltrason;
 import carte.Carte;
@@ -8,21 +8,23 @@ import moteurs.MouvementsBasiques;
 import moteurs.Pilote;
 import moteurs.Pince;
 
+/**
+ * <p>
+ * 		<ol>
+ * 			<li>Un palet est déposé au hasard n'importe où sur la table, excepté sur une des 9 intersections de la table et excepté sur une ligne</li>
+ * 			<li>Le robot est déposé au hasard n'importe où sur la table, excepté sur une ligne.</li>
+ * 		</ol>
+ * </p>
+ * 
+ * <p>
+ * Le robot franchit une des deux lignes blanches avec le palet, s'arrête et ouvre ses pinces.
+ * </p>
+ * @see Ultrason
+ * 
+ */
+
 public class P6 implements interfaceEmbarquee.Lancable{
-	/**
-	 * <p>
-	 * 		<ol>
-	 * 			<li>Un palet est déposé au hasard n'importe où sur la table, excepté sur une des 9 intersections de la table et excepté sur une ligne</li>
-	 * 			<li>Le robot est déposé au hasard n'importe où sur la table, excepté sur une ligne.</li>
-	 * 		</ol>
-	 * </p>
-	 * 
-	 * <p>
-	 * Le robot franchit une des deux lignes blanches avec le palet, s'arrête et ouvre ses pinces.
-	 * </p>
-	 * @see capteurs#Ultrason
-	 * 
-	 */
+	
 	public void lancer() {
 		new capteurs.Capteur();
 		capteurs.Couleur.startScanAtRate(0);
