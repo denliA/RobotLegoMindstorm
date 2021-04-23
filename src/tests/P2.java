@@ -22,7 +22,9 @@ import moteurs.Pince;
  * </p>
  * 
  * <p>Situation finale : Le robot franchit la ligne blanche du camp adverse avec le palet, s'arrête et ouvre ses pinces.</p>
- * @see capteurs
+ * @see Couleur;
+ * @see Toucher;
+ * @see Ultrason;
  */
 
 public class P2 implements interfaceEmbarquee.Lancable{
@@ -109,6 +111,12 @@ public class P2 implements interfaceEmbarquee.Lancable{
 	
 }
 
+/**
+ * <p>Dans un thread, on n'a pas acces a des variables d'instances d'autres classes or ici, on a besoin de passer la couleur en parametre
+ *  de suivreLigne() qui sera executée dans la methode run() du thread</p>
+ * 
+ * <p>Pour contourner ça, voici une classe qui permet de passer un parametre à un Runnable</p>
+ */
 abstract class ArgRunnable implements Runnable {
 	Object truc;
 	public ArgRunnable(Object truc) {

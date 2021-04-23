@@ -6,13 +6,15 @@ import lejos.hardware.lcd.LCD;
 import lejos.utility.Delay;
 import moteurs.MouvementsBasiques;
 import moteurs.Pince;
+import modeSolo.ModeSolo;
+import modeCompetition.ModeCompetition;
 
 /**
  * <p>Classe qui contient les danses.</p>
  * <p>Elles sont lancées en fin de partie dans le ModeSolo et le ModeCompetition. On peut aussi les lancer dans le menu "Regalages" de l'interface textuelle.</p>
  * 
- * @see modeSolo#ModeSolo
- * @see modeCompetition#ModeCompetition
+ * @see ModeSolo
+ * @see ModeCompetition
  * @see InterfaceTextuelle
  * 
  */

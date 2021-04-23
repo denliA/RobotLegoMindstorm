@@ -5,27 +5,24 @@ import capteurs.Couleur;
 import capteurs.CouleurLigne;
 import carte.Ligne;
 import carte.Point;
-import exceptions.OuvertureException;
 import interfaceEmbarquee.Lancable;
 import lejos.hardware.Sound;
 import lejos.robotics.chassis.Chassis;
 import modeSolo.ModeSolo;
 
 import java.util.Arrays;
-import java.util.Stack;
 import java.util.Vector;
 
 import capteurs.*;
-import carte.Ligne;
 import carte.Robot;
 import carte.Carte;
-import exceptions.*;
 import moteurs.*;
 
 /**
  * <p>Le robot est posé sur la table mais pas sur une ligne, doit ramener le palet pose a une intersection dans le camp adverse</p>
  * 
  */
+
 public class P3 implements Lancable {
 	
 	/**
@@ -174,6 +171,13 @@ public class P3 implements Lancable {
 	}
 
 }
+
+/**
+ * <p>Dans un thread, on n'a pas acces a des variables d'instances d'autres classes or ici, on a besoin de passer la couleur en parametre
+ *  de suivreLigne() qui sera executée dans le thread</p>
+ * 
+ * <p>Pour contourner ça, voici une classe qui permet de passer un parametre à un Thread</p>
+ */
 
 class ArgSuivi extends Thread{
 	CouleurLigne ligne;

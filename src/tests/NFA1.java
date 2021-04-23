@@ -10,7 +10,7 @@ import moteurs.MouvementsBasiques;
 /**
  * <p>Situation initiale : le robot est déposé sur n’importe quelle intersection de lignes de couleurs</p>
  * <p>Situation finale : le robot réalise un carré et revient sur son intersection de départ</p>
- * @see capteurs#Couleur
+ * @see Couleur
  * @see MouvementsBasiques#chassis
  */
 

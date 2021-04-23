@@ -1,4 +1,7 @@
 package tests;
+import capteurs.Couleur;
+import capteurs.Ultrason;
+import capteurs.Toucher;
 
 /**
  * <p>Situation initiale :
@@ -10,7 +13,9 @@ package tests;
  * </p>
  * 
  * <p>Situation finale : Le robot franchit la ligne blanche du camp adverse avec le palet, s'arrête et ouvre ses pinces.</p>
- * @see capteurs
+ * @see Couleur
+ * @see Ultrason
+ * @see Toucher
  */
 
 public class P4 implements interfaceEmbarquee.Lancable{

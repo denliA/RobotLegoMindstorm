@@ -1,5 +1,6 @@
 package tests;
-
+import capteurs.Couleur;
+import capteurs.Ultrason;
 /**
  * <p>Situation initiale :
  * 		<ul>
@@ -9,8 +10,8 @@ package tests;
  * </p>
  * <p>Situation finale : le robot avance d’une certaine distance puis s’arrête lorsqu’il est à moins d’un mètre du palet. Il affiche sur l’écran quelle intersection contient le palet.</p>
  * <p>Si le palet n’est pas sur une intersection mais sur une partie quelconque de la ligne, le robot affiche un message adéquat.</p>
- * @see capteurs#Couleur
- * @see capteurs#Ultrason
+ * @see Couleur
+ * @see Ultrason
  * @see carte
  */
 

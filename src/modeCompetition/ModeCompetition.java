@@ -10,6 +10,7 @@ import interfaceEmbarquee.Musique;
 import moteurs.MouvementsBasiques;
 import moteurs.Pilote;
 import moteurs.Pince;
+import modeSolo.ModeSolo;
 
 /**
  * <p>ModeCompetition est une classe qui contient les strategies du ModeCompetition et qui s'appuie sur le ModeSolo.</p>
@@ -31,7 +32,7 @@ import moteurs.Pince;
  *     </ul>
  * </p>
  * 
- * @see modeSolo#ModeCompetition.ramasserPalets()
+ * @see ModeSolo#ramasserPalets
  * 
  */
 

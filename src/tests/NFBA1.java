@@ -7,7 +7,7 @@ import moteurs.MouvementsBasiques;
 /**
  * <p>Situation initiale : le robot est déposé sur le début d'une ligne de couleur</p>
  * <p>Situation finale : le robot avance tout droit jusqu'à la ligne blanche adverse et s'arrête.</p>
- * @see capteurs#Couleur
+ * @see Couleur
  * @see MouvementsBasiques#chassis
  */
 

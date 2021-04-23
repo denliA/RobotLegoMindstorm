@@ -4,7 +4,6 @@ import moteurs.Pince;
 import moteurs.Pilote;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
 import capteurs.Capteur;
 import capteurs.Couleur;
 import capteurs.CouleurLigne;
