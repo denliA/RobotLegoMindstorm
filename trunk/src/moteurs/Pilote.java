@@ -8,9 +8,11 @@ import capteurs.Couleur.BufferContexte;
 import carte.Carte;
 import carte.Point;
 import carte.Robot;
+import exceptions.PositionPasCalibreeException;
 import carte.Ligne;
 import carte.Ligne.LCC;
 import interfaceEmbarquee.Musique;
+import lejos.hardware.Button;
 import lejos.hardware.Sound;
 import lejos.robotics.chassis.Chassis;
 import lejos.utility.Delay;
@@ -62,8 +64,9 @@ public class Pilote {
 
 	/**
 	 * Fonction pour suivre une ligne de couleur sans s'en décaler
+	 * <p> La fonction doit être interrompue manuellement par l'appelant en appelant la méthode {@link #SetSeDeplace(boolean)}
 	 * 
-	 * @param c
+	 * @param c couleurLigne qu'on doit suivre
 	 */
 	public static void suivreLigne(CouleurLigne c) {
 		seDeplace = true;
@@ -162,11 +165,11 @@ public class Pilote {
 					
 					//gestion d'erreur le robot n'a pas pu se redresser sur une ligne de couleur et il est perdu. Il faut arrêter le mouvement
 					System.out.println("	entrée dans le code de correction");
-					MouvementsBasiques.chassis.setLinearAcceleration(150);
+					MouvementsBasiques.chassis.setLinearAcceleration(40);
 					MouvementsBasiques.chassis.travel(-10);
 					MouvementsBasiques.chassis.waitComplete();
 					cycles = 0;
-					seRedresserSurLigne(c, false, 90,180); // TODO à calibrer (l'angle max et la vitesse de rotation)
+					seRedresserSurLigne(c, false, 90,250); // TODO à calibrer (l'angle max et la vitesse de rotation)
 					MouvementsBasiques.chassis.setLinearAcceleration(5);
 					MouvementsBasiques.chassis.travel(Float.POSITIVE_INFINITY); 	
 				}
@@ -198,12 +201,24 @@ public class Pilote {
 	
 	
 	
-	
+	/**
+	 * Se redresser sur la ligne précisée en faisant deux cycles de redressement
+	 * @see #seRedresserSurLigne(CouleurLigne, boolean, double, double, int)
+	 */
 	public static boolean seRedresserSurLigne(CouleurLigne c, boolean gauche_bouge, float max_angle, int vitesse_angulaire) {
 		return seRedresserSurLigne(c, gauche_bouge, max_angle, vitesse_angulaire, 2);
 	}
 	
-	
+	/**
+	 * Se redresser sur une ligne de couleur. Ne marche que si on est près de la ligne 
+	 * 
+	 * @param c couleurLigne sur laquelle on souhaite se redresser
+	 * @param gauche_bouge si à true, le robot essaie d'abord de tourner dans le sens horaire pour trouver la ligne
+	 * @param max_angle angle maximum de recherche. Pour que le robot ne change pas de direction, mettre à 90°
+	 * @param vitesse_angulaire vitesse angulaire du redressement, inversement proportionnelle à la précision
+	 * @param max_iterations
+	 * @return true si on a pu se redresser 
+	 */
 	public static boolean seRedresserSurLigne(CouleurLigne c, boolean gauche_bouge, double max_angle, double vitesse_angulaire, int max_iterations) {
 		boolean trouve;
 		
@@ -213,7 +228,7 @@ public class Pilote {
 		double def_speed_angulaire = MouvementsBasiques.chassis.getAngularSpeed();
 		double def_acc_angulaire = MouvementsBasiques.chassis.getAngularAcceleration();
 		
-		MouvementsBasiques.chassis.setAngularAcceleration(vitesse_angulaire*2); //TODO à calibrer pour avoir des mouvements ni trop lents ni trop brusques
+		MouvementsBasiques.chassis.setAngularAcceleration(10); //TODO à calibrer pour avoir des mouvements ni trop lents ni trop brusques
 		MouvementsBasiques.chassis.setLinearSpeed(15);
 		MouvementsBasiques.chassis.setAngularSpeed(vitesse_angulaire);
 		
@@ -226,12 +241,12 @@ public class Pilote {
 		while(Couleur.getLastCouleur() != c && seDeplace && iterations < max_iterations) {
 			trouve = tournerJusqua(c, !gauche_bouge, (int)vitesse_angulaire, 0, (int)max_angle);
 			if (!trouve && seDeplace) {
-				trouve = tournerJusqua(c, !gauche_bouge, (int)vitesse_angulaire, 0, (int)max_angle);
+				trouve = tournerJusqua(c, gauche_bouge, (int)vitesse_angulaire, 0, (int)max_angle);
 				if(!trouve && seDeplace) {
 					gauche_bouge = !gauche_bouge;
 					trouve = tournerJusqua(c, !gauche_bouge, (int)vitesse_angulaire, 0, (int)max_angle);
 					if (!trouve && seDeplace) {
-						trouve = tournerJusqua(c, !gauche_bouge, (int)vitesse_angulaire, 0, (int)max_angle);
+						trouve = tournerJusqua(c, gauche_bouge, (int)vitesse_angulaire, 0, (int)max_angle);
 						retour = false;
 						break;
 					}
@@ -239,7 +254,7 @@ public class Pilote {
 			}
 			if (Couleur.getLastCouleur()!=c&&seDeplace) {
 				MouvementsBasiques.pilot.setAngularSpeed(vitesse_angulaire/4);
-				trouve = tournerJusqua(c, !gauche_bouge, (int)(vitesse_angulaire/2), 0, (int)-20);
+				trouve = tournerJusqua(c, gauche_bouge, (int)(vitesse_angulaire/2), 0, (int)20);
 				MouvementsBasiques.pilot.setAngularSpeed(vitesse_angulaire);
 			}
 			if (seDeplace && iterations < max_iterations) {
@@ -271,7 +286,13 @@ public class Pilote {
 	}
 	
 
-	
+	/**
+	 * Cherche une ligne donnée en avançant 
+	 * <p> une fois la ligne trouvée, le robot de redresse sur celle ci
+	 * 
+	 * @see #chercheLigne(Vector, double, double, double, boolean)
+	 * @param c coulerLigne cherchée
+	 */
 	public static CouleurLigne chercheLigne(CouleurLigne c,double vitesseLineaire,double accelerationLineaire,double vitesseAngulaire, boolean adroite) {
 		Vector<CouleurLigne> v = new Vector<>();
 		v.add(c);
@@ -279,6 +300,18 @@ public class Pilote {
 		
 	}
 	
+	
+	/**
+	 * Cherche une des lignes passées en paramètre
+	 * <p> Avance jusqu'à ce qu'il tombe sur une des ligne ou qu'il voit le vide. Si une ligne est trouvée,
+	 * se gare dessus.
+	 * @param c tableau des lignes cherchées
+	 * @param vitesseLineaire vitesse linéaire pendant la recherche
+	 * @param accelerationLineaire accélération linéaire pendant la recherche
+	 * @param vitesseAngulaire vitesse angulaire pendant le redressement sur la ligne
+	 * @param adroite direction du redressement
+	 * @return la ligne trouvée si une ligne est trouvée, {@link capteurs.CouleurLigne.VIDE}
+	 */
 	public static CouleurLigne chercheLigne(Vector <CouleurLigne> c,double vitesseLineaire,double accelerationLineaire,double vitesseAngulaire, boolean adroite) {
 		MouvementsBasiques.chassis.setAngularSpeed(vitesseAngulaire);
 		MouvementsBasiques.chassis.setLinearSpeed(vitesseLineaire);
@@ -303,7 +336,7 @@ public class Pilote {
 				MouvementsBasiques.chassis.waitComplete();
 			}
 		} while(vide);
-		tournerJusqua(t,adroite,300,200);
+		tournerJusqua(t,adroite,250,200);
 		tournerJusqua(t, !adroite, 40);
 		return t;
 		
@@ -399,6 +432,13 @@ public class Pilote {
 	private static Vector<CouleurLigne> courtes = new Vector<>(Arrays.asList(new CouleurLigne[] {CouleurLigne.VERTE, CouleurLigne.BLEUE, CouleurLigne.BLANCHE}));
 	
 
+	
+	/**
+	 * Se déplace sur la table de manière à trouver les informations necessaries pour pouvoir se repérer. 
+	 * <p> Une fois les informations trouvées, retourne celles-ci
+	 * <p> Est utilisé par la carte pour calibrer la position du robot.
+	 * @return Une structure de type {@link carte.Ligne.LCC} (ligne-couleur-couleur) indiquant quelle ligne il a suivi, et sur quelles intersections il est passé
+	 */
 	public static LCC chercherPosition() {
 		seDeplace = true;
 		int vitesse = 15;
@@ -528,7 +568,20 @@ public class Pilote {
 			
 	}
 	
+	
+	/**
+	 * Permet de déplacer un robot <b>calibré</b> d'un point (intersection) à un autre de la table.
+	 * <p> Si le robot n'est pas calibré, il se calibre d'abord avant d'aller à la position souhaitée.
+	 * <p> Les coordonnées sont dans le repère (IntersectionNoire, IntersectionNoire-->IntersectionJauneVert, IntersectionNoire-->IntersectionNoireVert)
+	 * @param x coordonnée x de la destination
+	 * @param y coordonnée y de la destination
+	 */
 	public static void allerVersPoint(float x, float y) {
+		
+		boolean sens_change=false;
+		chassis.setLinearSpeed(20);
+		chassis.setLinearAcceleration(30);
+		
 		if(robot.getPosition()==Point.INCONNU) {
 			carte.calibrerPosition();
 		}
@@ -548,55 +601,109 @@ public class Pilote {
 			allerVersPoint(0, y);
 			return;
 		}
+		if(x_depart == 0 &&  x == 0 && y == -1 && y_depart != -1) {
+			System.out.println("Position au début : " + robot);
+			allerVersPoint(1, y);
+			System.out.println("Position après changement de ligne : " + robot);
+			allerVersPoint(0, y);
+			System.out.println("Position à la fin : " + robot);
+			return;
+		}
 		CouleurLigne ligne_arrivee = Ligne.xToLongues.get(x);
 		CouleurLigne inters_arrivee = Ligne.yToLongues.get(y); 
 		boolean det = direction ==270;
 		boolean inverse;
-		if(y>= y_depart) {
+		if(y> y_depart) {
 			inverse= !det; 
 		}
-		else if(y<= y_depart) {
+		else if(y< y_depart) {
 			inverse = det;
 		}
 		else {
-			inverse = true;
+			inverse = false;
 		}
 //		System.out.println("det: " + det + "y>y_depart:  " + (y>y_depart) + "Inverse? : "+inverse);
 		if (x != x_depart) {
 			int bonne_bifurquation = (det ? -1 : 1)*(x>x_depart ? -1 : 1);
-			if (Math.abs(y_depart)==2 || y_depart ==0) {chassis.travel(30); chassis.waitComplete();}
+			if (Math.abs(y_depart)==2 || y_depart ==0||true) {chassis.travel(30); chassis.waitComplete();}
 			chassis.rotate(bonne_bifurquation*90); chassis.waitComplete();
 			chercheLigne(ligne_arrivee, 20, 50, 180, (inverse ? !(bonne_bifurquation==1) : (bonne_bifurquation==1)));
-			if ((Math.abs(y_depart)==2 || y_depart ==0)&&y==y_depart) { 
-				chassis.travel(18); chassis.waitComplete();
-				Pilote.tournerJusqua(Ligne.xToLongues.get(x), true, 50, 20, 15);
-				Pilote.tournerJusqua(Ligne.xToLongues.get(x), false, 50, 20, 30);
+			if ((true||Math.abs(y_depart)==2 || y_depart ==0)&&y==y_depart) {
+				if(!inverse) {
+					chassis.travel(15); chassis.waitComplete();
+				}
+				else {
+					chassis.travel(-18); chassis.waitComplete();
+				}
+			}
+			Pilote.tournerJusqua(Ligne.xToLongues.get(x), true, 50, 20, 15);
+			Pilote.tournerJusqua(Ligne.xToLongues.get(x), false, 50, 20, 30);
+		}
+		else {
+			if(y>y_depart && det || y<y_depart && !det) {
+				if(ligne_arrivee!=CouleurLigne.NOIRE || y_depart != 0) {
+					Pilote.tournerJusqua(ligne_arrivee, true, 250); Pilote.tournerJusqua(ligne_arrivee, false, 50, 20);
+				}
+				else {
+					Pilote.tournerJusqua(CouleurLigne.NOIRE, true, 250,0);
+					Pilote.tournerJusqua(CouleurLigne.NOIRE, true, 250); Pilote.tournerJusqua(ligne_arrivee, false, 50, 20);
+				}
 			}
 		}
+		
 		if(y!=y_depart) {
 			new Thread(new ArgRunnable(ligne_arrivee) {
 				public void run() {
 					Pilote.suivreLigne((CouleurLigne)truc);
 				}
 			}).start();
+			Couleur.blacheTouchee(); 
+			while(Couleur.getLastCouleur() != inters_arrivee) {
+				if ((Couleur.blacheTouchee() && inters_arrivee!=CouleurLigne.BLANCHE)) {
+					sens_change = !sens_change;
+					Pilote.SetSeDeplace(false); chassis.waitComplete();
+					Pilote.tournerJusqua(ligne_arrivee, true, 250); Pilote.tournerJusqua(ligne_arrivee, false, 50, 20);
+					Couleur.blacheTouchee();
+					new Thread(new ArgRunnable(ligne_arrivee) {
+						public void run() {
+							Pilote.suivreLigne((CouleurLigne)truc);
+						}
+					}).start();	
+				}
+			};
+			seDeplace = false;
+			chassis.waitComplete();
 		}
-		while(Couleur.getLastCouleur() != inters_arrivee);
-		seDeplace = false;
-		chassis.waitComplete();
 		robot.setPosition(x, y);
 		if (y>y_depart) {
-			robot.setDirection(90);
+			robot.setDirection(!sens_change ? 90 : 270);
 		}
-		else if(y>y_depart) {
-			robot.setDirection(270);
+		else if(y<y_depart) {
+			robot.setDirection(!sens_change ? 270 : 90);
+		}
+		else {
+			robot.setDirection(robot.getDirection() == 270 ? 90 : 270);
 		}
 //		System.out.println("Position juste après le mouvement : " + robot);
 	}
 	
+	/**
+	 * Permet de faire aller le robot vers le camp indiqué, derrière la ligne blanche, puis se retourner
+	 * <p> IMPORTANT : Le robot doit avoir une position calibrée pour pouvoir faire ça. Si il ne l'est pas quand cette méthode est appelée, 
+	 * le robot va d'abord se calibrer avant de rentrer.
+	 * @param direction le camp vers lequel le robot doit aller. "table", "fenetre" ou "" si le camp n'a pas d'importance
+	 */
 	public static void rentrer(String direction) {
 		rentrer(direction, true);
 	}
 	
+	/**
+	 * Permet de faire aller le robot vers le camp indiqué, derrière la ligne blanche, puis se retourner
+	 * <p> IMPORTANT : Le robot doit avoir une position calibrée pour pouvoir faire ça. Si il ne l'est pas quand cette méthode est appelée, 
+	 * le robot va d'abord se calibrer avant de rentrer.
+	 * @param direction le camp vers lequel le robot doit aller. "table", "fenetre" ou "" si le camp n'a pas d'importance
+	 * @param se_retourner si à true, le robot se retroune après être rentré.
+	 */
 	public static void rentrer(String direction, boolean se_retourner) {
 		assert (direction.equals("porte") || direction.equals("fenetre") || direction.equals("")) : "direction doit indiquer une direction, ou être une chaîne vide";
 		float x = robot.getPosition().getX();
@@ -662,10 +769,95 @@ public class Pilote {
 		}
 	}
 
+	
+	
+	public static Point verifierPalet(boolean derriere) throws PositionPasCalibreeException{
+		
+		float direction = robot.getDirection();
+		float x = robot.getPosition().getX();
+		float y = robot.getPosition().getY();
+		CouleurLigne intersection = Ligne.yToLongues.get(y);
+		CouleurLigne ligne = Ligne.xToLongues.get(x);
+		
+		if(robot.getPosition()==Point.INCONNU) {
+			throw new PositionPasCalibreeException();
+		}
+		
+		else if(direction==0 || direction==180) {
+			tournerJusqua(ligne, true, 250, 250); tournerJusqua(ligne, false, 50, 20);
+			robot.setDirection(direction=(direction+90));
+		}
+//		System.out.println("[VerifierPalet] connait direction : " + robot);
+		
+		float prochain_y = (direction == 90 ?  y+1 : y-1);
+		boolean au_centre = (x==0);
+		
+//		System.out.println("[VerifierPalet] Prochain point : " + new Point(x, prochain_y));
+		
+		if(Math.abs(prochain_y)<2) {
+//			System.out.println("[VerifierPalet] Je vérifie ce dernier");
+			Ultrason.setDistance();
+			if(Ultrason.getDistance() <= .64f && Ultrason.getDistance() >= .40f) {
+//				System.out.println("[VerifierPalet] Trouvé!! " + Ultrason.getDistance() + "  " + new Point(x,prochain_y));
+				return new Point(x,prochain_y);
+			}
+		}
+		
+		chassis.travel(8); chassis.waitComplete();
+		
+		
+		if(Math.abs(x)==2) {
+			// on ne regarde pas sur les cotés
+		}
+		if(!au_centre) {
+			boolean a_droite = (x==1 && direction == 90 || x==-1 && direction == 270);
+//			System.out.println("[VerifierPalet] je regarde sur les cotés " + (a_droite ? "à droite" : "à gauche"));
+			tournerJusqua(intersection, a_droite, 250, 300); tournerJusqua(intersection, !a_droite, 50, 20);
+			robot.setDirection(direction = (direction + (a_droite? 90 : -90))%360);
+			System.out.println("[verifierPalet] Direction après avoir tourné: " + robot.getDirection());
+			Ultrason.setDistance();
+			if(Ultrason.getDistance()<= .56f && Ultrason.getDistance() >= .35f) {
+				return new Point(0, y);
+			}
+			else if(Ultrason.getDistance()<= 1.05f && Ultrason.getDistance() >= .81f) {
+				return new Point(-x, y);
+			}
+			else {
+//				System.out.println("[VerifierPalet] pas au centre mais pas la bonne distance sur les cotés :( --> distance="+Ultrason.getDistance());
+			}
+			tournerJusqua(ligne, !a_droite, 250, 150); tournerJusqua(ligne, a_droite, 50, 20);
+			robot.setDirection(direction = (direction + (a_droite? -90 : 90))%360);
+		}
+		else {
+//			System.out.println("[VerifierPalet] Je suis au centre ");
+			float coef_a_droite = (direction==90 ? -1 : 1);
+			tournerJusqua(intersection, true, 250, 300); tournerJusqua(intersection, false, 50, 20);
+			robot.setDirection(direction = ((direction + 90)%360));
+			Ultrason.setDistance();
+			if(Ultrason.getDistance()<= .56f && Ultrason.getDistance() >= .35f) {
+				return new Point(coef_a_droite, y);
+			}
+			tournerJusqua(intersection, true, 250, 250); tournerJusqua(intersection, false, 50, 20); 
+			if(y==0) {
+				tournerJusqua(intersection, true, 250, 250); tournerJusqua(intersection, false, 50, 20); 
+			}
+			robot.setDirection(direction = ((direction - 180)%360));
+			Ultrason.setDistance();
+			if(Ultrason.getDistance()<= .56f && Ultrason.getDistance() >= .35f) {
+				return new Point(-coef_a_droite, y);
+			}
+			tournerJusqua(intersection, true, 250, 150); tournerJusqua(intersection, false, 50, 20);
+			robot.setDirection(direction = (direction + 90));
+		}
+		
+		return Point.INCONNU;
+	}
 
 }
 
-
+/*
+ * Runnable prenant un argument.
+ */
 abstract class ArgRunnable implements Runnable {
 	Object truc;
 	public ArgRunnable(Object truc) {
