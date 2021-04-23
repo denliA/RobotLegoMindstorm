@@ -24,7 +24,7 @@ public enum Configurations{
 	danse("victoire",new String[] {"victoire","defaite"});
 	
 	
-	 /**
+	/**
      * valeur choisie par défaut. Peut etre modifiée par l'utilisateur dans le Picker. 
      * @see Picker
      */
