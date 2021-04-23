@@ -23,13 +23,13 @@ import exceptions.*;
 import moteurs.*;
 
 /**
- * <p>Le robot est pose sur la table mais pas sur une ligne, doit ramener le palet pose a une intersection dans le camp adverse</p>
+ * <p>Le robot est posé sur la table mais pas sur une ligne, doit ramener le palet pose a une intersection dans le camp adverse</p>
  * 
  */
 public class P3 implements Lancable {
 	
 	/**
-	 * campAdverse vaut 1 pour Est et 0 pour Ouest. On supose la ligne verte du cote ouest
+	 * campAdverse vaut 1 pour Est et 0 pour Ouest. On supose la ligne verte du coté ouest
 	 */
 	private int campAdverse;
 

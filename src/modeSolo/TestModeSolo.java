@@ -1,8 +1,6 @@
  package modeSolo;
 
-import capteurs.*;
 import exceptions.OuvertureException;
-import lejos.hardware.Sound;
 
 
 public class TestModeSolo {

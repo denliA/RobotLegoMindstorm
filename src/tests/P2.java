@@ -22,7 +22,7 @@ import moteurs.Pince;
  * </p>
  * 
  * <p>Situation finale : Le robot franchit la ligne blanche du camp adverse avec le palet, s'arrête et ouvre ses pinces.</p>
- * @see capteurs#Ultrason
+ * @see capteurs
  */
 
 public class P2 implements interfaceEmbarquee.Lancable{
