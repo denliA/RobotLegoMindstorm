@@ -2,6 +2,7 @@ package tests;
 
 import capteurs.Couleur;
 import capteurs.PaletUltrason;
+import capteurs.Toucher;
 import carte.Carte;
 import exceptions.OuvertureException;
 import lejos.hardware.Button;
@@ -79,7 +80,7 @@ public class P7 implements interfaceEmbarquee.Lancable{
 					;
 				}
 				//On redresse le robot de maniere a ce qu'il soit face au camp ou il souhaite aller
-				System.out.println("debut angle");
+				System.out.println("debut angle \t\t" + "Direction : " + Carte.carteUsuelle.getRobot().getDirection() + "\tAngle fait : " + PaletUltrason.getAngle() + " A faire : " + (angleCamp-(Carte.carteUsuelle.getRobot().getDirection()+PaletUltrason.getAngle())%360));
 				MouvementsBasiques.chassis.rotate(angleCamp-(Carte.carteUsuelle.getRobot().getDirection()+PaletUltrason.getAngle())%360); MouvementsBasiques.chassis.waitComplete();
 				System.out.println("fin angle");
 				MouvementsBasiques.chassis.travel(Float.POSITIVE_INFINITY);
@@ -114,7 +115,16 @@ public class P7 implements interfaceEmbarquee.Lancable{
 				catch(OuvertureException e) {
 					;
 				}
-				MouvementsBasiques.chassis.travel(60); MouvementsBasiques.chassis.waitComplete();
+				Pilote.tournerJusqua(capteurs.CouleurLigne.NOIRE, true, 50, 10);
+				float y = Carte.carteUsuelle.getRobot().getPosition().getY();
+				if(y == 0) {
+					Pilote.allerVersPoint(0, 1);
+				}
+				else {
+					Pilote.allerVersPoint(0, -1);
+				}
+				MouvementsBasiques.chassis.travel(5);
+//				MouvementsBasiques.chassis.travel(60); MouvementsBasiques.chassis.waitComplete();
 				try {
 					Pince.ouvrir();
 				}
@@ -125,6 +135,9 @@ public class P7 implements interfaceEmbarquee.Lancable{
 			}
 			
 		}while(!succes);
+		System.out.println("Sorti");
+		Couleur.stopScan();
+		Toucher.stopScan();
 		
 	}
 	

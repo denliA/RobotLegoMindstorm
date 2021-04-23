@@ -197,6 +197,7 @@ public class PaletUltrason {
 				}
 				else {
 					MouvementsBasiques.tourner(-tour);
+					angleTotal-=tour;
 					System.out.println("non : "+d);
 				}
 				tour=tour/2;
