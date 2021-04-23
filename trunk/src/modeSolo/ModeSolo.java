@@ -12,11 +12,6 @@ import capteurs.Toucher;
 import capteurs.Ultrason;
 import exceptions.*;
 import interfaceEmbarquee.Musique;
-import lejos.hardware.Button;
-import lejos.hardware.Sound;
-import lejos.hardware.Sounds;
-import lejos.hardware.lcd.LCD;
-import lejos.utility.Delay;
 
 public class ModeSolo {
 	//methode classique pour le ModeSolo

@@ -1,6 +1,5 @@
 package modeCompetition;
 
-import exceptions.EchecGarageException;
 import exceptions.OuvertureException;
 
 public class TestModeCompetition {
