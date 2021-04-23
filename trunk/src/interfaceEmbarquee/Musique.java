@@ -1,40 +1,66 @@
 package interfaceEmbarquee;
 
 import java.io.File;
-
-import lejos.hardware.Audio;
-import lejos.hardware.BrickFinder;
 import lejos.hardware.Sound;
 import lejos.hardware.lcd.LCD;
-import lejos.internal.ev3.EV3Audio;
 
-
-
-
+/**
+ * <p>Classe qui permet de lancer un son dans un thread et de l'interrompre si besoin.</p>
+ * 
+ * @see ValeursConfig
+ * @see Congigurations
+ * 
+ */
 
 public class Musique{
+	
+	/**
+	 * <p>Declaration de l'unique thread qui lancera un effet sonore. Mis en static pour pouvoir etre interrompu par la suite.</p>
+	 * 
+	 */
 	static Thread t;
 	
-	//lance le bruitage choisi dans le picker
+	/**
+	 * <p>Lance le bruitage choisi dans le picker.</p>
+	 * <p>Le nom du fichier qui correspond à la Configuration choisie se trouve dans ValeursConfig.</p>
+	 * @see Picker
+	 * @see Configurations
+	 * @see ValeursConfig
+	 * 
+	 */
 	public static void startSound(){
 		startMusic(ValeursConfig.bruitagesConfig.get(Configurations.bruitage.getVal()));
 	}
 	
-	//lance la musique choisie dans le picker
+	/**
+	 * <p>Lance la musique choisie dans le picker.</p>
+	 * <p>Le nom du fichier qui correspond à la Configuration choisie se trouve dans ValeursConfig.</p>
+	 * @see Picker
+	 * @see Configurations
+	 * @see ValeursConfig
+	 * 
+	 */
 	public static void startMusic(){
 		startMusic(ValeursConfig.musiquesConfig.get(Configurations.musique.getVal()));
 	}
 	
-	//lance le son dont le fichier.wav est passé en paramètre
+	/**
+	 * <p>Lance la musique dont le nom du fichier.wav est passé en paramètres.</p>
+	 * <p>Lancer la musique dans un thread permet de le faire en meme temps qu'une autre action du robot sans perturber son fonctionnement.</p>
+	 * @param name
+	 * 				nom du fichier du son à lancer
+	 * 
+	 */
 	public static void startMusic(final String name) {
+		//initialise la variable t et instancie le thread
 		t = new Thread(new Runnable() {
 			public void run(){
 				while(!Thread.interrupted()){
-					LCD.clear();
+					LCD.clear(); //vide l'écran
 					int res;
 					File fichier= new File(name);
 					if (!fichier.exists()) {
-						return; //On n'essaye pas de jouer une musique qui n'est existe pas
+						return; //on n'essaye pas de jouer une musique qui n'est existe pas
 					}
 					res = Sound.playSample(fichier, Sound.VOL_MAX); //attention : instruction bloquante
 					if (res<0) {
@@ -47,11 +73,16 @@ public class Musique{
 				}
 			}
 		});
-		t.start();		
+		//commence l'exécution du thread et donc lance la musique
+		t.start();
 	}
 	
+	/**
+	 * <p>Tente d'arreter le son en cours d'execution en interrompant le thread t.</p>
+	 * 
+	 */
 	public static void stopMusic(){
-		t.interrupt(); //va tenter d'arreter le thread en cours d'execution
+		t.interrupt();
     }
 }
     
