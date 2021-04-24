@@ -37,7 +37,7 @@ public class NFBM3 implements interfaceEmbarquee.Lancable{
 	}
 	
 	public String getTitre() {
-		return "NFBM3 - Détecter palet";
+		return "NFBM3 - Detecter palet";
 	}
 	
 }

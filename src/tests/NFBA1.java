@@ -16,6 +16,8 @@ public class NFBA1 implements interfaceEmbarquee.Lancable{
 	public void lancer() {
 		new Capteur();
 		Couleur.startScanAtRate(0);
+		MouvementsBasiques.chassis.setLinearAcceleration(10);
+		MouvementsBasiques.chassis.setLinearSpeed(20);
 		moteurs.MouvementsBasiques.chassis.travel(Double.POSITIVE_INFINITY);
 		Couleur.blacheTouchee();
 		while(!Couleur.blacheTouchee());
