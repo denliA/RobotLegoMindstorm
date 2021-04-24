@@ -63,7 +63,7 @@ public class P3 implements Lancable {
 		
 	}
 	
-	
+//TODO à remplacer dans P2	
 	public void P2_Ultrason() {
 		new Capteur();
 		Toucher.startScan();
