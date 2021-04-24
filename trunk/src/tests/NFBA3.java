@@ -1,17 +1,18 @@
 package tests;
 
+import java.util.Vector;
+
+import capteurs.Couleur;
+import capteurs.CouleurLigne;
+import capteurs.Toucher;
+import carte.Carte;
+import carte.Ligne;
+import exceptions.OuvertureException;
 import lejos.hardware.Button;
 import lejos.hardware.lcd.LCD;
 import moteurs.MouvementsBasiques;
 import moteurs.Pilote;
 import moteurs.Pince;
-
-import java.util.Vector;
-
-import capteurs.*;
-import carte.Carte;
-import carte.Ligne;
-import exceptions.OuvertureException;
 
 /**
  * <p>Situation initiale :
@@ -53,7 +54,7 @@ public class NFBA3 implements interfaceEmbarquee.Lancable{
 		int nbInter=0;
 		CouleurLigne cc;
 		CouleurLigne couleur = Couleur.getLastCouleur();
-		Pilote.suivreLigne(couleur);
+		Pilote.lancerSuivi(couleur);
 		while(!Toucher.getTouche()) {
 			if((cc = Couleur.getLastCouleur())!=couleur&&cc!=CouleurLigne.GRIS&&nbInter<2) {
 				tab.add(cc);
@@ -95,7 +96,7 @@ public class NFBA3 implements interfaceEmbarquee.Lancable{
 		
 		//Si la ligne est horizontale :
 		else {
-			Pilote.SetSeDeplace(false);
+			Pilote.arreterSuivi();
 			MouvementsBasiques.chassis.rotate(90);MouvementsBasiques.chassis.waitComplete();
 			couleur = Couleur.getLastCouleur();
 			Pilote.seRedresserSurLigne(couleur, false, 5, 50);
