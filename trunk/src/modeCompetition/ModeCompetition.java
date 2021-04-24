@@ -51,8 +51,8 @@ public class ModeCompetition {
      */
 	
 	public static void ramasserPalet(int nbPalets,boolean rougeAgauche) throws OuvertureException {
-		
-		new Capteur(); //Charger la classe capteur pour pouvoir l'utiliser
+		//Charger la classe capteur pour pouvoir l'utiliser
+		new Capteur(); 
 		//Debut des prises de mesures par les capteurs
 		Toucher.startScan();
 		Ultrason.startScan();
@@ -120,8 +120,9 @@ public class ModeCompetition {
 		//on ne fait rien, le robot continue d'avancer
 		while(((touche=Toucher.getTouche())==false) && (Couleur.getLastCouleur()!=CouleurLigne.BLANCHE));
 		
-		//Le robot a touche un palet ou detecte la ligne blanche
-		Pilote.SetSeDeplace(false); //arrete le suivi de ligne et le robot s'immobilise
+		//le robot a touche un palet ou detecte la ligne blanche
+		//arrete le suivi de ligne et le robot s'immobilise
+		Pilote.SetSeDeplace(false); 
 		MouvementsBasiques.chassis.waitComplete();
 		
 		/* Si le robot vient de toucher un palet */

@@ -2,7 +2,6 @@ package tests;
 import capteurs.Couleur;
 
 import capteurs.Capteur;
-import capteurs.Couleur;
 import capteurs.Toucher;
 import carte.Carte;
 import carte.Robot;
