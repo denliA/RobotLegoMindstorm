@@ -76,7 +76,7 @@ public class Picker implements Lancable{
 		//tant que l'utilisateur n'appuie pas sur le bouton "ESCAPE", on reste dans la boucle
 		while(button != Button.ID_ESCAPE && !(une_seule_fois && button == Button.ID_ENTER)) {
 			LCD.clear(1,2, 100); //nettoie l'écran	
-			
+			LCD.drawString(titre, 7, 1);
 			/** affiche une croix sur la configuration actuellement choisie. Elle est stockée dans la variable val de Configurations
 			 * @see Configurations#val
 			 */
