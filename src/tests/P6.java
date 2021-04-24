@@ -4,6 +4,7 @@ import capteurs.PaletUltrason;
 import capteurs.Toucher;
 import capteurs.Ultrason;
 import carte.Carte;
+import carte.Point;
 import exceptions.OuvertureException;
 import moteurs.MouvementsBasiques;
 import moteurs.Pilote;
@@ -86,8 +87,11 @@ public class P6 implements interfaceEmbarquee.Lancable{
 							;
 						}
 						//On redresse le robot de maniere a ce qu'il soit face au camp ou il souhaite aller
-						System.out.println("debut angle \t\t" + "Direction : " + Carte.carteUsuelle.getRobot().getDirection() + "\tAngle fait : " + PaletUltrason.getAngle() + " A faire : " + (90-(Carte.carteUsuelle.getRobot().getDirection()+PaletUltrason.getAngle())%360));
-						MouvementsBasiques.chassis.rotate(90-(Carte.carteUsuelle.getRobot().getDirection()+PaletUltrason.getAngle())%360); MouvementsBasiques.chassis.waitComplete();
+						System.out.println("debut angle \t\t" + "Direction : " + Carte.carteUsuelle.getRobot().getDirection() + "\tAngle fait : " + PaletUltrason.getAngle() + " A faire : " + (((Carte.carteUsuelle.getRobot().getPosition().getY()+(PaletUltrason.getDistance()*Math.sin(Math.toRadians(PaletUltrason.getAngle()))))<0?270:90)-(Carte.carteUsuelle.getRobot().getDirection()+PaletUltrason.getAngle())%360));
+						MouvementsBasiques.chassis.rotate(((Carte.carteUsuelle.getRobot().getPosition().getY()+(PaletUltrason.getDistance()*Math.sin(Math.toRadians(PaletUltrason.getAngle()))))<0?270:90)-(Carte.carteUsuelle.getRobot().getDirection()+PaletUltrason.getAngle())%360); MouvementsBasiques.chassis.waitComplete();
+						System.out.println("du coup : angle camp :" + ((Carte.carteUsuelle.getRobot().getPosition().getY()+(PaletUltrason.getDistance()*Math.sin(Math.toRadians(PaletUltrason.getAngle()))))<0?270:90) + " position :" + Carte.carteUsuelle.getRobot().getPosition());
+						System.out.println("distance : " + Carte.carteUsuelle.getRobot().getPosition().distance(new Point((float) (Carte.carteUsuelle.getRobot().getPosition().getX()+(PaletUltrason.getDistance()*Math.cos(Math.toRadians(PaletUltrason.getAngle())))),(float) (Carte.carteUsuelle.getRobot().getPosition().getY()+(PaletUltrason.getDistance()*Math.sin(Math.toRadians(PaletUltrason.getAngle())))))));
+						System.out.println("dsin(alpha) : " + PaletUltrason.getDistance()*Math.sin(Math.toRadians(PaletUltrason.getAngle())));
 						System.out.println("fin angle");
 						MouvementsBasiques.chassis.travel(Float.POSITIVE_INFINITY);
 						System.out.println("Avance");
@@ -152,8 +156,8 @@ public class P6 implements interfaceEmbarquee.Lancable{
 				;
 			}
 			//On redresse le robot de maniere a ce qu'il soit face au camp ou il souhaite aller
-			System.out.println("debut angle \t\t" + "Direction : " + Carte.carteUsuelle.getRobot().getDirection() + "\tAngle fait : " + PaletUltrason.getAngle() + " A faire : " + (90-(Carte.carteUsuelle.getRobot().getDirection()+PaletUltrason.getAngle())%360));
-			MouvementsBasiques.chassis.rotate(90-(Carte.carteUsuelle.getRobot().getDirection()+PaletUltrason.getAngle())%360); MouvementsBasiques.chassis.waitComplete();
+			System.out.println("debut angle \t\t" + "Direction : " + Carte.carteUsuelle.getRobot().getDirection() + "\tAngle fait : " + PaletUltrason.getAngle() + " A faire : " + (((Carte.carteUsuelle.getRobot().getPosition().getY()+(PaletUltrason.getDistance()*Math.sin(PaletUltrason.getAngle())))<0?270:90)-(Carte.carteUsuelle.getRobot().getDirection()+PaletUltrason.getAngle())%360));
+			MouvementsBasiques.chassis.rotate(((Carte.carteUsuelle.getRobot().getPosition().getY()+(PaletUltrason.getDistance()*Math.sin(PaletUltrason.getAngle())))<0?270:90)-(Carte.carteUsuelle.getRobot().getDirection()+PaletUltrason.getAngle())%360); MouvementsBasiques.chassis.waitComplete();
 			System.out.println("fin angle");
 			MouvementsBasiques.chassis.travel(Float.POSITIVE_INFINITY);
 			System.out.println("Avance");
