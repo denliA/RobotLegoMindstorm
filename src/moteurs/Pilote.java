@@ -3,21 +3,20 @@ package moteurs;
 import java.util.Arrays;
 import java.util.Vector;
 
-import capteurs.*;
+import capteurs.Couleur;
 import capteurs.Couleur.BufferContexte;
+import capteurs.CouleurLigne;
+import capteurs.Ultrason;
 import carte.Carte;
+import carte.Ligne;
+import carte.Ligne.LCC;
 import carte.Point;
 import carte.Robot;
 import exceptions.PositionPasCalibreeException;
-import carte.Ligne;
-import carte.Ligne.LCC;
 import interfaceEmbarquee.Musique;
-import lejos.hardware.Button;
 import lejos.hardware.Sound;
 import lejos.robotics.chassis.Chassis;
 import lejos.utility.Delay;
-import lejos.utility.Timer;
-import lejos.utility.TimerListener;
 
 /**
  * Classe contrôlant tous les déplacements intermédiaires utilisés par différents algorithmes de décision.
@@ -612,13 +611,13 @@ public class Pilote {
 			robot.setDirection(direction);
 		}
 		if (x == 0 && y==0 && y_depart != y) {
-			allerVersPoint(1, y);
+			allerVersPoint(x_depart==0? 1:x_depart, y);
 			allerVersPoint(0, y);
 			return;
 		}
 		if(x_depart == 0 &&  x == 0 && y == -1 && y_depart != -1) {
 			System.out.println("Position au début : " + robot);
-			allerVersPoint(1, y);
+			allerVersPoint(x_depart==0? 1:x_depart, y);
 			System.out.println("Position après changement de ligne : " + robot);
 			allerVersPoint(0, y);
 			System.out.println("Position à la fin : " + robot);
@@ -648,7 +647,7 @@ public class Pilote {
 				}
 				else {
 					chassis.setLinearSpeed(10);
-					chassis.travel(-18); chassis.waitComplete();
+					chassis.travel(-21); chassis.waitComplete();
 				}
 			}
 			Pilote.tournerJusqua(Ligne.xToLongues.get(x), true, 50, 20, 15);
@@ -660,6 +659,8 @@ public class Pilote {
 					Pilote.tournerJusqua(ligne_arrivee, true, 250); Pilote.tournerJusqua(ligne_arrivee, false, 50, 20);
 				}
 				else {
+					Sound.beep();
+					chassis.rotate(20);chassis.waitComplete();
 					Pilote.tournerJusqua(CouleurLigne.NOIRE, true, 250,0);
 					Pilote.tournerJusqua(CouleurLigne.NOIRE, true, 250); Pilote.tournerJusqua(ligne_arrivee, false, 50, 20);
 				}

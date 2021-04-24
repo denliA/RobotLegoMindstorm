@@ -69,7 +69,6 @@ public class P7 implements interfaceEmbarquee.Lancable{
 			Pince.fermer();
 			Pince.ouvrir();
 			done = PaletUltrason.verif();
-			Pince.fermer();
 		}
 		catch(OuvertureException Pourquoiiiiii) {
 			System.out.println("???????????");
@@ -128,6 +127,8 @@ public class P7 implements interfaceEmbarquee.Lancable{
 					}
 					//si faux-positif : on repart dans la boucle 
 					else {
+						MouvementsBasiques.chassis.travel(-(PaletUltrason.getDistance()*100));MouvementsBasiques.chassis.waitComplete();
+						MouvementsBasiques.chassis.rotate(-(PaletUltrason.getAngle()));MouvementsBasiques.chassis.waitComplete();
 						palet = PaletUltrason.dichotomique(1);
 					}
 					break;
@@ -142,28 +143,23 @@ public class P7 implements interfaceEmbarquee.Lancable{
 					break;
 				//gestion du "pas de palet" : cas ou le robot est trop proche du palet pour le voir avec le capteur ultrason
 				case 2:
-					try {
-						Pince.fermer();
+					boolean found = Pilote.tournerJusqua(capteurs.CouleurLigne.NOIRE, true, 50, 10, 30);
+					if(!found) {
+						MouvementsBasiques.chassis.travel(5);MouvementsBasiques.chassis.waitComplete();
 					}
-					catch(OuvertureException e) {
-						;
-					}
-					Pilote.tournerJusqua(capteurs.CouleurLigne.NOIRE, true, 50, 10);
 					float y = Carte.carteUsuelle.getRobot().getPosition().getY();
 					if(y == 0) {
 						Pilote.allerVersPoint(0, 1);
 					}
-					else {
+					else if(y == 1){
 						Pilote.allerVersPoint(0, -1);
+					}
+					else if(y == -1) {
+						Pilote.allerVersPoint(0, 0);
 					}
 					MouvementsBasiques.chassis.travel(5);
 	//				MouvementsBasiques.chassis.travel(60); MouvementsBasiques.chassis.waitComplete();
-					try {
-						Pince.ouvrir();
-					}
-					catch(OuvertureException e) {
-						;
-					}
+					
 					palet = PaletUltrason.dichotomique(1);
 				}
 				
