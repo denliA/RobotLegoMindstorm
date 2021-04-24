@@ -219,6 +219,16 @@ public class PaletUltrason {
 		}
 		return(2);
 			
-	}
+	}//fin dichotomique
 	
+	/**
+	 * Permet de verifier que le robot est bien aligne avec le palet.
+	 * <p>Il faut ouvrir les pinces avant de lancer cette methode.</p>
+	 * @return true si le capteur de contact est actif
+	 */
+	public static boolean verif() {
+		MouvementsBasiques.chassis.travel(-30);
+		MouvementsBasiques.chassis.travel(40);
+		return Toucher.getTouche();
+	}
 }
