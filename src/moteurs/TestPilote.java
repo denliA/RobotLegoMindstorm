@@ -4,12 +4,12 @@ package moteurs;
 import capteurs.Capteur;
 import capteurs.Couleur;
 import capteurs.CouleurLigne;
+import carte.Carte;
+import carte.Point;
+import carte.Robot;
 import lejos.hardware.Button;
 import lejos.hardware.Sound;
-import lejos.hardware.Sounds;
 import lejos.robotics.chassis.WheeledChassis;
-import lejos.utility.Delay;
-import carte.*;
 
 public class TestPilote {
 	static WheeledChassis chassis = MouvementsBasiques.chassis;
@@ -136,7 +136,7 @@ public class TestPilote {
 		Carte c = carte.Carte.carteUsuelle;
 		Robot r = c.getRobot();
 		r.setDirection(direction);  r.setPosition(x, y);
-		Point P = Pilote.verifierPalet(false);
+		Point P = Pilote.verifierPalet();
 		System.out.println("Point trouvé : "  + P);
 		System.out.println("Direction :" + r.getDirection());
 		

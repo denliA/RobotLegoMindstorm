@@ -227,8 +227,12 @@ public class PaletUltrason {
 	 * @return true si le capteur de contact est actif
 	 */
 	public static boolean verif() {
-		MouvementsBasiques.chassis.travel(-30);
-		MouvementsBasiques.chassis.travel(40);
+		Toucher.startScan();
+		MouvementsBasiques.chassis.travel(-10); MouvementsBasiques.chassis.waitComplete();
+		MouvementsBasiques.chassis.travel(13);
+		while(MouvementsBasiques.chassis.isMoving()&&!Toucher.getTouche()) {
+			;
+		}
 		return Toucher.getTouche();
 	}
 }
