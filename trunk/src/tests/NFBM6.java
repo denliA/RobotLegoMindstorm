@@ -1,6 +1,15 @@
 package tests;
 import capteurs.Couleur;
 import capteurs.Ultrason;
+import carte.Carte;
+import carte.Point;
+import carte.Robot;
+import interfaceEmbarquee.Configurations;
+import interfaceEmbarquee.Picker;
+import lejos.hardware.Button;
+import lejos.hardware.lcd.LCD;
+import moteurs.Pilote;
+
 /**
  * <p>Situation initiale :
  * 		<ul>
@@ -16,8 +25,28 @@ import capteurs.Ultrason;
  */
 
 public class NFBM6 implements interfaceEmbarquee.Lancable{
-	
+	Carte carte = Carte.carteUsuelle;
+	Robot robot = carte.getRobot();
 	public void lancer() {
+		LCD.clear();
+		new Picker("Colonne départ?", Configurations.departX, true).lancer();
+		new Picker("Ligne départ ?", Configurations.departY, true).lancer();
+		new Picker("Direction ?", Configurations.departD, true).lancer();
+		
+		robot.setPosition(Float.parseFloat(Configurations.departX.getVal()), Float.parseFloat(Configurations.departY.getVal()));
+		robot.setDirection((Configurations.departD.getVal() == "porte" ? 90 : 270));
+		float avancement = robot.getDirection() == 90 ? 1 : -1;
+		int verifies=0; Point point;
+		do {
+			point = Pilote.verifierPalet(Pilote.DEVANT);
+			if(point == Point.INCONNU) {
+				Pilote.allerVersPoint(robot.getPosition().getX(), robot.getPosition().getY() + avancement);
+			}
+		} while(point == Point.INCONNU && verifies<3);
+		
+		LCD.drawString("Palet dans "+point, 3, 0);
+		Button.waitForAnyPress();
+		
 	}
 	
 	public String getTitre() {

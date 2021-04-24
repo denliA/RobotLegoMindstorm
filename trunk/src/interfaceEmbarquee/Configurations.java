@@ -21,10 +21,17 @@ public enum Configurations{
 	
 	musique("megalovania",new String[] {"megalovania","victory","losing"}),
 	bruitage("wow",new String[] {"wow","easy","ohNo","nani","missionFailed","whilhelmScream","goatScream","nope","ennemySpotted","targetAcquired","targetLocked"}),
-	danse("victoire",new String[] {"victoire","defaite"});
+	danse("victoire",new String[] {"victoire","defaite"}),
+	
+	arriveeX("0", new String[] {"-2", "-1", "0", "1", "2", "3"}),
+	arriveeY("0", new String[] {"-2", "-1", "0", "1", "2", "3"}),
+	departX("0", new String[] {"-2", "-1", "0", "1", "2", "3"}),
+	departY("0", new String[] {"-2", "-1", "0", "1", "2", "3"}), 
+	departD("porte", new String[] {"porte", "fenetre"}),
+	campAdverse("porte", new String[] {"porte", "fenetre"});
 	
 	
-	/**
+	 /**
      * valeur choisie par défaut. Peut etre modifiée par l'utilisateur dans le Picker. 
      * @see Picker
      */

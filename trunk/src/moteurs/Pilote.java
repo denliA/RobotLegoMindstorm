@@ -199,7 +199,25 @@ public class Pilote {
 		suivreLigne(Couleur.getLastCouleur());
 	}
 	
+	/**
+	 * Permet de lancer un suivi de ligne de manière non bloquante
+	 * @param c couleur à suivre
+	 */
+	public static void lancerSuivi(CouleurLigne c) {
+		new Thread(new ArgRunnable(c) {
+			public void run() {
+				suivreLigne((CouleurLigne)truc);
+			}
+		}).start();
+	}
 	
+	/**
+	 * Permet d'arrêter le suivi de ligne lancé
+	 */
+	public static void arreterSuivi() {
+		seDeplace = false;
+		chassis.waitComplete();
+	}
 	
 	/**
 	 * Se redresser sur la ligne précisée en faisant deux cycles de redressement
@@ -595,7 +613,6 @@ public class Pilote {
 			direction = (direction+180)%360;
 			robot.setDirection(direction);
 		}
-		//		System.out.println("Position juste AVANT le mouvement : " + robot);
 		if (x == 0 && y==0 && y_depart != y) {
 			allerVersPoint(1, y);
 			allerVersPoint(0, y);
@@ -622,7 +639,6 @@ public class Pilote {
 		else {
 			inverse = false;
 		}
-//		System.out.println("det: " + det + "y>y_depart:  " + (y>y_depart) + "Inverse? : "+inverse);
 		if (x != x_depart) {
 			int bonne_bifurquation = (det ? -1 : 1)*(x>x_depart ? -1 : 1);
 			if (Math.abs(y_depart)==2 || y_depart ==0||true) {chassis.travel(30); chassis.waitComplete();}
@@ -684,11 +700,22 @@ public class Pilote {
 		else {
 			robot.setDirection(robot.getDirection() == 270 ? 90 : 270);
 		}
-//		System.out.println("Position juste après le mouvement : " + robot);
 	}
 	
 	/**
-	 * Permet de faire aller le robot vers le camp indiqué, derrière la ligne blanche, puis se retourner
+	 * Permet au robot d'aller vers le camp indiqué sans suivre de ligne 
+	 * @param direction angle indiquant la direction du bon camp
+	 */
+	public static void rentrer(float direction) {
+		chassis.rotate(robot.getDirection() - direction); chassis.waitComplete();
+		Couleur.blacheTouchee();
+		chassis.travel(INF);
+		while(!Couleur.blacheTouchee());
+		chassis.stop(); chassis.waitComplete();
+	}
+	
+	/**
+	 * Permet de faire aller le robot vers le camp indiqué en suivant une ligne, derrière la ligne blanche, puis se retourner
 	 * <p> IMPORTANT : Le robot doit avoir une position calibrée pour pouvoir faire ça. Si il ne l'est pas quand cette méthode est appelée, 
 	 * le robot va d'abord se calibrer avant de rentrer.
 	 * @param direction le camp vers lequel le robot doit aller. "table", "fenetre" ou "" si le camp n'a pas d'importance
@@ -698,7 +725,7 @@ public class Pilote {
 	}
 	
 	/**
-	 * Permet de faire aller le robot vers le camp indiqué, derrière la ligne blanche, puis se retourner
+	 * Permet de faire aller le robot vers le camp indiqué en suivant une ligne, derrière la ligne blanche, puis se retourner
 	 * <p> IMPORTANT : Le robot doit avoir une position calibrée pour pouvoir faire ça. Si il ne l'est pas quand cette méthode est appelée, 
 	 * le robot va d'abord se calibrer avant de rentrer.
 	 * @param direction le camp vers lequel le robot doit aller. "table", "fenetre" ou "" si le camp n'a pas d'importance
@@ -768,10 +795,32 @@ public class Pilote {
 			robot.setPosition(x, -2);
 		}
 	}
-
+	
+	/** Pour la fonction {@link #verifierPalet(int)} Indique qu'on doit vérifier si il y a un palet dans l'intersection en face*/
+	public static int DEVANT = 0b100;
+	/** Pour la fonction {@link #verifierPalet(int)} Indique qu'on doit vérifier si il y a un palet dans l'une des deux intersections à gauche/à droite*/
+	public static int ACOTE = 0b010;
+	/** Pour la fonction {@link #verifierPalet(int)} Indique qu'on doit vérifier si il y a un palet dans l'intersection derrière*/
+	public static int DERRIERE = 0b001;
 	
 	
-	public static Point verifierPalet(boolean derriere) throws PositionPasCalibreeException{
+	/**
+	 * Vérifie <b>à partir d'une intersection, et depuis une position calibrée</b>, si un palet se trouve dans l'intérsection d'aprés (sur les longues lignes),
+	 * ou dans l'une des deux intersections à coté (sur les courtes lignes)
+	 * 
+	 * @return la position du premier palet trouvé, ou Point.INCONNU si aucun palet n'a été trouvé.
+	 */
+	public static Point verifierPalet() {
+		return verifierPalet(DEVANT|ACOTE);
+	}
+	
+	/**
+	 * Vérifie <b>à partir d'une intersection, et depuis une position calibrée</b>, si un palet se trouve dans les intersections indiquées en paramètre
+	 * parmi les intersections autour
+	 * @param averifier indique les cotés à vérifier parmi {@link #DEVANT} , {@link #ACOTE} , et {@link #DERRIERE}
+	 * @return la position du premier palet trouvé, ou Point.INCONNU si aucun palet n'a été trouvé.
+	 */
+	public static Point verifierPalet(int averifier){
 		
 		float direction = robot.getDirection();
 		float x = robot.getPosition().getX();
@@ -787,18 +836,14 @@ public class Pilote {
 			tournerJusqua(ligne, true, 250, 250); tournerJusqua(ligne, false, 50, 20);
 			robot.setDirection(direction=(direction+90));
 		}
-//		System.out.println("[VerifierPalet] connait direction : " + robot);
 		
 		float prochain_y = (direction == 90 ?  y+1 : y-1);
 		boolean au_centre = (x==0);
 		
-//		System.out.println("[VerifierPalet] Prochain point : " + new Point(x, prochain_y));
 		
-		if(Math.abs(prochain_y)<2) {
-//			System.out.println("[VerifierPalet] Je vérifie ce dernier");
+		if(Math.abs(prochain_y)<2 && (DEVANT&averifier)!=0) {
 			Ultrason.setDistance();
 			if(Ultrason.getDistance() <= .64f && Ultrason.getDistance() >= .40f) {
-//				System.out.println("[VerifierPalet] Trouvé!! " + Ultrason.getDistance() + "  " + new Point(x,prochain_y));
 				return new Point(x,prochain_y);
 			}
 		}
@@ -809,9 +854,8 @@ public class Pilote {
 		if(Math.abs(x)==2) {
 			// on ne regarde pas sur les cotés
 		}
-		if(!au_centre) {
+		if(!au_centre && (averifier&ACOTE) != 0) {
 			boolean a_droite = (x==1 && direction == 90 || x==-1 && direction == 270);
-//			System.out.println("[VerifierPalet] je regarde sur les cotés " + (a_droite ? "à droite" : "à gauche"));
 			tournerJusqua(intersection, a_droite, 250, 300); tournerJusqua(intersection, !a_droite, 50, 20);
 			robot.setDirection(direction = (direction + (a_droite? 90 : -90))%360);
 			System.out.println("[verifierPalet] Direction après avoir tourné: " + robot.getDirection());
@@ -823,13 +867,11 @@ public class Pilote {
 				return new Point(-x, y);
 			}
 			else {
-//				System.out.println("[VerifierPalet] pas au centre mais pas la bonne distance sur les cotés :( --> distance="+Ultrason.getDistance());
 			}
 			tournerJusqua(ligne, !a_droite, 250, 150); tournerJusqua(ligne, a_droite, 50, 20);
 			robot.setDirection(direction = (direction + (a_droite? -90 : 90))%360);
 		}
-		else {
-//			System.out.println("[VerifierPalet] Je suis au centre ");
+		else  if ((averifier&ACOTE) != 0){
 			float coef_a_droite = (direction==90 ? -1 : 1);
 			tournerJusqua(intersection, true, 250, 300); tournerJusqua(intersection, false, 50, 20);
 			robot.setDirection(direction = ((direction + 90)%360));
@@ -853,6 +895,57 @@ public class Pilote {
 		return Point.INCONNU;
 	}
 
+	public static Point trouverPalet() {
+		
+		float x = robot.getPosition().getX(), y = robot.getPosition().getY();
+		Point point;
+		
+		if(robot.getPosition() == Point.INCONNU) {
+			throw new exceptions.PositionPasCalibreeException();
+		}
+		else if(robot.getDirection()%180 == 0) {
+			tournerJusqua(Ligne.xToLongues.get(x), true, 250, 250); tournerJusqua(Ligne.xToLongues.get(x), false, 50, 20);
+			robot.setDirection(robot.getDirection() + 90);
+		}
+		
+		if(x==0) {
+			allerVersPoint(x=1, y);
+		}
+		
+		CouleurLigne ligne = Ligne.xToLongues.get(x);
+		
+		float avancement = robot.getDirection() == 90 ? 1 : -1;
+		if(Math.abs(y) == 2 || y == 0) {
+			point = verifierPalet(DEVANT);
+			if (point != Point.INCONNU) {
+				return point;
+			}
+			else {
+				allerVersPoint(x, y+avancement);
+				if(y == 0) {
+					CouleurLigne inters = Ligne.yToLongues.get(robot.getPosition().getY());
+					chassis.travel(15);
+					tournerJusqua(ligne, true, 250, 200); tournerJusqua(ligne, true, 50, 20);
+					lancerSuivi(ligne);
+					while(Couleur.getLastCouleur()!=inters);
+					arreterSuivi();
+					avancement = -avancement;
+				}
+			}
+		}
+		int lignes_verifiees = 0; y  = robot.getPosition().getY();
+		while(lignes_verifiees<3) {
+			point = verifierPalet();
+			if(point!=Point.INCONNU) {
+				return point;
+			}
+			allerVersPoint(x, y+avancement);
+			lignes_verifiees++;
+		}
+		
+		return Point.INCONNU;
+	}
+	
 }
 
 /*

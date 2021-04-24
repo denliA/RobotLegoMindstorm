@@ -24,8 +24,10 @@ public class NFA2 implements interfaceEmbarquee.Lancable{
 		couleurs.add(CouleurLigne.BLEUE);
 		couleurs.add(CouleurLigne.VERTE);
 		couleurs.add(CouleurLigne.BLANCHE);
-		Pilote.chercheLigne(couleurs, 25, 30, 180, true);
-		Couleur.stopScan();
+		CouleurLigne couleur_trouvee;
+		do {
+			couleur_trouvee = Pilote.chercheLigne(couleurs, 25, 30, 180, true);
+		} while(couleur_trouvee == CouleurLigne.VIDE);
 	}
 	
 	public String getTitre() {

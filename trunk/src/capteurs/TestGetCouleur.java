@@ -14,7 +14,7 @@ public class TestGetCouleur {
 			if (buffer)
 				testGetLastCouleur();
 			else 
-				collectionnerDonnees("./Scans/20210415/NoirePorteFenetre_", false, 20);
+				collectionnerDonnees("./Scans/20210417/BlanchePorteTableauMur", false, 10);
 			buffer=!buffer;
 			button = Button.waitForAnyPress();
 		}

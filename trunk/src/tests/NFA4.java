@@ -10,6 +10,7 @@ import capteurs.Couleur;
 public class NFA4 implements interfaceEmbarquee.Lancable{
 	
 	public void lancer() {
+		new NFA3().lancer();
 	}
 	
 	public String getTitre() {

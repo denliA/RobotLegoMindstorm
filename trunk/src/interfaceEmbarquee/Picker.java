@@ -25,6 +25,7 @@ public class Picker implements Lancable{
 	 * 
 	 */
 	Configurations configuration;
+	boolean une_seule_fois;
 	
 	/**
 	 * Constructeur du Picker.
@@ -36,8 +37,13 @@ public class Picker implements Lancable{
 	 * 
 	 */
 	public Picker(String titre, Configurations c) {
+		this(titre, c , false);
+	}
+	
+	public Picker(String titre, Configurations c, boolean une_seule_fois) {
 		this.titre=titre;
 		this.configuration=c;
+		this.une_seule_fois = false;
 	}
 	
 	//affiche 1 seule configuration à la fois
@@ -68,7 +74,7 @@ public class Picker implements Lancable{
 		//indice du 1er caractère a afficher. C'est un curseur qui se déplace dans le buffer et permet le defilement horizontal
 		int debutColonne=0;
 		//tant que l'utilisateur n'appuie pas sur le bouton "ESCAPE", on reste dans la boucle
-		while(button != Button.ID_ESCAPE) {
+		while(button != Button.ID_ESCAPE && !(une_seule_fois && button == Button.ID_ENTER)) {
 			LCD.clear(1,2, 100); //nettoie l'écran	
 			
 			/** affiche une croix sur la configuration actuellement choisie. Elle est stockée dans la variable val de Configurations

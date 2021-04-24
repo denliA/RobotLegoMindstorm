@@ -1,6 +1,10 @@
 package tests;
 import capteurs.Toucher;
+import capteurs.Capteur;
+import capteurs.Couleur;
+import capteurs.Toucher;
 import moteurs.MouvementsBasiques;
+import moteurs.Pilote;
 
 /**
  * <p>Situation initiale :
@@ -17,6 +21,15 @@ import moteurs.MouvementsBasiques;
 public class NFBM3 implements interfaceEmbarquee.Lancable{
 	
 	public void lancer() {
+		new Capteur();
+		Couleur.startScanAtRate(0);
+		Toucher.startScan();
+		
+		Pilote.lancerSuivi(Couleur.getLastCouleur());
+		while(!Toucher.getTouche()) {
+			
+		}
+		Pilote.arreterSuivi();
 	}
 	
 	public String getTitre() {

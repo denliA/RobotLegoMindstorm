@@ -213,7 +213,7 @@ public class InterfaceTextuelle {
 	 * @see Configurations
 	 */
 	Lancable lancerDanse = new Lancable() {
-		//les fichiers.waw doivent etre mono,8000Hz et unsigned 8 bit
+		//les fichiers.waw doivent être mono,8000Hz et unsigned 8 bit
 		public void lancer() {
 			Danse.startDance();
 		}
