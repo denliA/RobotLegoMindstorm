@@ -15,7 +15,6 @@ public class NFA0 implements interfaceEmbarquee.Lancable{
 	
 	public void lancer() {
 		new Capteur();
-		Couleur.setScanMode(Couleur.RGBMODE);
 		Couleur.startScanAtRate(0);
 		Thread t = new Thread(new Runnable() {
 			@Override
