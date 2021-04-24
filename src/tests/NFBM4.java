@@ -17,6 +17,7 @@ public class NFBM4 implements interfaceEmbarquee.Lancable{
 	public void lancer() {
 		int button = -1;
 		Couleur.startScanAtRate(10);
+		MouvementsBasiques.chassis.setLinearSpeed(15);
 		while (button != Button.ID_ESCAPE) {
 			button = Button.waitForAnyPress();
 			if (button == Button.ID_ENTER) {
