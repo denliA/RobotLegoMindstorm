@@ -2,6 +2,8 @@ package tests;
 
 import capteurs.Capteur;
 import capteurs.Couleur;
+import capteurs.CouleurLigne;
+import lejos.utility.Delay;
 import moteurs.Pilote;
 
 /**
@@ -16,10 +18,13 @@ public class NFA0 implements interfaceEmbarquee.Lancable{
 	public void lancer() {
 		new Capteur();
 		Couleur.startScanAtRate(0);
+		Delay.msDelay(1000);
 		Thread t = new Thread(new Runnable() {
 			@Override
 			public void run() {
-				Pilote.suivreLigne(Couleur.getLastCouleur());
+				CouleurLigne couleur = Couleur.getLastCouleur();
+				System.out.println(couleur);
+				Pilote.suivreLigne(couleur);
 			}	
 		});
 		t.start(); //lance le suivi de ligne
