@@ -54,14 +54,12 @@ public class P3 implements Lancable {
 		carte.calibrerPosition();
 		
 		if(!Pince.getOuvert()) Pince.ouvrir();
-//		Pilote.rentrer(""); (Pas besoin pour trouver palet??)
 		Pilote.trouverPalet();
 		Pilote.lancerSuivi((robot.getDirection()%180==0) ? Ligne.yToLongues.get(robot.getPosition().getY()) : Ligne.xToLongues.get(robot.getPosition().getX()));
 		while(!Toucher.getTouche()) { /* rien */ }
 		Pilote.arreterSuivi(); 
-		Pince.fermer(750);
+		Pince.fermer();
 		Pilote.rentrer(robot.getPosition().getY() < 0 ? 270 : 90); Pince.ouvrir();
-//		ModeSolo.ramasserPalet(1, carte.getRobot().getDirection()==90); Valeur sûre mais met trop de temps.
 		
 	}
 	
