@@ -24,29 +24,10 @@ import moteurs.Pilote;
  * @see carte
  */
 
-public class NFBM6 implements interfaceEmbarquee.Lancable{
-	Carte carte = Carte.carteUsuelle;
-	Robot robot = carte.getRobot();
-	public void lancer() {
-		LCD.clear();
-		new Picker("Colonne départ?", Configurations.departX, true).lancer();
-		new Picker("Ligne départ ?", Configurations.departY, true).lancer();
-		new Picker("Direction ?", Configurations.departD, true).lancer();
-		
-		robot.setPosition(Float.parseFloat(Configurations.departX.getVal()), Float.parseFloat(Configurations.departY.getVal()));
-		robot.setDirection((Configurations.departD.getVal() == "porte" ? 90 : 270));
-		float avancement = robot.getDirection() == 90 ? 1 : -1;
-		int verifies=0; Point point;
-		do {
-			point = Pilote.verifierPalet(Pilote.DEVANT);
-			if(point == Point.INCONNU) {
-				Pilote.allerVersPoint(robot.getPosition().getX(), robot.getPosition().getY() + avancement);
-			}
-		} while(point == Point.INCONNU && verifies<3);
-		
-		LCD.drawString("Palet dans "+point, 3, 0);
-		Button.waitForAnyPress();
-		
+public class NFBM6 extends P2{
+	public NFBM6() {
+		super();
+		this.saisirPalet = false;
 	}
 	
 	public String getTitre() {

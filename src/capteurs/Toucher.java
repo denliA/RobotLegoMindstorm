@@ -12,9 +12,10 @@ public class Toucher{
 	 */
 	private static boolean status;
 	private static boolean touche;
+	private static boolean souvenir;
 	
 	/**
-	 * Le timer permet de lancer des analyse de manière périodique (à chaque fois qu'un certain temps s'ecoule).
+	 * Le timer permet de lancer des analyse de maniï¿½re pï¿½riodique (ï¿½ chaque fois qu'un certain temps s'ecoule).
 	 */
 	private static Timer lanceur = 
 		new Timer(100, new TimerListener() {
@@ -47,7 +48,7 @@ public class Toucher{
 		//recuperation des donnees
 		Capteur.TOUCHER.fetchSample(touched, 0);
 		touche = (touched[0]==1);
-		
+		souvenir|=touche;
 	}
 	
 	/**
@@ -66,6 +67,14 @@ public class Toucher{
 		lanceur.stop();
 		status = false;
 		touche = false;
+	}
+	
+	public static boolean aToucheAUnMoment() {
+		if(souvenir) {
+			souvenir = false; 
+			return true;
+		}
+		else return false;
 	}
 }
 
