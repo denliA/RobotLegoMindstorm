@@ -75,32 +75,54 @@ public class P7 implements interfaceEmbarquee.Lancable{
 		//gestion du vide : cas ou le robot capte le mur
 		do{
 			switch(palet) {
+			//on a trouve un palet
 			case 0:
-				//Deposer le palet derriere la ligne blanche
+				//On verifie que le palet est bien la
+				//fermeture puis reouverture des pinces necessaires avant de lancer la methode verif (permet d'aligner le palet avec le capteur contact)
 				try {
 					Pince.fermer();
 				}
 				catch(OuvertureException e) {
 					;
 				}
-				//On redresse le robot de maniere a ce qu'il soit face au camp ou il souhaite aller
-				System.out.println("debut angle \t\t" + "Direction : " + Carte.carteUsuelle.getRobot().getDirection() + "\tAngle fait : " + PaletUltrason.getAngle() + " A faire : " + (angleCamp-(Carte.carteUsuelle.getRobot().getDirection()+PaletUltrason.getAngle())%360));
-				MouvementsBasiques.chassis.rotate(angleCamp-(Carte.carteUsuelle.getRobot().getDirection()+PaletUltrason.getAngle())%360); MouvementsBasiques.chassis.waitComplete();
-				System.out.println("fin angle");
-				MouvementsBasiques.chassis.travel(Float.POSITIVE_INFINITY);
-				System.out.println("Avance");
-				Couleur.blacheTouchee();
-				while(!Couleur.blacheTouchee()) {
-					;
-				}
-				MouvementsBasiques.chassis.stop();
-				try{
+				try {
 					Pince.ouvrir();
 				}
 				catch(OuvertureException e) {
 					;
 				}
-				succes = true;
+				//si on a bien un palet 
+				if(PaletUltrason.verif()) {
+					//Deposer le palet derriere la ligne blanche
+					try {
+						Pince.fermer();
+					}
+					catch(OuvertureException e) {
+						;
+					}
+					//On redresse le robot de maniere a ce qu'il soit face au camp ou il souhaite aller
+					System.out.println("debut angle \t\t" + "Direction : " + Carte.carteUsuelle.getRobot().getDirection() + "\tAngle fait : " + PaletUltrason.getAngle() + " A faire : " + (angleCamp-(Carte.carteUsuelle.getRobot().getDirection()+PaletUltrason.getAngle())%360));
+					MouvementsBasiques.chassis.rotate(angleCamp-(Carte.carteUsuelle.getRobot().getDirection()+PaletUltrason.getAngle())%360); MouvementsBasiques.chassis.waitComplete();
+					System.out.println("fin angle");
+					MouvementsBasiques.chassis.travel(Float.POSITIVE_INFINITY);
+					System.out.println("Avance");
+					Couleur.blacheTouchee();
+					while(!Couleur.blacheTouchee()) {
+						;
+					}
+					MouvementsBasiques.chassis.stop();
+					try{
+						Pince.ouvrir();
+					}
+					catch(OuvertureException e) {
+						;
+					}
+					succes = true;
+				}
+				//si faux-positif : on repart dans la boucle 
+				else {
+					palet = PaletUltrason.dichotomique(1);
+				}
 				break;
 			//vide
 			case 1:
