@@ -23,8 +23,9 @@ public class NFBM1 implements interfaceEmbarquee.Lancable{
 			LCD.drawString("Couleur detectee", 1, 0);
 			button = Button.waitForAnyPress();
 			if (button == Button.ID_ENTER) {
+				LCD.clear(2,3,10);
 				couleur = Couleur.getLastCouleur();
-				LCD.drawString(couleur.toString(), 2, 3);
+				LCD.drawString(couleur.toString(), 2, 3); 
 			}
 			Button.waitForAnyEvent();
 		}
