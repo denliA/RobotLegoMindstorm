@@ -99,14 +99,21 @@ public class ModeSolo {
 		MouvementsBasiques.chassis.setLinearSpeed(vitesse);
 		MouvementsBasiques.chassis.setLinearAcceleration(acceleration);
 		
+		//Nombre de palets ramassés
 		int scoredPalets=0;
+		//Nombre de lignes parcourues
 		int lignesParcourues=0;
+		//Si le robot tient un palet
 		boolean tient_palet=false;
+		//Pour indiquer dans quel sens le robot va tourner selon son point de départ
 		boolean droite=false;
 		boolean gauche=false;
 		boolean milieu=false;
+		//Utilisé pour faire un aller retour dans une ligne de couleur
 		int rien_trouve;
+		//Si le capteur de toucher détecte un palet
 		boolean touche=false;
+		//Pour ramasser trois palets par ligne
 		int trio;
 		
 		//Ouvrir les pinces si ce n'est pas deja fait
@@ -144,14 +151,16 @@ public class ModeSolo {
 			}
 		}
 		
-		
+		//conditions de sortie de la boucle
 		while((scoredPalets<nbPalets)&&(lignesParcourues<3)) {
 			if (paletScored) {
+				//le robot a déjà ramassé un palet
 				trio=1;
 				//la prochaine fois on ne rentre plus dans cette boucle
 				paletScored=false; 
 			}
 			else {
+				//on initialise trio à zero
 				trio=0;
 			}
 			rien_trouve = 0;
@@ -193,6 +202,7 @@ public class ModeSolo {
 						MouvementsBasiques.chassis.travel(-8); MouvementsBasiques.chassis.waitComplete();
 						lignesParcourues++;
 					}
+					//robot fait demi-tour
 					Pilote.tournerJusqua(couleur, true,250);
 					Pilote.tournerJusqua(couleur, false, 50,50);
 				}
@@ -209,6 +219,7 @@ public class ModeSolo {
 						Pilote.tournerJusqua(couleur, false, 50, 50); 
 					}
 					else {
+						//robot fait demi-tour
 						Pilote.tournerJusqua(couleur, true,250);
 						Pilote.tournerJusqua(couleur, false, 50,50);
 					}
@@ -221,8 +232,10 @@ public class ModeSolo {
 						lignesParcourues++;
 						rien_trouve++;
 					}
-					else
-						rien_trouve++;	
+					else {
+						rien_trouve++;
+					}
+					//robot fait demi-tour
 					Pilote.tournerJusqua(couleur, true,250);
 					Pilote.tournerJusqua(couleur, false, 50,50);
 				}
