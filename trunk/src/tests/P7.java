@@ -1,9 +1,9 @@
 package tests;
 
 import capteurs.Couleur;
-import capteurs.Ultrason;
 import capteurs.PaletUltrason;
 import capteurs.Toucher;
+import capteurs.Ultrason;
 import carte.Carte;
 import exceptions.OuvertureException;
 import lejos.hardware.Button;
@@ -50,11 +50,12 @@ public class P7 implements interfaceEmbarquee.Lancable{
 		}
 		new capteurs.Capteur();
 		capteurs.Couleur.startScanAtRate(0);
-		//Fermer les pinces pour eviter d'entrainer le palet avec le robot.
+		//Ouvrir les pinces pour mieux calibrer (les pinces fermees le poids en avant donne un risque de leger bascule qui fausse la mesure (rarement)
+		//De plus on peut trouver le palet et l'entrainer avec nous sans le faire exprès, nous vérifions cela en allant en (0,0) plus bas.
 		try {
-			Pince.fermer();
+			Pince.ouvrir();
 		}
-		//Rien a faire en cas d'exception (car cela signifie que les pinces sont deja fermees), on continue programme
+		//Rien a faire en cas d'exception (car cela signifie que les pinces sont deja ouvertes), on continue programme
 		catch(OuvertureException e) {
 			;
 		}
@@ -62,105 +63,137 @@ public class P7 implements interfaceEmbarquee.Lancable{
 		Carte.carteUsuelle.calibrerPosition();
 		//Aller au centre du terrain
 		Pilote.allerVersPoint(0, 0);
-		//Aller chercher le palet
+		//Vérification de la présence ou non d'un palet entraine par les pinces du robot :
+		boolean done = false;
 		try {
+			Pince.fermer();
 			Pince.ouvrir();
+			done = PaletUltrason.verif();
+			Pince.fermer();
 		}
-		catch(OuvertureException e) {
-			;
+		catch(OuvertureException Pourquoiiiiii) {
+			System.out.println("???????????");
 		}
-		int palet = PaletUltrason.dichotomique(1);
-		System.out.println("palet : "+palet);
-		boolean succes = false;
-		//gestion du vide : cas ou le robot capte le mur
-		do{
-			switch(palet) {
-			//on a trouve un palet
-			case 0:
-				//On verifie que le palet est bien la
-				//fermeture puis reouverture des pinces necessaires avant de lancer la methode verif (permet d'aligner le palet avec le capteur contact)
-				try {
-					Pince.fermer();
-				}
-				catch(OuvertureException e) {
-					;
-				}
-				try {
-					Pince.ouvrir();
-				}
-				catch(OuvertureException e) {
-					;
-				}
-				//si on a bien un palet 
-				if(PaletUltrason.verif()) {
-					//Deposer le palet derriere la ligne blanche
+		if(!done) {
+			//Aller chercher le palet
+			int palet = PaletUltrason.dichotomique(1);
+			System.out.println("palet : "+palet);
+			boolean succes = false;
+			//gestion du vide : cas ou le robot capte le mur
+			do{
+				switch(palet) {
+				//on a trouve un palet
+				case 0:
+					//On verifie que le palet est bien la
+					//fermeture puis reouverture des pinces necessaires avant de lancer la methode verif (permet d'aligner le palet avec le capteur contact)
 					try {
 						Pince.fermer();
 					}
 					catch(OuvertureException e) {
 						;
 					}
-					//On redresse le robot de maniere a ce qu'il soit face au camp ou il souhaite aller
-					System.out.println("debut angle \t\t" + "Direction : " + Carte.carteUsuelle.getRobot().getDirection() + "\tAngle fait : " + PaletUltrason.getAngle() + " A faire : " + (angleCamp-(Carte.carteUsuelle.getRobot().getDirection()+PaletUltrason.getAngle())%360));
-					MouvementsBasiques.chassis.rotate(angleCamp-(Carte.carteUsuelle.getRobot().getDirection()+PaletUltrason.getAngle())%360); MouvementsBasiques.chassis.waitComplete();
-					System.out.println("fin angle");
-					MouvementsBasiques.chassis.travel(Float.POSITIVE_INFINITY);
-					System.out.println("Avance");
-					Couleur.blacheTouchee();
-					while(!Couleur.blacheTouchee()) {
-						;
-					}
-					MouvementsBasiques.chassis.stop();
-					try{
+					try {
 						Pince.ouvrir();
 					}
 					catch(OuvertureException e) {
 						;
 					}
-					succes = true;
-				}
-				//si faux-positif : on repart dans la boucle 
-				else {
+					//si on a bien un palet 
+					if(PaletUltrason.verif()) {
+						//Deposer le palet derriere la ligne blanche
+						try {
+							Pince.fermer();
+						}
+						catch(OuvertureException e) {
+							;
+						}
+						//On redresse le robot de maniere a ce qu'il soit face au camp ou il souhaite aller
+						System.out.println("debut angle \t\t" + "Direction : " + Carte.carteUsuelle.getRobot().getDirection() + "\tAngle fait : " + PaletUltrason.getAngle() + " A faire : " + (angleCamp-(Carte.carteUsuelle.getRobot().getDirection()+PaletUltrason.getAngle())%360));
+						MouvementsBasiques.chassis.rotate(angleCamp-(Carte.carteUsuelle.getRobot().getDirection()+PaletUltrason.getAngle())%360); MouvementsBasiques.chassis.waitComplete();
+						System.out.println("fin angle");
+						MouvementsBasiques.chassis.travel(Float.POSITIVE_INFINITY);
+						System.out.println("Avance");
+						Couleur.blacheTouchee();
+						while(!Couleur.blacheTouchee()) {
+							;
+						}
+						MouvementsBasiques.chassis.stop();
+						try{
+							Pince.ouvrir();
+						}
+						catch(OuvertureException e) {
+							;
+						}
+						succes = true;
+					}
+					//si faux-positif : on repart dans la boucle 
+					else {
+						palet = PaletUltrason.dichotomique(1);
+					}
+					break;
+				//vide
+				case 1:
+					MouvementsBasiques.chassis.setLinearAcceleration(200);
+					MouvementsBasiques.chassis.stop();
+					//il, le robot, retourne ou il etait (son point de depart, le centre de la table)
+					MouvementsBasiques.chassis.travel(-PaletUltrason.getDistance()); MouvementsBasiques.chassis.waitComplete();
+					MouvementsBasiques.chassis.rotate(-PaletUltrason.getAngle()+180);MouvementsBasiques.chassis.waitComplete();
+					palet = PaletUltrason.dichotomique(1);
+					break;
+				//gestion du "pas de palet" : cas ou le robot est trop proche du palet pour le voir avec le capteur ultrason
+				case 2:
+					try {
+						Pince.fermer();
+					}
+					catch(OuvertureException e) {
+						;
+					}
+					Pilote.tournerJusqua(capteurs.CouleurLigne.NOIRE, true, 50, 10);
+					float y = Carte.carteUsuelle.getRobot().getPosition().getY();
+					if(y == 0) {
+						Pilote.allerVersPoint(0, 1);
+					}
+					else {
+						Pilote.allerVersPoint(0, -1);
+					}
+					MouvementsBasiques.chassis.travel(5);
+	//				MouvementsBasiques.chassis.travel(60); MouvementsBasiques.chassis.waitComplete();
+					try {
+						Pince.ouvrir();
+					}
+					catch(OuvertureException e) {
+						;
+					}
 					palet = PaletUltrason.dichotomique(1);
 				}
-				break;
-			//vide
-			case 1:
-				MouvementsBasiques.chassis.setLinearAcceleration(200);
-				MouvementsBasiques.chassis.stop();
-				//il, le robot, retourne ou il etait (son point de depart, le centre de la table)
-				MouvementsBasiques.chassis.travel(-PaletUltrason.getDistance()); MouvementsBasiques.chassis.waitComplete();
-				MouvementsBasiques.chassis.rotate(-PaletUltrason.getAngle()+180);MouvementsBasiques.chassis.waitComplete();
-				palet = PaletUltrason.dichotomique(1);
-				break;
-			//gestion du "pas de palet" : cas ou le robot est trop proche du palet pour le voir avec le capteur ultrason
-			case 2:
-				try {
-					Pince.fermer();
-				}
-				catch(OuvertureException e) {
-					;
-				}
-				Pilote.tournerJusqua(capteurs.CouleurLigne.NOIRE, true, 50, 10);
-				float y = Carte.carteUsuelle.getRobot().getPosition().getY();
-				if(y == 0) {
-					Pilote.allerVersPoint(0, 1);
-				}
-				else {
-					Pilote.allerVersPoint(0, -1);
-				}
-				MouvementsBasiques.chassis.travel(5);
-//				MouvementsBasiques.chassis.travel(60); MouvementsBasiques.chassis.waitComplete();
-				try {
-					Pince.ouvrir();
-				}
-				catch(OuvertureException e) {
-					;
-				}
-				palet = PaletUltrason.dichotomique(1);
+				
+			}while(!succes);
+		}
+		else {
+			try {
+				Pince.fermer();
 			}
-			
-		}while(!succes);
+			catch(OuvertureException e) {
+				;
+			}
+			//On redresse le robot de maniere a ce qu'il soit face au camp ou il souhaite aller
+			System.out.println("debut angle \t\t" + "Direction : " + Carte.carteUsuelle.getRobot().getDirection() + "\tAngle fait : " + PaletUltrason.getAngle() + " A faire : " + (angleCamp-(Carte.carteUsuelle.getRobot().getDirection()+PaletUltrason.getAngle())%360));
+			MouvementsBasiques.chassis.rotate(angleCamp-(Carte.carteUsuelle.getRobot().getDirection()+PaletUltrason.getAngle())%360); MouvementsBasiques.chassis.waitComplete();
+			System.out.println("fin angle");
+			MouvementsBasiques.chassis.travel(Float.POSITIVE_INFINITY);
+			System.out.println("Avance");
+			Couleur.blacheTouchee();
+			while(!Couleur.blacheTouchee()) {
+				;
+			}
+			MouvementsBasiques.chassis.stop();
+			try{
+				Pince.ouvrir();
+			}
+			catch(OuvertureException e) {
+				;
+			}
+		}
 		System.out.println("Sorti");
 		Couleur.stopScan();
 		Toucher.stopScan();

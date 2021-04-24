@@ -184,10 +184,10 @@ public class PaletUltrason {
 			trouve = true;
 			dDepart = d;
 			System.out.println("dDepart vaut : "+dDepart);
-			
-			int tour = 10;
+			//On met 10.5 degres pour palier au problèmes mecaniques de decallages
+			double tour = 10.5;
 			while(tour>1) {
-				MouvementsBasiques.tourner(tour);
+				MouvementsBasiques.chassis.rotate(tour);MouvementsBasiques.chassis.waitComplete();
 				Ultrason.setDistance();
 				d = Ultrason.getDistance();
 				if(d<=dDepart) {
@@ -196,7 +196,7 @@ public class PaletUltrason {
 					angleTotal+=tour;
 				}
 				else {
-					MouvementsBasiques.tourner(-tour);
+					MouvementsBasiques.chassis.rotate(-tour);MouvementsBasiques.chassis.waitComplete();
 					angleTotal-=tour;
 					System.out.println("non : "+d);
 				}
