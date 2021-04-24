@@ -3,6 +3,7 @@ package tests;
 import capteurs.Couleur;
 import capteurs.CouleurLigne;
 import lejos.hardware.Button;
+import lejos.hardware.lcd.LCD;
 
 
 /**
@@ -16,13 +17,14 @@ public class NFBM1 implements interfaceEmbarquee.Lancable{
 	public void lancer() {
 		int button = -1;
 		CouleurLigne couleur;
-		Couleur.setScanMode(Couleur.RGBMODE);
-		Couleur.startScanAtRate(10);
+		Couleur.startScanAtRate(0);
+		LCD.clear();
 		while (button != Button.ID_ESCAPE) {
+			LCD.drawString("Couleur detectee", 1, 0);
 			button = Button.waitForAnyPress();
 			if (button == Button.ID_ENTER) {
 				couleur = Couleur.getLastCouleur();
-				System.out.println(couleur);
+				LCD.drawString(couleur.toString(), 2, 3);
 			}
 			Button.waitForAnyEvent();
 		}
