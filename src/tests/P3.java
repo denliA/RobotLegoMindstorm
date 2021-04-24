@@ -6,9 +6,7 @@ import capteurs.CouleurLigne;
 import carte.Ligne;
 import carte.Point;
 import interfaceEmbarquee.Lancable;
-import lejos.hardware.Sound;
 import lejos.robotics.chassis.Chassis;
-import modeSolo.ModeSolo;
 
 import java.util.Arrays;
 import java.util.Vector;
@@ -19,7 +17,7 @@ import carte.Carte;
 import moteurs.*;
 
 /**
- * <p>Le robot est posé sur la table mais pas sur une ligne, doit ramener le palet pose a une intersection dans le camp adverse</p>
+ * <p> Le robot est posé sur la table mais pas sur une ligne, doit ramener le palet pose a une intersection dans le camp adverse</p>
  * 
  */
 
@@ -48,17 +46,21 @@ public class P3 implements Lancable {
 	public void lancer() {
 		
 		new Capteur(); Couleur.startScanAtRate(0); Toucher.startScan();
-		if(Pince.getOuvert()) Pince.fermer();
+		//if(Pince.getOuvert()) Pince.fermer();
+		MouvementsBasiques.chassis.setLinearAcceleration(10);
+		MouvementsBasiques.chassis.setLinearSpeed(20);
 		
 		
 		carte.calibrerPosition();
+		
+		if(!Pince.getOuvert()) Pince.ouvrir();
 //		Pilote.rentrer(""); (Pas besoin pour trouver palet??)
 		Pilote.trouverPalet();
 		Pilote.lancerSuivi((robot.getDirection()%180==0) ? Ligne.yToLongues.get(robot.getPosition().getY()) : Ligne.xToLongues.get(robot.getPosition().getX()));
 		while(!Toucher.getTouche()) { /* rien */ }
 		Pilote.arreterSuivi(); 
-		Pince.fermer(500);
-		Pilote.rentrer(robot.getPosition().getY() < 0 ? 270 : 90);
+		Pince.fermer(750);
+		Pilote.rentrer(robot.getPosition().getY() < 0 ? 270 : 90); Pince.ouvrir();
 //		ModeSolo.ramasserPalet(1, carte.getRobot().getDirection()==90); Valeur sûre mais met trop de temps.
 		
 	}
@@ -72,7 +74,7 @@ public class P3 implements Lancable {
 		if(!Pince.getOuvert()) {
 			Pince.ouvrir();
 		}
-		float avancement;
+		float avancement, bonne_direction=Float.NaN;
 		boolean debut_noir;
 		CouleurLigne ligne = Couleur.getLastCouleur();
 		if(debut_noir = (ligne == CouleurLigne.NOIRE)) {
@@ -82,9 +84,9 @@ public class P3 implements Lancable {
 			chassis.travel(-15); chassis.waitComplete(); Pilote.tournerJusqua(ligne, true, 50, 0, 15); Pilote.tournerJusqua(ligne, false, 50, 0, 15);
 			carte.getRobot().setPosition(ligne == CouleurLigne.ROUGE ? -1 : 1, ligne == CouleurLigne.ROUGE ? -2 : 2);
 			carte.getRobot().setDirection(ligne == CouleurLigne.ROUGE ? 90 : 270);
+			bonne_direction = robot.getDirection();
 		}
 		
-		float bonne_direction = robot.getDirection();
 		
 		Ultrason.setDistance();
 		if(Ultrason.getDistance()<= .64f && Ultrason.getDistance()>= .40f) {
@@ -109,6 +111,7 @@ public class P3 implements Lancable {
 			Pilote.SetSeDeplace(false); chassis.waitComplete();
 			carte.calibrerPosition(ligne, CouleurLigne.BLANCHE, inters);
 			avancement = robot.getDirection() == 90 ? 1 : -1; 
+			bonne_direction = robot.getDirection();
 		}
 		else {
 			avancement = robot.getDirection() == 90 ? 1 : -1; 
@@ -130,10 +133,10 @@ public class P3 implements Lancable {
 		Pilote.SetSeDeplace(false); chassis.waitComplete();
 		Pince.fermer();
 		System.out.println("[P2Ultrason] pour rentrer : " + bonne_direction + " Mais on est à " + robot.getDirection());
-		chassis.rotate(90);
-		chassis.waitComplete();
-//		chassis.rotate((robot.getDirection()-bonne_direction)%360);
+//		chassis.rotate(90);
 //		chassis.waitComplete();
+		chassis.rotate((bonne_direction-robot.getDirection())%360);
+		chassis.waitComplete();
 		chassis.travel(Float.POSITIVE_INFINITY);
 		Couleur.blacheTouchee();
 		while(!Couleur.blacheTouchee());
@@ -150,8 +153,8 @@ public class P3 implements Lancable {
 	
 	
 	public static void main(String[] args) {
-//		new P3().lancer();
-		new P3().P2_Ultrason();
+		new P3().lancer();
+//		new P3().P2_Ultrason();
 		
 	}
 

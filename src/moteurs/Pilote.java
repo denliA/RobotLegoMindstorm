@@ -41,9 +41,9 @@ public class Pilote {
 	final private static float INF = Float.POSITIVE_INFINITY;
 	
 	
+	
 	static private boolean seDeplace = false;
 	static private boolean suiviLigne = false;
-
 	/**
 	 * Permet de savoir si le robot est en cours de déplacement
 	 * @return true ssi le robot se déplace
@@ -62,6 +62,7 @@ public class Pilote {
 	
 
 
+	public static boolean seMetBien=false;
 	/**
 	 * Fonction pour suivre une ligne de couleur sans s'en décaler
 	 * <p> La fonction doit être interrompue manuellement par l'appelant en appelant la méthode {@link #SetSeDeplace(boolean)}
@@ -69,6 +70,7 @@ public class Pilote {
 	 * @param c couleurLigne qu'on doit suivre
 	 */
 	public static void suivreLigne(CouleurLigne c) {
+		System.out.println("ENTREE DANS SUIVI");
 		seDeplace = true;
 		suiviLigne = true;
 		// vitesses d'avant l'appel, à remettre à la fin
@@ -114,9 +116,12 @@ public class Pilote {
 					trouve = tournerJusqua(c, true, vitesse_roues, 0, angle);
 					trouve|= tournerJusqua(c, false, 50, 0, angle*2);
 					if(!trouve) {
+						if(c.intersections.containsKey(Couleur.getLastCouleur())) {
+							chassis.travel(5); chassis.waitComplete(); continue;
+						}
 						trouve = tournerJusqua(c, true, vitesse_roues, 0, angle);
 					}
-				} while(!trouve && (angle = angle*2)!=0 && (vitesse_roues=(int)(vitesse_roues*1.5))!=0);
+				} while(!trouve && (angle = angle*2)!=0 && (vitesse_roues=(int)(vitesse_roues*1.5))!=0 && seDeplace);
 				MouvementsBasiques.chassis.travel(Float.POSITIVE_INFINITY); // On relance le mouvement
 			}
 			
@@ -204,6 +209,9 @@ public class Pilote {
 	 * @param c couleur à suivre
 	 */
 	public static void lancerSuivi(CouleurLigne c) {
+		if(seDeplace||suiviLigne) {
+			throw new RuntimeException("DEUXIEME SUIVI EN MEME TEMPS " + seDeplace + "  " + suiviLigne);
+		}
 		new Thread(new ArgRunnable(c) {
 			public void run() {
 				suivreLigne((CouleurLigne)truc);
@@ -217,6 +225,8 @@ public class Pilote {
 	public static void arreterSuivi() {
 		seDeplace = false;
 		chassis.waitComplete();
+		while(suiviLigne)
+			Thread.yield();
 	}
 	
 	/**
@@ -442,6 +452,8 @@ public class Pilote {
 		if(Moteur.MOTEUR_DROIT.getTachoCount()-tacho_debut>max_angle_roues) {
 			//System.out.println("((a dépassé l'angle)) (("+Moteur.MOTEUR_DROIT.getTachoCount()+",   "+tacho_debut);
 		}
+		if(!suiviLigne)
+			seDeplace = false;
 		return coul==c;
 			
 	}
@@ -458,7 +470,6 @@ public class Pilote {
 	 * @return Une structure de type {@link carte.Ligne.LCC} (ligne-couleur-couleur) indiquant quelle ligne il a suivi, et sur quelles intersections il est passé
 	 */
 	public static LCC chercherPosition() {
-		seDeplace = true;
 		int vitesse = 15;
 		int acceleration = 10;
 		chassis.setLinearSpeed(vitesse);
@@ -532,11 +543,7 @@ public class Pilote {
 		}
 		
 		int trouvees = (inter1 == null? 0 : 1);
-		new Thread(new ArgRunnable(ligne) {
-			public void run() {
-				Pilote.suivreLigne((CouleurLigne)truc);
-			}
-		}).start();
+		lancerSuivi(ligne);
 		Couleur.blacheTouchee(); Couleur.videTouche();
 		System.out.println("Ligne ="+ligne);
 		boolean cblanche = false;
@@ -545,29 +552,21 @@ public class Pilote {
 				if(trouvees==0) {
 					inter1 = cblanche ? CouleurLigne.BLANCHE : c;
 					if(cblanche) {
-						Pilote.SetSeDeplace(false); chassis.waitComplete();
+						arreterSuivi();
 						System.out.println("Blanche en 1??");
 						Pilote.tournerJusqua(ligne, true, 250, 30);
 						Pilote.tournerJusqua(ligne, false, 50, 30); 
 						cblanche = Couleur.blacheTouchee()&Couleur.blacheTouchee();
-						new Thread(new ArgRunnable(ligne) {
-							public void run() {
-								Pilote.suivreLigne((CouleurLigne)truc);
-							}
-						}).start();
+						lancerSuivi(ligne);
 					}
 					System.out.println("Inter 1 = "+inter1);
 				}
 				else if (cblanche&&(inter1==CouleurLigne.BLANCHE)){
-					Pilote.SetSeDeplace(false);
+					arreterSuivi();
 					Pilote.tournerJusqua(ligne, true, 250, 30);
 					Pilote.tournerJusqua(ligne, false, 50, 30); 
 					cblanche = Couleur.blacheTouchee()&Couleur.blacheTouchee();
-					new Thread(new ArgRunnable(ligne) {
-						public void run() {
-							Pilote.suivreLigne((CouleurLigne)truc);
-						}
-					}).start();
+					lancerSuivi(ligne);
 					continue;
 				}
 				else if(inter1==c)
@@ -580,8 +579,7 @@ public class Pilote {
 			}
 		}
 		
-		Pilote.SetSeDeplace(false);
-		chassis.stop();
+		arreterSuivi();
 		return new LCC(Ligne.hashLignes.get(ligne), inter1, inter2);
 			
 	}
@@ -637,7 +635,7 @@ public class Pilote {
 			inverse = det;
 		}
 		else {
-			inverse = false;
+			inverse = true;
 		}
 		if (x != x_depart) {
 			int bonne_bifurquation = (det ? -1 : 1)*(x>x_depart ? -1 : 1);
@@ -649,6 +647,7 @@ public class Pilote {
 					chassis.travel(15); chassis.waitComplete();
 				}
 				else {
+					chassis.setLinearSpeed(10);
 					chassis.travel(-18); chassis.waitComplete();
 				}
 			}
@@ -668,27 +667,18 @@ public class Pilote {
 		}
 		
 		if(y!=y_depart) {
-			new Thread(new ArgRunnable(ligne_arrivee) {
-				public void run() {
-					Pilote.suivreLigne((CouleurLigne)truc);
-				}
-			}).start();
+			lancerSuivi(ligne_arrivee);
 			Couleur.blacheTouchee(); 
 			while(Couleur.getLastCouleur() != inters_arrivee) {
 				if ((Couleur.blacheTouchee() && inters_arrivee!=CouleurLigne.BLANCHE)) {
 					sens_change = !sens_change;
-					Pilote.SetSeDeplace(false); chassis.waitComplete();
+					arreterSuivi();
 					Pilote.tournerJusqua(ligne_arrivee, true, 250); Pilote.tournerJusqua(ligne_arrivee, false, 50, 20);
 					Couleur.blacheTouchee();
-					new Thread(new ArgRunnable(ligne_arrivee) {
-						public void run() {
-							Pilote.suivreLigne((CouleurLigne)truc);
-						}
-					}).start();	
+					lancerSuivi(ligne_arrivee);
 				}
 			};
-			seDeplace = false;
-			chassis.waitComplete();
+			arreterSuivi();
 		}
 		robot.setPosition(x, y);
 		if (y>y_depart) {
@@ -698,7 +688,8 @@ public class Pilote {
 			robot.setDirection(!sens_change ? 270 : 90);
 		}
 		else {
-			robot.setDirection(robot.getDirection() == 270 ? 90 : 270);
+			// Normalement la direction ne devrait pas changer ici
+			//robot.setDirection(robot.getDirection() == 270 ? 90 : 270);
 		}
 	}
 	
@@ -707,7 +698,7 @@ public class Pilote {
 	 * @param direction angle indiquant la direction du bon camp
 	 */
 	public static void rentrer(float direction) {
-		chassis.rotate(robot.getDirection() - direction); chassis.waitComplete();
+		chassis.rotate(direction  - robot.getDirection()); chassis.waitComplete();
 		Couleur.blacheTouchee();
 		chassis.travel(INF);
 		while(!Couleur.blacheTouchee());
@@ -770,15 +761,10 @@ public class Pilote {
 				tournerJusqua(Couleur.getLastCouleur(), false, 50, 20);
 			}
 			if (true) {
-				new Thread(new ArgRunnable(Ligne.xToLongues.get(x)) {
-					public void run() {
-						Pilote.suivreLigne((CouleurLigne)truc);
-					}
-				}).start();
+				lancerSuivi(Ligne.xToLongues.get(x));
 				Couleur.blacheTouchee();
 				while(!Couleur.blacheTouchee());
-				seDeplace = false;
-				chassis.waitComplete();
+				arreterSuivi();
 				tournerJusqua(Ligne.xToLongues.get(x), true, 250);
 			}
 		}
@@ -848,7 +834,9 @@ public class Pilote {
 			}
 		}
 		
-		chassis.travel(8); chassis.waitComplete();
+		if((ACOTE&averifier)!=0) {
+			chassis.travel(8); chassis.waitComplete();			
+		}
 		
 		
 		if(Math.abs(x)==2) {
@@ -907,6 +895,10 @@ public class Pilote {
 			tournerJusqua(Ligne.xToLongues.get(x), true, 250, 250); tournerJusqua(Ligne.xToLongues.get(x), false, 50, 20);
 			robot.setDirection(robot.getDirection() + 90);
 		}
+		else if(robot.getDirection() == 90 && robot.getPosition().getY() == 1 || robot.getDirection() == 270 && robot.getPosition().getY() == -1) {
+			Pilote.allerVersPoint(x, y*2);
+			Pilote.allerVersPoint(x, y);
+		}
 		
 		if(x==0) {
 			allerVersPoint(x=1, y);
@@ -916,16 +908,23 @@ public class Pilote {
 		
 		float avancement = robot.getDirection() == 90 ? 1 : -1;
 		if(Math.abs(y) == 2 || y == 0) {
+			System.out.println("[trouverPalet] début de ligne, je vérifie la première intersection");
 			point = verifierPalet(DEVANT);
 			if (point != Point.INCONNU) {
 				return point;
 			}
 			else {
-				allerVersPoint(x, y+avancement);
-				if(y == 0) {
-					CouleurLigne inters = Ligne.yToLongues.get(robot.getPosition().getY());
-					chassis.travel(15);
-					tournerJusqua(ligne, true, 250, 200); tournerJusqua(ligne, true, 50, 20);
+				System.out.println("[trouverPalet] rien trouvé dans la première intersection, j'avance");
+				allerVersPoint(x, y=(y+avancement));
+				if(y-avancement == 0) {
+					System.out.println("[trouverPalet] y = 0, je dois me retourner");
+					CouleurLigne inters = Ligne.yToLongues.get(y);
+					System.out.println("[trouverPalet] intersection : " + inters);
+					chassis.travel(30); chassis.waitComplete();
+					tournerJusqua(ligne, true, 250, 300); tournerJusqua(ligne, false, 50, 20);
+					robot.setDirection(robot.getDirection()==90 ? 270 : 90);
+					System.out.println("[trouverPalet] Direction juste avant le suivi " + robot.getDirection());
+					Button.waitForAnyPress();
 					lancerSuivi(ligne);
 					while(Couleur.getLastCouleur()!=inters);
 					arreterSuivi();
@@ -933,13 +932,17 @@ public class Pilote {
 				}
 			}
 		}
+		Sound.beep();
+		Button.waitForAnyPress();
 		int lignes_verifiees = 0; y  = robot.getPosition().getY();
 		while(lignes_verifiees<3) {
+			System.out.println("[trouverPalet] je vérifie pour la ligne numéro " + (lignes_verifiees+1));
 			point = verifierPalet();
 			if(point!=Point.INCONNU) {
 				return point;
 			}
-			allerVersPoint(x, y+avancement);
+			if(lignes_verifiees < 2)
+				allerVersPoint(x, y=(y+avancement));
 			lignes_verifiees++;
 		}
 		
