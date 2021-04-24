@@ -64,7 +64,9 @@ public class NFA7 implements interfaceEmbarquee.Lancable{
 		    future.cancel(true);
 		    LCD.clear();
 			LCD.drawString("Fin match", 5, 4);
-		    System.out.println("cancelled: " + future.isCancelled() + "done: " + future.isDone()); 
+			LCD.drawString("cancelled: " + future.isCancelled(),1,7);
+		    LCD.drawString("done: " + future.isDone(),1,8); 
+		    Delay.msDelay(3*1000);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		} catch (ExecutionException e) {
