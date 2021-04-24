@@ -82,18 +82,23 @@ public class ModeSolo {
 	public static void ramasserPalet(int nbPalets,int palets_par_ligne, boolean ligneDuo, boolean paletScored,boolean rougeAgauche) throws OuvertureException {
 		//Ne pas rouvrir les capteurs si ils ont deja ete ouverts dans le modeCompetition
 		if ((ligneDuo==false)&&(paletScored==false)) {
+			//Charger la classe capteur pour pouvoir l'utiliser
 			new Capteur();
+			//Debut des prises de mesures par les capteurs
 			Toucher.startScan();
 			Ultrason.startScan();
 			Couleur.startScanAtRate(0);
 		}
 		ExecutorService executor = Executors.newSingleThreadExecutor();
+		
+		//Calibrer la vitesse et l'acceleration réelles du robot et celles des moteurs
 		final double vitesse = 25;
 		final double acceleration = 30;
 		final double vitesse_angulaire = 180;
 		MouvementsBasiques.chassis.setAngularSpeed(vitesse_angulaire);
 		MouvementsBasiques.chassis.setLinearSpeed(vitesse);
 		MouvementsBasiques.chassis.setLinearAcceleration(acceleration);
+		
 		int scoredPalets=0;
 		int lignesParcourues=0;
 		boolean tient_palet=false;
@@ -104,11 +109,14 @@ public class ModeSolo {
 		boolean touche=false;
 		int trio;
 		
+		//Ouvrir les pinces si ce n'est pas deja fait
 		if(!Pince.getOuvert()){
 			Pince.ouvrir();
 		}
+		//On sauvegarde la couleur de la ligne de depart du robot
 		CouleurLigne couleur = Couleur.getLastCouleur();
 		System.out.println(couleur);
+		
 		//robot demarre coté armoire
 		if (rougeAgauche) { 
 			if (couleur==CouleurLigne.ROUGE) {
@@ -155,16 +163,16 @@ public class ModeSolo {
 					lignesParcourues++;
 					break;
 				}
-
+				//demande à l'executor d'executer le suivi de ligne dans un thread
 				executor.execute(new ArgRunnable(couleur) {
 					public void run() {
 						Pilote.suivreLigne((CouleurLigne) truc);
 					}
 				});
-				
+				//si le robot avait déjà détecté du blanc, on met le boolean à faux pour ignorer cette information
 				Couleur.blacheTouchee();
 				while((tient_palet || (touche=Toucher.getTouche())==false)&&!Couleur.blacheTouchee()){
-					//on ne fait rien
+					//on ne fait rien, le robot continue d'avancer
 				};
 				
 				
@@ -219,6 +227,7 @@ public class ModeSolo {
 					Pilote.tournerJusqua(couleur, false, 50,50);
 				}
 			}
+			//on sort de la boucles si 3 lignes longues ont été parcourues ou si tous les palets demandés ont été ramassés
 			if (lignesParcourues>=3||scoredPalets>=nbPalets)
 				break;
 			if (gauche) {
@@ -267,11 +276,11 @@ public class ModeSolo {
 		//limite arbitraire pour evaluer notre niveau de satisfaction
 		if (scoredPalets>=(nbPalets)/2) {
 			//partie gagnée
-			Musique.startMusic("VictorySong.wav"); //lance le bruitage dans un thread
+			Musique.startMusic("VictorySong.wav"); //lance la musique dans un thread
 		}
 		else {
 			//partie perdue
-			Musique.startMusic("LosingSong.wav"); //lance le bruitage dans un thread
+			Musique.startMusic("LosingSong.wav"); //lance la musique dans un thread
 		}
 		
 		//possibilite d'arreter la musique qui ne dure pas plus de 30 secondes
