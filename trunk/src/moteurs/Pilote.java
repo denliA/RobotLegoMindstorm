@@ -918,22 +918,14 @@ public class Pilote {
 				allerVersPoint(x, y=(y+avancement));
 				if(y-avancement == 0) {
 					System.out.println("[trouverPalet] y = 0, je dois me retourner");
-					CouleurLigne inters = Ligne.yToLongues.get(y);
-					System.out.println("[trouverPalet] intersection : " + inters);
-					chassis.travel(30); chassis.waitComplete();
-					tournerJusqua(ligne, true, 250, 300); tournerJusqua(ligne, false, 50, 20);
-					robot.setDirection(robot.getDirection()==90 ? 270 : 90);
-					System.out.println("[trouverPalet] Direction juste avant le suivi " + robot.getDirection());
-					Button.waitForAnyPress();
-					lancerSuivi(ligne);
-					while(Couleur.getLastCouleur()!=inters);
-					arreterSuivi();
+					Pilote.allerVersPoint(x, y*2);
+					Pilote.allerVersPoint(x, y);
 					avancement = -avancement;
 				}
 			}
 		}
 		Sound.beep();
-		Button.waitForAnyPress();
+//		Button.waitForAnyPress();
 		int lignes_verifiees = 0; y  = robot.getPosition().getY();
 		while(lignes_verifiees<3) {
 			System.out.println("[trouverPalet] je vérifie pour la ligne numéro " + (lignes_verifiees+1));
