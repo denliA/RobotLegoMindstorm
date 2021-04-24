@@ -32,34 +32,28 @@ public class NFBA3 implements interfaceEmbarquee.Lancable{
 		//Partie 1 : choix du camp par l'utilisateur
 		int button = -1;
 		LCD.clear();
-		LCD.drawString("Porte ou fenetre?", 3, 1);
-		LCD.drawString("Porte <<  >> Fenetre", 1, 3);
+		LCD.drawString("Deposer palet où?", 3, 1);
+		LCD.drawString("Devant ↑", 3, 2);
+		LCD.drawString("Derriere ↓", 3, 3);
 		String camp = null;
-		
-		while((button!=Button.ID_LEFT)&&(button!=Button.ID_RIGHT)) {
+		while((button!=Button.ID_UP)&&(button!=Button.ID_DOWN)) {
 			button = Button.waitForAnyPress();
 		}
-		if (button == Button.ID_LEFT) {
-			camp = "PORTE";
+		if (button == Button.ID_UP) {
+			camp = "devant";
 		}
-		else if (button == Button.ID_RIGHT) {
-			camp = "FENETRE";
+		else if (button == Button.ID_DOWN) {
+			camp = "derriere";
 		}
-
+		
 		//Partie 2 : attraper le palet quand il le touche en suivant la ligne
 		new capteurs.Capteur();
 		Couleur.startScanAtRate(0);
 		Toucher.startScan();
-		Vector<CouleurLigne> tab = new Vector<CouleurLigne>(2);
-		int nbInter=0;
-		CouleurLigne cc;
 		CouleurLigne couleur = Couleur.getLastCouleur();
 		Pilote.lancerSuivi(couleur);
 		while(!Toucher.getTouche()) {
-			if((cc = Couleur.getLastCouleur())!=couleur&&cc!=CouleurLigne.GRIS&&nbInter<2) {
-				tab.add(cc);
-				nbInter++;
-			}
+			//on ne fait rien, le robot avance
 		}
 		try {
 			Pince.fermer();
@@ -68,48 +62,114 @@ public class NFBA3 implements interfaceEmbarquee.Lancable{
 			;
 		}
 		
-		//Partie 3 : retrouver le bon camp
-		//Si c'est une ligne horizontale : retrouver une ligne verticale sans faire tomber le palet dans le vide
-		
-		//cas particulier de la noire verticale :
-		if(tab.size()!=0&&couleur==CouleurLigne.NOIRE) {
-			couleur = CouleurLigne.NOIREV;
-		}
-		else {
-			couleur = CouleurLigne.NOIREH;
-		}
-		
-		//Si la ligne est verticale :
-		if(!Ligne.hashLignes.get(couleur).getDirection()) {
-			while(tab.size()!=tab.capacity()) {
-				if((cc = Couleur.getLastCouleur())!=couleur&&cc!=CouleurLigne.GRIS&&nbInter<2) {
-					tab.add(cc);
-					nbInter++;
-				}
-			}
-			if(tab.size()==tab.capacity()) {
-				Ligne.Etat etat = Ligne.hashPerdu.get(new Ligne.LCC(Ligne.hashLignes.get(couleur), tab.get(0),tab.get(1)));
-				Carte.carteUsuelle.getRobot().setPosition(etat.position.getX(),etat.position.getY());
-				Carte.carteUsuelle.getRobot().setDirection(etat.direction);
-			}
-		}
-		
-		//Si la ligne est horizontale :
-		else {
+		//Partie 3 : deposer le palet dans le bon camp
+		if (camp=="derriere") {
+			//arreter le suivi de ligne
 			Pilote.arreterSuivi();
-			MouvementsBasiques.chassis.rotate(90);MouvementsBasiques.chassis.waitComplete();
-			couleur = Couleur.getLastCouleur();
-			Pilote.seRedresserSurLigne(couleur, false, 5, 50);
-			Carte.carteUsuelle.calibrerPosition();
+			//demi tour
+			Pilote.tournerJusqua(couleur, true,250);
+			Pilote.tournerJusqua(couleur, false, 50,50);
+			//lancer le suivi de ligne
+			Pilote.lancerSuivi(couleur);
 		}
-		Pilote.rentrer(camp);
+		//reinitialiser le boolean qui indique si le blanc a été détecté
+		Couleur.blacheTouchee();
+		while(!Couleur.blacheTouchee()) {
+			//on ne fait rien
+		}
+		Pilote.arreterSuivi();
+		//ouvrir les pinces
 		try {
 			Pince.ouvrir();
-		}
-		catch(OuvertureException aAAAAAAAAAAAAA) {
+		}catch(OuvertureException pain) {
 			;
 		}
+		//recule
+		MouvementsBasiques.chassis.travel(-5);
 	}
+	
+//	public void lancer() {
+//		//Partie 1 : choix du camp par l'utilisateur
+//		int button = -1;
+//		LCD.clear();
+//		LCD.drawString("Porte ou fenetre?", 3, 1);
+//		LCD.drawString("Porte <<  >> Fenetre", 1, 3);
+//		String camp = null;
+//		
+//		while((button!=Button.ID_LEFT)&&(button!=Button.ID_RIGHT)) {
+//			button = Button.waitForAnyPress();
+//		}
+//		if (button == Button.ID_LEFT) {
+//			camp = "PORTE";
+//		}
+//		else if (button == Button.ID_RIGHT) {
+//			camp = "FENETRE";
+//		}
+//
+//		//Partie 2 : attraper le palet quand il le touche en suivant la ligne
+//		new capteurs.Capteur();
+//		Couleur.startScanAtRate(0);
+//		Toucher.startScan();
+//		Vector<CouleurLigne> tab = new Vector<CouleurLigne>(2);
+//		int nbInter=0;
+//		CouleurLigne cc;
+//		CouleurLigne couleur = Couleur.getLastCouleur();
+//		Pilote.lancerSuivi(couleur);
+//		while(!Toucher.getTouche()) {
+//			if((cc = Couleur.getLastCouleur())!=couleur&&cc!=CouleurLigne.GRIS&&nbInter<2) {
+//				tab.add(cc);
+//				nbInter++;
+//			}
+//		}
+//		try {
+//			Pince.fermer();
+//		}
+//		catch(OuvertureException pain) {
+//			;
+//		}
+//		
+//		//Partie 3 : retrouver le bon camp
+//		//Si c'est une ligne horizontale : retrouver une ligne verticale sans faire tomber le palet dans le vide
+//		
+//		//cas particulier de la noire verticale :
+//		if(tab.size()!=0&&couleur==CouleurLigne.NOIRE) {
+//			couleur = CouleurLigne.NOIREV;
+//		}
+//		else {
+//			couleur = CouleurLigne.NOIREH;
+//		}
+//		
+//		//Si la ligne est verticale :
+//		if(!Ligne.hashLignes.get(couleur).getDirection()) {
+//			while(tab.size()!=tab.capacity()) {
+//				if((cc = Couleur.getLastCouleur())!=couleur&&cc!=CouleurLigne.GRIS&&nbInter<2) {
+//					tab.add(cc);
+//					nbInter++;
+//				}
+//			}
+//			if(tab.size()==tab.capacity()) {
+//				Ligne.Etat etat = Ligne.hashPerdu.get(new Ligne.LCC(Ligne.hashLignes.get(couleur), tab.get(0),tab.get(1)));
+//				Carte.carteUsuelle.getRobot().setPosition(etat.position.getX(),etat.position.getY());
+//				Carte.carteUsuelle.getRobot().setDirection(etat.direction);
+//			}
+//		}
+//		
+//		//Si la ligne est horizontale :
+//		else {
+//			Pilote.arreterSuivi();
+//			MouvementsBasiques.chassis.rotate(90);MouvementsBasiques.chassis.waitComplete();
+//			couleur = Couleur.getLastCouleur();
+//			Pilote.seRedresserSurLigne(couleur, false, 5, 50);
+//			Carte.carteUsuelle.calibrerPosition();
+//		}
+//		Pilote.rentrer(camp);
+//		try {
+//			Pince.ouvrir();
+//		}
+//		catch(OuvertureException aAAAAAAAAAAAAA) {
+//			;
+//		}
+//	}
 	
 	public String getTitre() {
 		return "NFBA3 - Ramener palet";

@@ -2,6 +2,7 @@ package tests;
 import capteurs.Toucher;
 import capteurs.Capteur;
 import capteurs.Couleur;
+import capteurs.CouleurLigne;
 import capteurs.Toucher;
 import moteurs.MouvementsBasiques;
 import moteurs.Pilote;
@@ -24,8 +25,11 @@ public class NFBM3 implements interfaceEmbarquee.Lancable{
 		new Capteur();
 		Couleur.startScanAtRate(0);
 		Toucher.startScan();
-		
-		Pilote.lancerSuivi(Couleur.getLastCouleur());
+		CouleurLigne couleur;
+		while((couleur=Couleur.getLastCouleur())==null) {
+			;
+		}
+		Pilote.lancerSuivi(couleur);
 		while(!Toucher.getTouche()) {
 			
 		}
