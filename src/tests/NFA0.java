@@ -20,7 +20,7 @@ public class NFA0 implements interfaceEmbarquee.Lancable{
 		Thread t = new Thread(new Runnable() {
 			@Override
 			public void run() {
-				Pilote.suivreLigne();
+				Pilote.suivreLigne(Couleur.getLastCouleur());
 			}	
 		});
 		t.start(); //lance le suivi de ligne
