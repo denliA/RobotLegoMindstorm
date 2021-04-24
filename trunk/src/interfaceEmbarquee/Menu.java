@@ -135,6 +135,7 @@ public class Menu implements Lancable{
 			}
 			else if (button == Button.ID_ENTER) {
 				//on lance le menu ou le picker sur lequel la flèche pointe
+				LCD.clear();
 				tab[choix+6*page-1].lancer();
 			}
 			else if (button == Button.ID_RIGHT) {

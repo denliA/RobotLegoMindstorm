@@ -26,7 +26,7 @@ public class Danse {
 	 * @see Picker
 	 */
 	public static void startDance(){
-		startDance(Configurations.bruitage.getVal());
+		startDance(Configurations.danse.getVal());
 	}
 	
 	/**
@@ -43,7 +43,10 @@ public class Danse {
 		}
 		else if(name=="defaite") {
 			defaite();
-		}		
+		}else {
+			LCD.clear();
+			LCD.drawString("Erreur", 3, 3);
+		}
 	}
 	
 	/**
@@ -58,8 +61,7 @@ public class Danse {
 		double acceleration = MouvementsBasiques.chassis.getLinearAcceleration();
 		MouvementsBasiques.chassis.setLinearSpeed(speed);
 		//on l'eloigne de la ligne blanche
-		MouvementsBasiques.chassis.travel(100);
-		//Pilote.allerVersPoint(0, 0);
+		MouvementsBasiques.chassis.travel(100); MouvementsBasiques.chassis.waitComplete();
 		
 		//lance la musique dans un thread
 		Musique.startMusic("VictorySong.wav");
@@ -123,7 +125,7 @@ public class Danse {
 		Couleur.startScanAtRate(10);
 		double speed = MouvementsBasiques.chassis.getLinearSpeed();
 		//tourne à droite
-		MouvementsBasiques.chassis.rotate(-90);
+		MouvementsBasiques.chassis.rotate(-90); 
 		MouvementsBasiques.chassis.setLinearSpeed(speed/4);
 		//on reinitialise le boolean qui indique si le vide a été détecté
 		Couleur.videTouche();

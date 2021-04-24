@@ -60,6 +60,7 @@ public class Musique{
 					int res;
 					File fichier= new File(name);
 					if (!fichier.exists()) {
+						LCD.drawString("Pas de fichier", 3, 5);
 						return; //on n'essaye pas de jouer une musique qui n'est existe pas
 					}
 					res = Sound.playSample(fichier, Sound.VOL_MAX); //attention : instruction bloquante
