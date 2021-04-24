@@ -27,37 +27,17 @@ import moteurs.Pince;
  * @see Toucher
  */
 
-public class P4 implements interfaceEmbarquee.Lancable{
+public class P4 extends P3 {
 	
 	Carte carte = Carte.carteUsuelle;
 	Robot robot = carte.getRobot();
 	
-	@Override	
-	public void lancer() {
-		
-		new Capteur(); Couleur.startScanAtRate(0); Toucher.startScan();
-		if(Pince.getOuvert()) Pince.fermer();
-		float angle = choixDirection();
-		
-		carte.calibrerPosition();
-		Pilote.rentrer("");
-		Point p = Pilote.trouverPalet();
-		if(p == Point.INCONNU) {
-			System.out.println("Pas de palet trouvé!"); return;
-		}
-		Pilote.lancerSuivi((robot.getDirection()%180==0) ? Ligne.yToLongues.get(robot.getPosition().getY()) : Ligne.xToLongues.get(robot.getPosition().getX()));
-		while(!Toucher.getTouche()) { /* rien */ }
-		Pilote.arreterSuivi(); 
-		Pince.fermer(500);
-		Pilote.rentrer(angle);
-//		ModeSolo.ramasserPalet(1, carte.getRobot().getDirection()==90); Valeur sûre mais met trop de temps.
-		
-	}
 	
 	public String getTitre() {
 		return "P4";
 	}
 	
+	@Override
 	public float choixDirection() {
 		int button = -1;
 		LCD.clear();
