@@ -24,11 +24,8 @@ import moteurs.*;
  */
 
 public class P3 implements Lancable {
-	
-	/**
-	 * campAdverse vaut 1 pour Est et 0 pour Ouest. On supose la ligne verte du coté ouest
-	 */
-	private int campAdverse;
+
+
 
 	@Override
 	public String getTitre() {
@@ -36,20 +33,8 @@ public class P3 implements Lancable {
 	}
 	Carte carte  = Carte.carteUsuelle;
 	Robot robot = carte.getRobot();
+	Chassis chassis = MouvementsBasiques.chassis;
 
-	/**
-	 * @return campAdverse
-	 */
-	public int getCampAdverse() {
-		return campAdverse;
-	}
-
-	/**
-	 * @param campAdverse le camp souhaite (1 pour Est et 0 pour Ouest)
-	 */
-	public void setCampAdverse(int campAdverse) {
-		this.campAdverse = campAdverse;
-	}
 	
 	/**
 	 * Contient le code du test :
@@ -62,23 +47,24 @@ public class P3 implements Lancable {
 	@Override	
 	public void lancer() {
 		
-		new Capteur();
-		Couleur.startScanAtRate(0);
+		new Capteur(); Couleur.startScanAtRate(0); Toucher.startScan();
 		if(Pince.getOuvert()) Pince.fermer();
 		
 		
-		
 		carte.calibrerPosition();
-		Pilote.rentrer("");
-		ModeSolo.ramasserPalet(1, carte.getRobot().getDirection()==90);
-		
-		
+//		Pilote.rentrer(""); (Pas besoin pour trouver palet??)
+		Pilote.trouverPalet();
+		Pilote.lancerSuivi((robot.getDirection()%180==0) ? Ligne.yToLongues.get(robot.getPosition().getY()) : Ligne.xToLongues.get(robot.getPosition().getX()));
+		while(!Toucher.getTouche()) { /* rien */ }
+		Pilote.arreterSuivi(); 
+		Pince.fermer(500);
+		Pilote.rentrer(robot.getPosition().getY() < 0 ? 270 : 90);
+//		ModeSolo.ramasserPalet(1, carte.getRobot().getDirection()==90); Valeur sûre mais met trop de temps.
 		
 	}
 	
 	
 	public void P2_Ultrason() {
-		Chassis chassis = MouvementsBasiques.chassis;
 		new Capteur();
 		Toucher.startScan();
 		chassis.setLinearSpeed(20);
@@ -102,7 +88,6 @@ public class P3 implements Lancable {
 		
 		Ultrason.setDistance();
 		if(Ultrason.getDistance()<= .64f && Ultrason.getDistance()>= .40f) {
-			Sound.beep();
 			new ArgSuivi(ligne).start();
 			while(!Toucher.getTouche()) {
 				//rien
@@ -133,11 +118,11 @@ public class P3 implements Lancable {
 		System.out.println("[Ultrason P2] Position : " + robot);
 		
 		Point palet_trouve;
-		palet_trouve = Pilote.verifierPalet(false);
+		palet_trouve = Pilote.verifierPalet();
 		int essais = 1;
 		while(palet_trouve == Point.INCONNU&&essais<3) {
 			Pilote.allerVersPoint(robot.getPosition().getX(), robot.getPosition().getY()+1);
-			palet_trouve = Pilote.verifierPalet(false);
+			palet_trouve = Pilote.verifierPalet();
 			essais++;
 		}
 		new ArgSuivi((robot.getDirection()%180==0) ? Ligne.yToLongues.get(robot.getPosition().getY()) : Ligne.xToLongues.get(robot.getPosition().getX())).start();

@@ -25,7 +25,7 @@ public class Ultrason {
 	//Pour lancer des analyses de mani�re p�riodique
 		private static Timer lanceur = 
 			//cr�ation d'un objet Timer qui lancera les scans toutes les 100ms
-			new Timer(100, new TimerListener() {
+			new Timer(0, new TimerListener() {
 				public void timedOut() {
 					//appel aux deux fonctions lancant les scans necessaire a la classe
 					setDistance();
@@ -39,7 +39,7 @@ public class Ultrason {
 	 * Lance des scans periodiques avec lanceur et modifie l'attribut <i>status</i> de maniere adequate
 	 */
 	public static void startScan() {
-		//scan toutes les 20 ms
+		//scan en continu
 		lanceur.setDelay(0);
 		lanceur.start();
 		status = true;

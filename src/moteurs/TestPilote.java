@@ -31,8 +31,12 @@ public class TestPilote {
 		//testPositions();
 		//testRentrer(1, 2, 270, "fenetre", true, -1,0);
 //		new tests.P3().lancer();
-		carte.Carte.carteUsuelle.calibrerPosition();
-		Pilote.allerVersPoint(0, 0);
+		//carte.Carte.carteUsuelle.calibrerPosition();
+		
+		
+//		carte.Carte.carteUsuelle.getRobot().setPosition(1, -1);
+//		carte.Carte.carteUsuelle.getRobot().setDirection(270);
+//		Pilote.allerVersPoint(1, 1);
 		
 		//testPID(CouleurLigne.VERTE);
 		
@@ -46,6 +50,9 @@ public class TestPilote {
 //		couleurs.add(CouleurLigne.NOIRE);
 //		couleurs.add(CouleurLigne.JAUNE);
 //		Pilote.chercheLigne(couleurs, 25, 30, 180);
+		
+		
+		testVerifierPalet(1,1,90);
 	}
 	
 	
@@ -120,6 +127,18 @@ public class TestPilote {
 		else
 			Pilote.allerVersPoint(xf, yf);
 		System.out.println("Après : " + r);
+		
+	}
+	
+	public static void testVerifierPalet(float x, float y, float direction) {
+		new Capteur();
+		Couleur.startScanAtRate(0);
+		Carte c = carte.Carte.carteUsuelle;
+		Robot r = c.getRobot();
+		r.setDirection(direction);  r.setPosition(x, y);
+		Point P = Pilote.verifierPalet(false);
+		System.out.println("Point trouvé : "  + P);
+		System.out.println("Direction :" + r.getDirection());
 		
 	}
 	
