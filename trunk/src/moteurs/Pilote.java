@@ -699,6 +699,7 @@ public class Pilote {
 	 * @param direction angle indiquant la direction du bon camp
 	 */
 	public static void rentrer(float direction) {
+		System.out.println("[rentrer] direction : " + direction + "Robot actuellement : " + robot.getDirection() + "Ce que je dois faire : " + (direction  - robot.getDirection()));
 		chassis.rotate(direction  - robot.getDirection()); chassis.waitComplete();
 		Couleur.blacheTouchee();
 		chassis.travel(INF);
@@ -857,7 +858,7 @@ public class Pilote {
 			}
 			else {
 			}
-			tournerJusqua(ligne, !a_droite, 250, 150); tournerJusqua(ligne, a_droite, 50, 20);
+			tournerJusqua(ligne, !a_droite, 250, 0); tournerJusqua(ligne, a_droite, 50, 0);
 			robot.setDirection(direction = (direction + (a_droite? -90 : 90))%360);
 		}
 		else  if ((averifier&ACOTE) != 0){
@@ -900,6 +901,11 @@ public class Pilote {
 			Pilote.allerVersPoint(x, y*2);
 			Pilote.allerVersPoint(x, y);
 		}
+		else if(robot.getDirection() == 90 && robot.getPosition().getY() == 2 || robot.getDirection() == 270 && robot.getPosition().getY() == -2) {
+			Pilote.tournerJusqua(Ligne.xToLongues.get(x), true, 250); Pilote.tournerJusqua(Ligne.xToLongues.get(x), false, 50, 20);
+			chassis.travel(-5); chassis.waitComplete();
+			robot.setDirection((robot.getDirection() + 180)%360);
+		}
 		
 		if(x==0) {
 			allerVersPoint(x=1, y);
@@ -926,7 +932,6 @@ public class Pilote {
 			}
 		}
 		Sound.beep();
-//		Button.waitForAnyPress();
 		int lignes_verifiees = 0; y  = robot.getPosition().getY();
 		while(lignes_verifiees<3) {
 			System.out.println("[trouverPalet] je vérifie pour la ligne numéro " + (lignes_verifiees+1));
