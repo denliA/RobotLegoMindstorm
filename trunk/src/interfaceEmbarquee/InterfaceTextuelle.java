@@ -1,11 +1,17 @@
 package interfaceEmbarquee;
 import tests.*;
+
+import java.lang.reflect.Field;
+
 import exceptions.OuvertureException;
 import lejos.hardware.Button;
 import lejos.hardware.lcd.LCD;
 import lejos.utility.Delay;
 import modeCompetition.ModeCompetition;
 import modeSolo.ModeSolo;
+import lejos.internal.ev3.EV3Wrapper;
+import lejos.internal.ev3.EV3LCDManager;
+import lejos.internal.ev3.EV3LCDManager.LCDLayer;;
 
 /**
  * <p>InterfaceTextuelle est une classe qui instancie tous les Lancables (Menu,Picker,lancerSolo...) de l'interfaceEmbarquee.</p>
@@ -18,6 +24,7 @@ import modeSolo.ModeSolo;
  * 
  */
 
+@SuppressWarnings("restriction")
 public class InterfaceTextuelle {
 	
 	/**
@@ -337,7 +344,6 @@ public class InterfaceTextuelle {
 	 */
 	Menu menuPrincipal = new Menu("Menu Principal",new Lancable[] {modeSolo,modeCompetition,scenarios,reglages});
 	
-	
 	/**
 	 * <p>Méthode qui lance l'interface textuelle.</p>
 	 * 
@@ -351,6 +357,11 @@ public class InterfaceTextuelle {
 	 * 
 	 */
 	public static void main(String[] args) {
+		EV3LCDManager manager = EV3LCDManager.getLocalLCDManager();
+		for (LCDLayer layer : manager.getLayers()) {
+			layer.setVisible(false);
+		}
+		manager.getLayer("LCD").setVisible(true);
 		new InterfaceTextuelle().lancer();
 	}
 }
