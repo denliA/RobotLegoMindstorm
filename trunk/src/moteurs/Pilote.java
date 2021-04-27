@@ -34,6 +34,9 @@ import lejos.utility.Delay;
  */
 public class Pilote {
 	
+	/*
+	 * Dépendances des autres classes, la carte pour se repérer et le chassis pour se déplacer. 
+	 */
 	static private Carte carte = Carte.carteUsuelle;
 	static private Robot robot = carte.getRobot();
 	private static Chassis chassis = MouvementsBasiques.chassis;
@@ -42,7 +45,7 @@ public class Pilote {
 	
 	
 	static private boolean seDeplace = false;
-	static private boolean suiviLigne = false;
+	static private boolean suiviLigne = false; // Permet de s'assurer qu'on ne lance jamais deux suivis de ligne en même temps
 	/**
 	 * Permet de savoir si le robot est en cours de déplacement
 	 * @return true ssi le robot se déplace
@@ -224,7 +227,7 @@ public class Pilote {
 	public static void arreterSuivi() {
 		seDeplace = false;
 		chassis.waitComplete();
-		while(suiviLigne)
+		while(suiviLigne) // On ne rend pas la main à la fonction appelante tant que la fonction du suivi de ligne n'a pas totalement fini.
 			Thread.yield();
 	}
 	
@@ -266,34 +269,37 @@ public class Pilote {
 		int iterations = 0;
 		
 		while(Couleur.getLastCouleur() != c && seDeplace && iterations < max_iterations) {
-			trouve = tournerJusqua(c, !gauche_bouge, (int)vitesse_angulaire, 0, (int)max_angle);
+			trouve = tournerJusqua(c, !gauche_bouge, (int)vitesse_angulaire, 0, (int)max_angle); // Pn essaie de tourner une fois vers la direction donnée 
 			if (!trouve && seDeplace) {
-				trouve = tournerJusqua(c, gauche_bouge, (int)vitesse_angulaire, 0, (int)max_angle);
+				trouve = tournerJusqua(c, gauche_bouge, (int)vitesse_angulaire, 0, (int)max_angle); // Si on ne trouve pas, on revient à la position de départ
 				if(!trouve && seDeplace) {
-					gauche_bouge = !gauche_bouge;
-					trouve = tournerJusqua(c, !gauche_bouge, (int)vitesse_angulaire, 0, (int)max_angle);
+					gauche_bouge = !gauche_bouge; // On inverse le sens de rotation
+					trouve = tournerJusqua(c, !gauche_bouge, (int)vitesse_angulaire, 0, (int)max_angle); // Puis on essaie de trouver de l'autre coté 
 					if (!trouve && seDeplace) {
-						trouve = tournerJusqua(c, gauche_bouge, (int)vitesse_angulaire, 0, (int)max_angle);
+						trouve = tournerJusqua(c, gauche_bouge, (int)vitesse_angulaire, 0, (int)max_angle); // Si on ne trouve toujours pas, on revient à la position de départ et on quitte la fonction en retorunant false
 						retour = false;
 						break;
 					}
 				}
 			}
+			/*
+			 * Si on a trouvé pendant la recherche, mais qu'on a légèrement dépassé, on revient en arrière très lentement pour retrouver la bonne position
+			 */
 			if (Couleur.getLastCouleur()!=c&&seDeplace) {
 				MouvementsBasiques.pilot.setAngularSpeed(vitesse_angulaire/4);
 				trouve = tournerJusqua(c, gauche_bouge, (int)(vitesse_angulaire/2), 0, (int)20);
 				MouvementsBasiques.pilot.setAngularSpeed(vitesse_angulaire);
 			}
-			if (seDeplace && iterations < max_iterations) {
+			if (seDeplace && iterations < max_iterations) { // Après avoir trouvé, on avance de 10cm pour vérifier si l'on sort ou pas
 				MouvementsBasiques.chassis.travel(10);
 				MouvementsBasiques.chassis.waitComplete();
 			}
 			
-			if (seDeplace && iterations == 0) {
+			if (seDeplace && iterations == 0) { // La deuxième fois qu'on recherche, on augmente l'angle de recherche.
 				max_angle = max_angle*2;
 			}
 			else if(seDeplace && iterations == 1) {
-				max_angle = max_angle/4;
+				max_angle = max_angle/4; 
 			}
 			
 			gauche_bouge = !gauche_bouge;
@@ -340,17 +346,19 @@ public class Pilote {
 	 * @return la ligne trouvée si une ligne est trouvée, {@link capteurs.CouleurLigne.VIDE}
 	 */
 	public static CouleurLigne chercheLigne(Vector <CouleurLigne> c,double vitesseLineaire,double accelerationLineaire,double vitesseAngulaire, boolean adroite) {
+		
+		// On met les vitesse indiquées en paramètre.
 		MouvementsBasiques.chassis.setAngularSpeed(vitesseAngulaire);
 		MouvementsBasiques.chassis.setLinearSpeed(vitesseLineaire);
 		MouvementsBasiques.chassis.setLinearAcceleration(accelerationLineaire);
 		
-		CouleurLigne t=CouleurLigne.INCONNU;
+		CouleurLigne t=CouleurLigne.INCONNU; // Si rien n'est trouvé, on retourne CouleurLigne.INCONNU
 		boolean vide;
 		do {
-			MouvementsBasiques.chassis.travel(Double.POSITIVE_INFINITY);
-			vide = Couleur.videTouche();
-			while(!(vide=Couleur.videTouche()) && (!c.contains(t=Couleur.getLastCouleur())));
-			if (vide) {
+			MouvementsBasiques.chassis.travel(Double.POSITIVE_INFINITY); // On lance le robot tout droit
+			vide = Couleur.videTouche(); // On remet le buffer du vide à 0
+			while(!(vide=Couleur.videTouche()) && (!c.contains(t=Couleur.getLastCouleur()))); // Tant qu'on a pas trouvé la bonne couleur, et qu'on ne voit pas du vide, on continue
+			if (vide) { // Si on voie du vide, on s'arrête, on se retorune (180°) et on retourne CouleurLigne.VIDE à l'appelant
 				MouvementsBasiques.chassis.setLinearAcceleration(250);
 				MouvementsBasiques.chassis.stop(); MouvementsBasiques.chassis.waitComplete();
 				MouvementsBasiques.chassis.setLinearAcceleration(accelerationLineaire);
@@ -358,13 +366,13 @@ public class Pilote {
 				MouvementsBasiques.chassis.rotate(180); MouvementsBasiques.chassis.waitComplete();
 				return CouleurLigne.VIDE;
 			}
-			else {
+			else { // Sinon, on a trouvé la bonne couleur, alors on avance un peu pour centrer les roues du robot sur la ligne trouvée
 				MouvementsBasiques.chassis.travel(10); //avance de 10 cm
 				MouvementsBasiques.chassis.waitComplete();
 			}
 		} while(vide);
-		tournerJusqua(t,adroite,250,200);
-		tournerJusqua(t, !adroite, 40);
+		tournerJusqua(t,adroite,250,200); // Puis on tourne jusuqu'à la bonne couleur.
+		tournerJusqua(t, !adroite, 40); // On tourne plus lentement de l'autre coté pour s'assurer qu'on n'a pas dépassé la couleur.
 		return t;
 		
 	}
@@ -441,8 +449,8 @@ public class Pilote {
 		while(System.currentTimeMillis()-debut<temps_deb && seDeplace && Math.abs(Moteur.MOTEUR_DROIT.getTachoCount()-tacho_debut) <= max_angle_roues)
 			;
 		CouleurLigne coul;
-		// Arrêt de la rotation juste après la détection de la ligne
 		while((coul=Couleur.getLastCouleur())!=c&&seDeplace && Math.abs(Moteur.MOTEUR_DROIT.getTachoCount()-tacho_debut) <= max_angle_roues);
+		// Arrêt de la rotation juste après la détection de la ligne
 		Moteur.MOTEUR_GAUCHE.startSynchronization();
 			Moteur.MOTEUR_DROIT.stop();
 			Moteur.MOTEUR_GAUCHE.stop();
@@ -469,60 +477,66 @@ public class Pilote {
 	 * @return Une structure de type {@link carte.Ligne.LCC} (ligne-couleur-couleur) indiquant quelle ligne il a suivi, et sur quelles intersections il est passé
 	 */
 	public static LCC chercherPosition() {
+		
+		// Configuration des vitesses initiales de recherche
 		int vitesse = 15;
 		int acceleration = 10;
 		chassis.setLinearSpeed(vitesse);
 		chassis.setLinearAcceleration(acceleration);
 		Delay.msDelay(1000);
-		Couleur.videTouche(); Couleur.blacheTouchee();
+		Couleur.videTouche(); Couleur.blacheTouchee(); // Remise à 0 des buffers de blanc et de vide
 		
-		CouleurLigne ligne = null, inter1=null, inter2 = null;
+		CouleurLigne ligne = null, inter1=null, inter2 = null; // Les trois informations qu'on cherche à trouver
 		
-		CouleurLigne c = Couleur.getLastCouleur();
-		if (c!=CouleurLigne.GRIS) {
-			if(longues.contains(c)||courtes.contains(c)) {
+		CouleurLigne c = Couleur.getLastCouleur(); // Couleur initiale sur laquelle se trouve le robot
+		
+		if (c!=CouleurLigne.GRIS && c!=CouleurLigne.NOIRE && c!=CouleurLigne.INCONNU) { // Si la couleur initiale est déjà une ligne intéressante
+			if(longues.contains(c)||courtes.contains(c)) { // Si c'est l'une des lignes qu'on cherche, on essaie de se mettre droit sur cette ligne
 				chassis.travel(10); chassis.waitComplete();
-				Pilote.tournerJusqua(c, true, 250, 30);
-				Pilote.tournerJusqua(c, false, 50, 30);
+				Pilote.tournerJusqua(c, true, 250, 10);
+				Pilote.tournerJusqua(c, false, 50, 10);
 			}
 			else return null;
 		}
 		
-		boolean bcouleur=false,bblanche=false,bvide=false;
+		boolean bcouleur=false,bblanche=false,bvide=false; // booléens qui vont contenir les informations de la recherche
 		int times=1;
 		do {
-			chassis.travel(INF);
+			chassis.travel(INF); // On fonce tout droit
 			while( !(bblanche=Couleur.blacheTouchee()) && (times==2 ||!(bvide=Couleur.videTouche()))  &&  ((bcouleur=(c=Couleur.getLastCouleur())==CouleurLigne.GRIS)||(bcouleur|=c==CouleurLigne.INCONNU)||(bcouleur=c==CouleurLigne.NOIRE)))
-				;
+				; // Tant qu'on ne voit pas de couleur intéressante ni le vide, on continue d'avancer 
 			
-			if (times==1&&bvide) {
+			if (times==1&&bvide) { // Si on voit du vide pour la premère fois, on s'arrête en urgence et on fait un 180°
 				chassis.setLinearAcceleration(100); chassis.stop(); chassis.waitComplete(); chassis.setLinearAcceleration(acceleration);
 				chassis.travel(-10); chassis.waitComplete();
 				chassis.rotate(180); chassis.waitComplete();
 			}
-			else {
+			else { // Si c'est autre chose que du vide qui nous a fait sortir, on s'arrête sans se retourner
 				chassis.stop();
 			}
 			times++;
-		} while(bvide && times <=2);
+		} while(bvide && times <=2); // On refait l'opération si on est tombé sur du vide
 		
 		
 		
-		if (courtes.contains(c)||bblanche) {
-			inter1 = bblanche ? CouleurLigne.BLANCHE :c;
+		if (courtes.contains(c)||bblanche) { // Si c'est une des lignes verticales qui a été vue (blanche, verte, bleue)
+			inter1 = bblanche ? CouleurLigne.BLANCHE :c; // On mémorise le fait qu'on a vu cette ligne pour la suite
 			System.out.println("Inter 1 = "+inter1 + "(bvide="+ bvide+")");
-			chassis.travel(10);
+			chassis.travel(10); // On avance de 10 pour pouvoir se redresser sur la dite ligne
 			chassis.waitComplete();
-			Pilote.tournerJusqua(inter1, true, 250, 30);
+			Pilote.tournerJusqua(inter1, true, 250, 30); // On se redresse sur la ligne
 			Pilote.tournerJusqua(inter1, false, 50, 30);
-			int coef = bvide ? (-1) : 1;
-			chassis.rotate(coef*90); chassis.waitComplete();
+			int coef = bvide ? (-1) : 1; // On calcule la direction dans laquelle on va tourner qui dépend de si on a déjà croisé le vide ou pas. 
+			/*
+			 * On se positionne de manière parallèle à la ligne verticale, pour pouvoir ensuite chercher une ligne horizontale.
+			 */
+			chassis.rotate(coef*90); chassis.waitComplete(); 
 			chassis.travel(15); chassis.waitComplete();
 			chassis.rotate(coef*-90); chassis.waitComplete();
-			boolean direction_rotation = true;
+			boolean direction_rotation = true; // Direction de rotation après avoir trouvé la ligne horizontale. On calcule cette direction de manière à ce que le robot se trouve à l'opposé de la ligne verticale trouvée au début, pour ne pas perdre du temps
 			int iter = 0;
 			do {
-				if (iter==2) {
+				if (iter==2) { // Si on croise le vide deux fois : Situation ne pouvant arriver que si on est derrière la ligne de départ, et qu'on marche parallèlement à la ligne blanche. Il faut alors aller de l'autre coté de la ligne pour pouvoir chercher.
 					chassis.rotate(coef*-90); chassis.waitComplete();
 					chassis.travel(30); chassis.waitComplete();
 					chassis.rotate(coef*90); chassis.waitComplete();
@@ -530,28 +544,30 @@ public class Pilote {
 				c = Pilote.chercheLigne(longues, 15, 10, 180, direction_rotation);
 				direction_rotation = false;
 				iter++;
-			} while(c==CouleurLigne.VIDE);
-			ligne = c;
+			} while(c==CouleurLigne.VIDE); // On continue la recherche jusuqu'à ce qu'on trouve une des deux lignes (rouge, jaune)
+			ligne = c; // On marque quelle ligne on a trouvé 
 		}
 		
-		else if(longues.contains(c)) {
-			ligne = c;
-			chassis.travel(10); chassis.waitComplete();
+		else if(longues.contains(c)) { // Sinon, si on a directement croisé une ligne horizontale
+			ligne = c; // On marque la ligne qu'on va suivre
+			chassis.travel(10); chassis.waitComplete(); // On avance pour se redresser sur la dite ligne 
 			Pilote.tournerJusqua(c, true, 250, 0);
 			Pilote.tournerJusqua(c, false, 50, 0);
 		}
 		
-		int trouvees = (inter1 == null? 0 : 1);
-		lancerSuivi(ligne);
-		Couleur.blacheTouchee(); Couleur.videTouche();
+		int trouvees = (inter1 == null? 0 : 1); // On marque le nombre d'intersections trouvées jusqu'à maintenant
+		lancerSuivi(ligne); // On commence à suivre la ligne à la recherche d'intersections
+		Couleur.blacheTouchee(); Couleur.videTouche(); // On remet à 0 la detection du vide et du blanc.
 		System.out.println("Ligne ="+ligne);
 		boolean cblanche = false;
-		while(trouvees<2) {
-			if((cblanche=Couleur.blacheTouchee()) || ligne.intersections.containsKey(c=Couleur.getLastCouleur())) {
+		while(trouvees<2) { // Tant qu'on est pas tombé sur deux intersections
+			if((cblanche=Couleur.blacheTouchee()) || ligne.intersections.containsKey(c=Couleur.getLastCouleur())) { // Si on a trouvé une intersection
 				if(trouvees==0) {
-					inter1 = cblanche ? CouleurLigne.BLANCHE : c;
-					if(cblanche) {
-						arreterSuivi();
+					inter1 = cblanche ? CouleurLigne.BLANCHE : c; // On vérifie si c'est la blanche 
+					// Si c'est la blanche, on arrête le suivi de ligne, et on se retrouve pour chercher l'intersection de l'autre coté.
+					// Puis on relance le suivi dans la direction opposée 
+					if(cblanche) { 
+						arreterSuivi(); 
 						System.out.println("Blanche en 1??");
 						Pilote.tournerJusqua(ligne, true, 250, 30);
 						Pilote.tournerJusqua(ligne, false, 50, 30); 
@@ -560,7 +576,7 @@ public class Pilote {
 					}
 					System.out.println("Inter 1 = "+inter1);
 				}
-				else if (cblanche&&(inter1==CouleurLigne.BLANCHE)){
+				else if (cblanche&&(inter1==CouleurLigne.BLANCHE)){ // Si on voit la blanche pour la deuxième fois, on se retourne aussi
 					arreterSuivi();
 					Pilote.tournerJusqua(ligne, true, 250, 30);
 					Pilote.tournerJusqua(ligne, false, 50, 30); 
@@ -568,16 +584,19 @@ public class Pilote {
 					lancerSuivi(ligne);
 					continue;
 				}
-				else if(inter1==c)
+				else if(inter1==c) // Si on tombe deux fois sur la même intersection pour une raison inconnue, on ignore.
 					continue;
 				else {
-					inter2=cblanche ? CouleurLigne.BLANCHE : c;
+					inter2=cblanche ? CouleurLigne.BLANCHE : c; // On mémorise la dernière intersection.
 					System.out.println("Inter 2 = "+inter2);
 				}
 				trouvees++;
 			}
 		}
 		
+		/*
+		 * Une fois toutes les informations colléctées, on arrête le suivi de ligne, et on renvoie la ligne ainsi que les deux intersections trouvées.
+		 */
 		arreterSuivi();
 		return new LCC(Ligne.hashLignes.get(ligne), inter1, inter2);
 			
@@ -593,28 +612,37 @@ public class Pilote {
 	 */
 	public static void allerVersPoint(float x, float y) {
 		
+		// Mise en place des conditions initiales.
 		boolean sens_change=false;
 		chassis.setLinearSpeed(20);
 		chassis.setLinearAcceleration(30);
 		
-		if(robot.getPosition()==Point.INCONNU) {
+		if(robot.getPosition()==Point.INCONNU) { // Si la position du robot n'est pas calibrée, on la calibre avant d'aller au point
 			carte.calibrerPosition();
 		}
 		Point position = robot.getPosition();
 		float direction = robot.getDirection();
-		float x_depart = position.getX(), y_depart = position.getY();
-		if(y_depart == 2 && direction == 90 || y_depart == -2 && direction == 270) {
+		float x_depart = position.getX(), y_depart = position.getY(); // On mémorise les positions de départ du robot.
+		if(y_depart == 2 && direction == 90 || y_depart == -2 && direction == 270) { // Si le robot est derrière un des deux camps et regarde le vide, on le retorune
 			Sound.beep();
 			tournerJusqua(Ligne.xToLongues.get(x_depart), true, 250);
 			tournerJusqua(Ligne.xToLongues.get(x_depart), false, 50, 20);
-			direction = (direction+180)%360;
-			robot.setDirection(direction);
+			direction = (direction+180)%360; 
+			robot.setDirection(direction); // On met à jour la direction
 		}
-		if (x == 0 && y==0 && y_depart != y) {
+		/*
+		 * L'intersection (0,0) pose un problème puisque c'est une intersection Noire-Noire qui est difficile à detecter. Si on veut aller vers cette position,
+		 * on contourne en allant d'abord quelque part avec une coordonnée y égale à 0, et ensuite on va à la position (x,y) en passant par la verticale
+		 */
+		if (x == 0 && y==0 && y_depart != y) { 
 			allerVersPoint(x_depart==0? 1:x_depart, y);
 			allerVersPoint(0, y);
 			return;
 		}
+		/*
+		 * L'intersection (0, -1) pose aussi problème à cause de l'intersection Bleue-Noire qui est complètement effacée.
+		 * On contourne lors aussi en allant d'abord au bon y puis en se déplaçant à la verticale.
+		 */
 		if(x_depart == 0 &&  x == 0 && y == -1 && y_depart != -1) {
 			System.out.println("Position au début : " + robot);
 			allerVersPoint(x_depart==0? 1:x_depart, y);
@@ -623,10 +651,11 @@ public class Pilote {
 			System.out.println("Position à la fin : " + robot);
 			return;
 		}
-		CouleurLigne ligne_arrivee = Ligne.xToLongues.get(x);
-		CouleurLigne inters_arrivee = Ligne.yToLongues.get(y); 
-		boolean det = direction ==270;
-		boolean inverse;
+		
+		CouleurLigne ligne_arrivee = Ligne.xToLongues.get(x); // Ligne horizontale qu'on doit suivre
+		CouleurLigne inters_arrivee = Ligne.yToLongues.get(y);  // Ligne verticale de laquelle on doit détecter l'intersection avec ligne_arrivee
+		boolean det = direction ==270; // Permet de savoir si le robot avance ou recule dans le sens des y
+		boolean inverse; // Décide si le reobot doit changer de direction en tournant ou pas (dépend de si le point cherché est devant le robot ou derrière lui)
 		if(y> y_depart) {
 			inverse= !det; 
 		}
@@ -634,14 +663,15 @@ public class Pilote {
 			inverse = det;
 		}
 		else {
-			inverse = true;
+			inverse = true; // Si c'est le même y, on inverse la direction pa défaut.
 		}
-		if (x != x_depart) {
+		
+		if (x != x_depart) { // Si les x ne sont pas les mêmes, on change d'abord de ligne.
 			int bonne_bifurquation = (det ? -1 : 1)*(x>x_depart ? -1 : 1);
 			if (Math.abs(y_depart)==2 || y_depart ==0||true) {chassis.travel(30); chassis.waitComplete();}
 			chassis.rotate(bonne_bifurquation*90); chassis.waitComplete();
-			chercheLigne(ligne_arrivee, 20, 50, 180, (inverse ? !(bonne_bifurquation==1) : (bonne_bifurquation==1)));
-			if ((true||Math.abs(y_depart)==2 || y_depart ==0)&&y==y_depart) {
+			chercheLigne(ligne_arrivee, 20, 50, 180, (inverse ? !(bonne_bifurquation==1) : (bonne_bifurquation==1))); // On se gare dans la nouvelle ligne de manière à regarder direction le point cherché
+			if ((true||Math.abs(y_depart)==2 || y_depart ==0)&&y==y_depart) { // On avance/recule pour regagner la distance perdue en tournant
 				if(!inverse) {
 					chassis.travel(15); chassis.waitComplete();
 				}
@@ -653,12 +683,12 @@ public class Pilote {
 			Pilote.tournerJusqua(Ligne.xToLongues.get(x), true, 50, 20, 15);
 			Pilote.tournerJusqua(Ligne.xToLongues.get(x), false, 50, 20, 30);
 		}
-		else {
-			if(y>y_depart && det || y<y_depart && !det) {
-				if(ligne_arrivee!=CouleurLigne.NOIRE || y_depart != 0) {
+		else { // Si on est sur la même ligne
+			if(y>y_depart && det || y<y_depart && !det) { // Si on regarde dans la mauvais direction
+				if(ligne_arrivee!=CouleurLigne.NOIRE || y_depart != 0) { // On se retourne. 
 					Pilote.tournerJusqua(ligne_arrivee, true, 250); Pilote.tournerJusqua(ligne_arrivee, false, 50, 20);
 				}
-				else {
+				else { // Si c'est l'intersection (0,0), on se retourne en deux étapes
 					Sound.beep();
 					chassis.rotate(20);chassis.waitComplete();
 					Pilote.tournerJusqua(CouleurLigne.NOIRE, true, 250,0);
@@ -667,8 +697,8 @@ public class Pilote {
 			}
 		}
 		
-		if(y!=y_depart) {
-			lancerSuivi(ligne_arrivee);
+		if(y!=y_depart) { // Si on est pas au même y 
+			lancerSuivi(ligne_arrivee); // maintenant qu'on est dans le même x on peut suivre la ligne jusuqu'à tomber sur une des intersections
 			Couleur.blacheTouchee(); 
 			while(Couleur.getLastCouleur() != inters_arrivee) {
 				if ((Couleur.blacheTouchee() && inters_arrivee!=CouleurLigne.BLANCHE)) {
@@ -681,6 +711,10 @@ public class Pilote {
 			};
 			arreterSuivi();
 		}
+		
+		/*
+		 * à la toute fin, on change la position du robot pour la mettre à jour après avoir changé de point (et peu être de direction)
+		 */
 		robot.setPosition(x, y);
 		if (y>y_depart) {
 			robot.setDirection(!sens_change ? 90 : 270);
@@ -700,9 +734,9 @@ public class Pilote {
 	 */
 	public static void rentrer(float direction) {
 		System.out.println("[rentrer] direction : " + direction + "Robot actuellement : " + robot.getDirection() + "Ce que je dois faire : " + (direction  - robot.getDirection()));
-		chassis.rotate(direction  - robot.getDirection()); chassis.waitComplete();
-		Couleur.blacheTouchee();
-		chassis.travel(INF);
+		chassis.rotate(direction  - robot.getDirection()); chassis.waitComplete(); // On tourne de l'angle necessaire pour atteindre l'angle recherché.
+		Couleur.blacheTouchee(); // On reset le détecteur de blanc
+		chassis.travel(INF); // On fonce tout droit jusqu'à ce que l'on voit du blanc. 
 		while(!Couleur.blacheTouchee());
 		chassis.stop(); chassis.waitComplete();
 	}
@@ -810,45 +844,52 @@ public class Pilote {
 	 */
 	public static Point verifierPalet(int averifier){
 		
+		// On obtient les conditions initiales de la position du robot, ainsi que la ligne depuis laquelle on va vérifier et les intersections sur lesquelles on va tourner.
 		float direction = robot.getDirection();
 		float x = robot.getPosition().getX();
 		float y = robot.getPosition().getY();
 		CouleurLigne intersection = Ligne.yToLongues.get(y);
 		CouleurLigne ligne = Ligne.xToLongues.get(x);
 		
+		// on n'accepte pas si le robot n'est pas claibré.
 		if(robot.getPosition()==Point.INCONNU) {
 			throw new PositionPasCalibreeException();
 		}
 		
+		// Si le robot regarde verticalement et pas horizontalement, on le fait se tourner pour se mettre sur la ligne horizontale
 		else if(direction==0 || direction==180) {
 			tournerJusqua(ligne, true, 250, 250); tournerJusqua(ligne, false, 50, 20);
 			robot.setDirection(direction=(direction+90));
 		}
 		
-		float prochain_y = (direction == 90 ?  y+1 : y-1);
-		boolean au_centre = (x==0);
+		
+		float prochain_y = (direction == 90 ?  y+1 : y-1); // Le point que le robot regarde actuellement selon sa direction 
+		boolean au_centre = (x==0); // pour savoir si on est dans la méchante ligne noire avec ses intersections indétectables.
 		
 		
+		// On vérifie que l'on n'est pas dans la ligne blanche en direction du camp, auquel cas il n'y a rien à vérifier.
 		if(Math.abs(prochain_y)<2 && (DEVANT&averifier)!=0) {
+			// On essaie de vérifier si un palet se trouve dans la prochaine intersection
 			Ultrason.setDistance();
 			if(Ultrason.getDistance() <= .64f && Ultrason.getDistance() >= .40f) {
 				return new Point(x,prochain_y);
 			}
 		}
 		
-		if((ACOTE&averifier)!=0) {
+		if((ACOTE&averifier)!=0) { // Si on doit aussi vérifier à coté, on avance de 8cm pour pouvoir bien tourner.
 			chassis.travel(8); chassis.waitComplete();			
 		}
 		
 		
-		if(Math.abs(x)==2) {
+		if(Math.abs(x)==2) { // Si on est sur la blanche.
 			// on ne regarde pas sur les cotés
 		}
-		if(!au_centre && (averifier&ACOTE) != 0) {
-			boolean a_droite = (x==1 && direction == 90 || x==-1 && direction == 270);
-			tournerJusqua(intersection, a_droite, 250, 300); tournerJusqua(intersection, !a_droite, 50, 20);
-			robot.setDirection(direction = (direction + (a_droite? 90 : -90))%360);
+		if(!au_centre && (averifier&ACOTE) != 0) { // Si nous sommes dans une ligne sur le coté et pas centrée (comme la ligne noire)
+			boolean a_droite = (x==1 && direction == 90 || x==-1 && direction == 270); // On regarde selon notre position et notre direction de quel coté il faut regarder
+			tournerJusqua(intersection, a_droite, 250, 300); tournerJusqua(intersection, !a_droite, 50, 20); // On tourne dans la direction calculée
+			robot.setDirection(direction = (direction + (a_droite? 90 : -90))%360); // On met à jour la position du robot
 			System.out.println("[verifierPalet] Direction après avoir tourné: " + robot.getDirection());
+			// On vérifie si il y a un palet dans l'intersection suivante, ensuite si il y en a un dans celle d'après
 			Ultrason.setDistance();
 			if(Ultrason.getDistance()<= .56f && Ultrason.getDistance() >= .35f) {
 				return new Point(0, y);
@@ -858,10 +899,10 @@ public class Pilote {
 			}
 			else {
 			}
-			tournerJusqua(ligne, !a_droite, 250, 0); tournerJusqua(ligne, a_droite, 50, 0);
+			tournerJusqua(ligne, !a_droite, 250, 0); tournerJusqua(ligne, a_droite, 50, 0); // Si on a pas trouvé, on se remet sur la ligne horizontale
 			robot.setDirection(direction = (direction + (a_droite? -90 : 90))%360);
 		}
-		else  if ((averifier&ACOTE) != 0){
+		else  if ((averifier&ACOTE) != 0){ // Si nous sommes sur la ligne noire, on fait la même chose mais en vérifiant à chaque fois des deux cotés
 			float coef_a_droite = (direction==90 ? -1 : 1);
 			tournerJusqua(intersection, true, 250, 300); tournerJusqua(intersection, false, 50, 20);
 			robot.setDirection(direction = ((direction + 90)%360));
@@ -882,45 +923,56 @@ public class Pilote {
 			robot.setDirection(direction = (direction + 90));
 		}
 		
+		// Si on n'a trouvé de palet dans aucun des endroits vérifiés, on retourne Point.INCONNU
 		return Point.INCONNU;
 	}
 
+	
+	
+	/**
+	 * Permet de chercher un palet dans une intersection de la table, en faisant parcourir une ligne au robot tout en vérifiant sur les cotés à chaque intersection.
+	 * <p> Cette recherche ne marche que si tous les palets sont déposés sur une intersection.
+	 * 
+	 * @return Le point sur lequel on a détecté un palet, sinon Point.INCONNU
+	 */
 	public static Point trouverPalet() {
 		
+		// On prend les conditions de départ du robot
 		float x = robot.getPosition().getX(), y = robot.getPosition().getY();
 		Point point;
 		
+		// On accepte pas si le robot n'est pas claibré
 		if(robot.getPosition() == Point.INCONNU) {
 			throw new exceptions.PositionPasCalibreeException();
 		}
-		else if(robot.getDirection()%180 == 0) {
+		else if(robot.getDirection()%180 == 0) { // Si le robot est en position verticale, on le remet en position horizontale
 			tournerJusqua(Ligne.xToLongues.get(x), true, 250, 250); tournerJusqua(Ligne.xToLongues.get(x), false, 50, 20);
 			robot.setDirection(robot.getDirection() + 90);
 		}
-		else if(robot.getDirection() == 90 && robot.getPosition().getY() == 1 || robot.getDirection() == 270 && robot.getPosition().getY() == -1) {
+		else if(robot.getDirection() == 90 && robot.getPosition().getY() == 1 || robot.getDirection() == 270 && robot.getPosition().getY() == -1) { // Si le robot est dans  face à la blanche, on le fait se retourner
 			Pilote.allerVersPoint(x, y*2);
 			Pilote.allerVersPoint(x, y);
 		}
-		else if(robot.getDirection() == 90 && robot.getPosition().getY() == 2 || robot.getDirection() == 270 && robot.getPosition().getY() == -2) {
+		else if(robot.getDirection() == 90 && robot.getPosition().getY() == 2 || robot.getDirection() == 270 && robot.getPosition().getY() == -2) { // si le robot est face au vide, on le fait se retourner
 			Pilote.tournerJusqua(Ligne.xToLongues.get(x), true, 250); Pilote.tournerJusqua(Ligne.xToLongues.get(x), false, 50, 20);
 			chassis.travel(-5); chassis.waitComplete();
 			robot.setDirection((robot.getDirection() + 180)%360);
 		}
 		
-		if(x==0) {
+		if(x==0) { // Si on est sur la ligne noire, on contourne en allant vers la jaune.
 			allerVersPoint(x=1, y);
 		}
 		
 		CouleurLigne ligne = Ligne.xToLongues.get(x);
 		
-		float avancement = robot.getDirection() == 90 ? 1 : -1;
-		if(Math.abs(y) == 2 || y == 0) {
+		float avancement = robot.getDirection() == 90 ? 1 : -1; // direction du robot 
+		if(Math.abs(y) == 2 || y == 0) { // Si nous sommes dans le centre, ou que nous sommes dans une ligne blanche, on vérifie qu'aucun palet ne se trouve dans l'intersection qu'on regarde
 			System.out.println("[trouverPalet] début de ligne, je vérifie la première intersection");
 			point = verifierPalet(DEVANT);
 			if (point != Point.INCONNU) {
 				return point;
 			}
-			else {
+			else { // Une fois qu'on est sûr que l'intersection est vide, on s'y place pour commencer une recherche sur les trois intersections
 				System.out.println("[trouverPalet] rien trouvé dans la première intersection, j'avance");
 				allerVersPoint(x, y=(y+avancement));
 				if(y-avancement == 0) {
@@ -932,8 +984,11 @@ public class Pilote {
 			}
 		}
 		Sound.beep();
+		/* à partir de ce point, on se trouve forcément dans la première intersection de notre direction 
+		 * et on vérifie dans chacune des trois intersections si on voit un palet ou pas
+		 */
 		int lignes_verifiees = 0; y  = robot.getPosition().getY();
-		while(lignes_verifiees<3) {
+		while(lignes_verifiees<3) { // Pour chacune des trois intersections on vérifie sur les cotés.
 			System.out.println("[trouverPalet] je vérifie pour la ligne numéro " + (lignes_verifiees+1));
 			point = verifierPalet();
 			if(point!=Point.INCONNU) {
@@ -944,6 +999,8 @@ public class Pilote {
 			lignes_verifiees++;
 		}
 		
+		
+		// Si l'on a trouvé dans aucune intersection, on retroune INCONNU.
 		return Point.INCONNU;
 	}
 	
