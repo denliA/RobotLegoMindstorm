@@ -35,6 +35,10 @@ public class Toucher{
 		return(touche);
 	}
 	
+	/**
+	 * Indique si le capteur de toucher est actif ou pas
+	 * @return true si le capteur de toucher est actif
+	 */
 	public static boolean getStatus() {
 		return(status);
 	}

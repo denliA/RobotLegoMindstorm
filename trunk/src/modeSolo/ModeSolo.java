@@ -220,7 +220,7 @@ public class ModeSolo {
 					}
 					else {
 						//robot fait demi-tour
-						Pilote.tournerJusqua(couleur, true,250);
+						Pilote.tournerJusqua(couleur, true,250, 350, 200);
 						Pilote.tournerJusqua(couleur, false, 50,50);
 					}
 				}

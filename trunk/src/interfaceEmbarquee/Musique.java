@@ -8,7 +8,7 @@ import lejos.hardware.lcd.LCD;
  * <p>Classe qui permet de lancer un son dans un thread et de l'interrompre si besoin.</p>
  * 
  * @see ValeursConfig
- * @see Congigurations
+ * @see Configurations
  * 
  */
 

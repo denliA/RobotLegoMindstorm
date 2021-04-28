@@ -9,8 +9,7 @@ public class Palet extends Cercle {
 	private final static float rayonPalet = 2.9f;
 	/**
 	 * Constructeur du palet qui fait en fait juste appel au constructeur @see Cercle#Cercle(Point, float).
-	 * @param centre
-	 * @param rayon
+	 * @param centre centre du palet
 	 */
 	public Palet(Point centre) {
 		super(centre, rayonPalet);
@@ -26,8 +25,8 @@ public class Palet extends Cercle {
 	
 	/**
 	 * Méthode indiquant le deplacement. Appelle simplement la méthode @see Cercle#setCentre(Point).
-	 * @param x
-	 * @param y
+	 * @param x mouvement en x
+	 * @param y mouvement en y
 	 */
 	public void deplacer(float x, float y) {
 		this.setCentre(this.getCentre().getX()+x, this.getCentre().getY()+y);

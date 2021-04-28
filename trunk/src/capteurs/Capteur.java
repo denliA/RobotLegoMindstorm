@@ -21,17 +21,21 @@ public class Capteur {
 	Ils permettent la recuperation des donnees des capteurs.
 	Ces objets sont utilises par les autres classes du package pour obtenir les valeurs mesurees*/
 	
-	//Capteur toucher pour la classe Toucher
+	/**Capteur toucher pour la classe Toucher*/
 	public static SampleProvider TOUCHER;
 	
-	//sample providers du capteur de couleur pour la classe Couleur
+	/**Capteur RGB*/
 	public static SampleProvider RGB;
+	/**Capteur de lumière ambiante*/
 	public static SampleProvider LUMIERE_AMBIANTE;
+	/**Capteur d'ID Couleur*/
 	public static SampleProvider ID_COULEUR;
+	/**Capteur d'intensité du rouge*/
 	public static SampleProvider ROUGE;
 	
-	//sample providers pour la classe Ultrason
+	/**Capteur à ultrasons en mode distance*/
 	public static SampleProvider ULTRASON;
+	/**Capteur à ultrasons en mode écoute d'un autre ultrason*/
 	public static SampleProvider ECOUTE;
 	
 	static {

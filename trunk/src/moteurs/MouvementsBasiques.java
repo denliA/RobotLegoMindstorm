@@ -34,6 +34,7 @@ public class MouvementsBasiques {
 					WheeledChassis.modelWheel(Moteur.MOTEUR_DROIT, rightWheelDiameter).offset(-trackWidth / 2).invert(false) },
 				WheeledChassis.TYPE_DIFFERENTIAL);
 	
+	/**Pilote contenant le chassis. Ne pas utiliser.*/
 	@Deprecated 
 	public static MovePilot pilot = new MovePilot (chassis);
 	

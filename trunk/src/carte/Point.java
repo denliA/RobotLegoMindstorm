@@ -6,6 +6,7 @@ package carte;
  */
 public class Point {
 	
+	/**Représente un point indéterminé. Utile pour les fonctions qui retournent un point mais qui échouent*/
 	public static final Point INCONNU = new Point(Float.NaN, Float.NaN);
 	
 	private float x;
@@ -13,8 +14,8 @@ public class Point {
 	
 	/**
 	 * Le constructeur, un point sur un plan a des coordonnées (x,y).
-	 * @param x
-	 * @param y
+	 * @param x coordonnée en x du point 
+	 * @param y coordonnée en y du point
 	 */
 	public Point(float x, float y) {
 		this.x = x;
@@ -22,27 +23,32 @@ public class Point {
 	}
 	
 	/**
-	 * Les getters.
-	 * @return La coordonnée que l'on souhaite connaître.
+	 * getter.
+	 * @return La coordonnée en x
 	 */
 	public float getX() {
 		return(this.x);
 	}
-	
+	/**
+	 * getter.
+	 * @return La coordonnée en y
+	 */
 	public float getY() {
 		return(this.y);
 	}
 	
 	/**
-	 * Les setters, ils permettent de modifier la coordonnée qui leur est associée.
-	 * @param x
-	 * ou bien (pour le setY()
-	 * @param y
+	 * setter 
+	 * @param x la nouvelle valeur de la coordonnée en x 
 	 */
 	void setX(float x) {
 		this.x = x;
 	}
 	
+	/**
+	 * setter 
+	 * @param y la nouvelle valeur de la coordonnée en y 
+	 */
 	void setY(float y) {
 		this.y = y;
 	}
@@ -51,7 +57,7 @@ public class Point {
 	 * Calcule la distance entre le point appelant cette méthode et le point A entre en paramètre.
 	 * Utilise la formule classique consistant a faire la racine carrée de la somme des carres des difference entre les coordonnées des points :
 	 * sqrt((x-x0)^2+(y-y0)^2).
-	 * @param A
+	 * @param A point duquel on calcule la distance
 	 * @return La distance entre 2 points.
 	 */
 	public float distance(Point A) {

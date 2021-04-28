@@ -39,6 +39,8 @@ public class Menu implements Lancable{
 		this.tab = tab;
 	}
 	
+	/**Construit un nouveau menu vide
+	 * @param titre du menu*/
 	public Menu(String titre) {
 		this.titre=titre;
 		this.tab = null;
@@ -57,7 +59,7 @@ public class Menu implements Lancable{
 	/**
      * Affecte un tableau de Lancables préexistant à l'attribut tab du Menu
      * @see Lancable
-     *
+     * @param tab tableau de lancables affecté
      */
 	public void setTab(Lancable tab[]) {
 		this.tab = tab;
@@ -84,6 +86,8 @@ public class Menu implements Lancable{
 		int debutColonne=0;
 		//indice qui limite le défilement à droite
 		long max=0;
+		int nb_pages = (tab.length%6) == 0 ? tab.length/6 : (int)Math.ceil(tab.length/6f);
+		
 		//tant que l'utilisateur n'appuie pas sur le bouton "ESCAPE", on reste dans la boucle
 		while(button != Button.ID_ESCAPE) {
 			//nettoie les 6 dernières lignes de l'écran du robot.
@@ -92,6 +96,7 @@ public class Menu implements Lancable{
 			LCD.drawString("->", 0, choix+1);
 			//affiche le titre du Menu
 			LCD.drawString(titre, 3, 0);
+			LCD.drawString("("+(page+1)+"/"+(nb_pages)+")", 7, 1);
 			for (i=0; i<6 && i+6*page<tab.length;i++) { // On boucle sur les 6 lignes à afficher pour cette fois, en sautant les lignes des pages précédentes
 				buffer[i]=tab[i+page*6].getTitre().toCharArray();
 				max= (max<buffer[i].length ? buffer[i].length : max); // Permet de connaître la ligne la plus longue à afficher

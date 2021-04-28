@@ -18,6 +18,7 @@ public class TestPilote {
 		Couleur.startScanAtRate(0); //commence le scan de la couleur immediatement. Quand une tache est finie, une autre est relancée sans délai.
 		MouvementsBasiques.chassis.setLinearAcceleration(10);
 		MouvementsBasiques.chassis.setLinearSpeed(20);
+		chassis.waitComplete();
 		//testSeRedresserSurLigne(CouleurLigne.JAUNE);
 
 		

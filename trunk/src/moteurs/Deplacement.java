@@ -20,16 +20,16 @@ import lejos.utility.TimerListener;
 public abstract class Deplacement extends Thread {
 	
 	/**
-	 * Enumeration listant les types de déplacements : <ul>
-	 *  	<li> Un déplacement <code>EXCLUSIF</code> représente le mouvement principal du robot, qui ne peut s'éxécuter en concurrence avec un autre déplacement exclusif. 
-	 *  	<li> Un déplacement <code>DEMON</code> est un déplacement qui peut s'exécuter en permanence en concurrence avec d'autres déplacements. Par exemple, la gestion du vide
-	 *  	     peut être modélisée par un déplacement de ce type.
-	 *  	<li> 
-	 *
+	 * Enumeration listant les types de déplacements :
 	 */
-	public enum TypeDeplacement {EXCLUSIF, DEMON, AIDE}
+	public enum TypeDeplacement {/**représente le mouvement principal du robot, qui ne peut s'éxécuter en concurrence avec un autre déplacement exclusif. */EXCLUSIF, 
+		/**est un déplacement qui peut s'exécuter en permanence en concurrence avec d'autres déplacements. Par exemple, la gestion du vide peut être modélisée par un déplacement de ce type.*/DEMON, 
+		/**est lancé par un autre déplacement */AIDE}
 	
-	public enum StatusDeplacement { PRET, ENCOURS, INTERROMPU, FINI }
+	/**
+	 * Enumeration listant le l'état du déplacement.
+	 */
+	public enum StatusDeplacement { /**Avant le début du déplacement*/PRET, /**Pendant le déplacement*/ENCOURS, /**Après l'interruption, mais avant la fin */INTERROMPU, /**après la fin*/FINI }
 	
 	protected ConditionArret condition;
 	protected  StatusDeplacement status;
@@ -39,6 +39,11 @@ public abstract class Deplacement extends Thread {
 	Timer verificateur;
 	Stack<Deplacement> pile_aide = new Stack<>();
 	
+	/**
+	 * 
+	 * @param condition condition d'arrêt du déplacement. Va être constamment évaluée pendant le dit déplacement
+	 * @param type type du déplacement (si c'est un déplacement d'aide, exclusif etc...
+	 */
 	public Deplacement(ConditionArret condition, TypeDeplacement type) {
 		this.condition = condition;
 		this.type =  type;
@@ -55,19 +60,35 @@ public abstract class Deplacement extends Thread {
 		});
 	}
 	
+	/**
+	 * Fonction contenant le code à executer pour faire le déplacement.
+	 */
 	public void lancer() {
 		this.status = StatusDeplacement.ENCOURS;
 		run();
 	};
 	
+	/**
+	 * Retourne le status du déplacement (Prêt, en cours, interrompu etc...)
+	 * @return status du déplacement
+	 * @see StatusDeplacement
+	 */
 	public StatusDeplacement getStatus() {
 		return status;
 	}
 	
+	/**
+	 * Appelée <b>après</b> l'arrêt d'un déplacement. Indique les cause d'arrêt du déplacement
+	 * @return un tableau de chaînes de caractères, chacune représentant une cause d'arrêt
+	 */
 	public String [] causesArret() {
 		return condition.getCausesArret();
 	}
 	
+	/**
+	 * Permet d'arrêter manuellement le déplacement
+	 * @param attendreArret si à true, la fonction ne retourne pas la main à l'appelant avant la fin du déplacement.
+	 */
 	public void arreter(boolean attendreArret) {
 		while(!pile_aide.isEmpty()) {
 			Deplacement d = pile_aide.pop();

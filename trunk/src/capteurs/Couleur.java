@@ -99,9 +99,13 @@ public class Couleur {
 	 *
 	 */
 	public static class BufferContexte {
+		/**Couleur interprétée*/
 		public CouleurLigne couleur_x;
+		/**Instant de la sauvegarde du contexte*/
 		public long temps_x;
-		public float [] rgb_x, ratios_x;
+		/**Valeurs RGB*/
+		public float [] rgb_x, /**Valeurs RGB en version Ratios*/ ratios_x;
+		/** Intersection (non utilisé pour le moment) */
 		public CouleurLigne intersection_x=null;
 		
 		
@@ -128,6 +132,15 @@ public class Couleur {
 		/**
 		 * Si on détecte que l'on est à une intersection donnée avec une autre couleur, <code>intersection_x</code> est initialisée à cette couleur
 		 * en plus du reste des composantes de la mesure.
+		 * @param couleur_x couleurLigne interprétée
+		 * @param temps_x instant de la prise de mesure
+		 * @param rouge_x valeur mesurée du rouge
+		 * @param vert_x valeur mesurée du vert
+		 * @param bleu_x valeur mesurée du bleu
+		 * @param rg_x valeur du ratio rouge/vert
+		 * @param bg_x valeur du ratio bleu/vert
+		 * @param br_x valeur du ratio bleu/rouge
+		 * @param intersection_x intersection détectée (souvent à null)
 		 * @see #BufferContexte(CouleurLigne, long, float, float, float, float, float, float)
 		 */
 		public BufferContexte(CouleurLigne couleur_x, long temps_x, float rouge_x, float vert_x, float bleu_x,
@@ -137,6 +150,7 @@ public class Couleur {
 			
 		}
 		
+		/** Constructeur d'une case non déterminée (ne contennat pas encore les informations)*/
 		public BufferContexte() {}
 		
 		/**
@@ -171,9 +185,15 @@ public class Couleur {
 		
 		private BufferContexte[] buffer;
 		private int index;
+		/**Taille de l'historique (nombre maximal de mesures enregistrées en même temps)*/
 		public int taille;
+		/**Nombre de mesures effectuées jusuqu'à maintenant*/
 		public int mesures_effectuees;
 		
+		/**
+		 * Crée un nouveau buffer
+		 * @param taille taille du buffer
+		 */
 		public BufferCouleurs(int taille) {
 			index = -1;
 			this.taille = taille;
@@ -197,7 +217,7 @@ public class Couleur {
 		
 		/**
 		 * @deprecated Moins adaptée que save(BufferContexte) car utilise les attributs de Couleur pour créer le contexte, et bloque tout le buffer pendant toute la durée de sauvegarde
-		 * @param c couleur intérprétée de la mesure.
+		 * @param c couleur interprétée de la mesure.
 		 * @see #save(BufferContexte)
 		 */
 		public void save(CouleurLigne c) {
@@ -212,8 +232,8 @@ public class Couleur {
 		
 		/**
 		 * @deprecated utiliser {@link #save(BufferContexte)}
-		 * @param couleur
-		 * @param intersection
+		 * @param couleur interprétée de la mesure.
+		 * @param intersection intersection (à null)
 		 */
 		public void save(CouleurLigne couleur, CouleurLigne intersection) {
 			save(couleur);
@@ -255,7 +275,7 @@ public class Couleur {
 		/**
 		 * Pour sauvegarder l'historique entier des mesures dans un fichier au format CSV
 		 * @param savePath chemin et nom du fichier contenant la sauvegarde
-		 * @see {@link BufferContexte#formatCSV()}
+		 * @see BufferContexte#formatCSV()
 		 */
 		public void toCSV(String savePath) {
 			BufferContexte[] h = historique(taille);
@@ -331,7 +351,7 @@ public class Couleur {
 	
 	/**
 	 * Dernière lumière ambiante mesurée
-	 * @return
+	 * @return la valeur de la dernière mesure de lumière ambiante
 	 */
 	public static float getAmbiantLight() {
 		synchronized(lock) {
