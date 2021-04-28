@@ -44,8 +44,8 @@ public class Pilote {
 	
 	
 	
-	static private boolean seDeplace = false;
-	static private boolean suiviLigne = false; // Permet de s'assurer qu'on ne lance jamais deux suivis de ligne en même temps
+	static volatile private boolean seDeplace = false;
+	static volatile private boolean suiviLigne = false; // Permet de s'assurer qu'on ne lance jamais deux suivis de ligne en même temps
 	/**
 	 * Permet de savoir si le robot est en cours de déplacement
 	 * @return true ssi le robot se déplace
@@ -64,7 +64,8 @@ public class Pilote {
 	
 
 
-	public static boolean seMetBien=false;
+	private volatile static boolean recursion = false; // Permet d'éviter les problèmes de concurrence avec la récursion.
+	public volatile static boolean correctionSuivi = false;
 	/**
 	 * Fonction pour suivre une ligne de couleur sans s'en décaler
 	 * <p> La fonction doit être interrompue manuellement par l'appelant en appelant la méthode {@link #SetSeDeplace(boolean)}
@@ -72,9 +73,13 @@ public class Pilote {
 	 * @param c couleurLigne qu'on doit suivre
 	 */
 	public static void suivreLigne(CouleurLigne c) {
-		System.out.println("ENTREE DANS SUIVI");
-		seDeplace = true;
-		suiviLigne = true;
+		if(recursion) {
+			seDeplace = true;
+			suiviLigne = true;
+		}
+		else {
+			recursion = false;
+		}
 		// vitesses d'avant l'appel, à remettre à la fin
 		double def_acc=MouvementsBasiques.chassis.getLinearAcceleration();
 		double def_speed = MouvementsBasiques.chassis.getLinearSpeed();
@@ -86,7 +91,7 @@ public class Pilote {
 		final long dureeRotation = 250; //possibilité de mieux calibrer, en fonction de la vitesse? (200 bien mais se décale vers la gauche des fois)
 		MouvementsBasiques.chassis.setLinearSpeed(20);
 		MouvementsBasiques.chassis.setLinearAcceleration(5);
-		final int max_cycles = 2; //nombre de fois ou il ne trouve pas la couleur avant d'appeler seRedresserSurLigne. Cycles commence à 0.
+		final int max_cycles = 1; //nombre de fois ou il ne trouve pas la couleur avant d'appeler seRedresserSurLigne. Cycles commence à 0.
 		
 		long debut;
 
@@ -98,7 +103,7 @@ public class Pilote {
 		Couleur.startScanAtRate(1);
 		MouvementsBasiques.chassis.travel(Float.POSITIVE_INFINITY); // Le robot commence à avancer tout droit sans arrêt
 		
-		
+		correctionSuivi = true;
 		// Si dès le début, le robot se décale de la ligne dès le début, c'est qu'il n'était pas bien placé, et on essaie de le faire se redresser avec tournerJusqua
 		boolean sorti;
 		do {
@@ -128,7 +133,7 @@ public class Pilote {
 			}
 			
 		} while(sorti && seDeplace); // On répète l'opération jusuqu'à ce que le robot puisse rester sur la ligne pendant au moins une période
-		
+		correctionSuivi = false;
 		
 		BufferContexte last;
 		
@@ -150,7 +155,7 @@ public class Pilote {
 				Moteur.MOTEUR_DROIT.setSpeed(defaultSpeedDroit); // On remet le moteur à la bonne vitesse après avoir fini
 				
 				// Si on ne voit toujours pas la couleur, on tourne dans la direction opposée pendant deux fois plus de temps
-				if ((last=Couleur.buffer.getLast()).couleur_x!=c) {
+				if ((last=Couleur.buffer.getLast()).couleur_x!=c && seDeplace) {
 					int nb_pas_bien = 0; boolean pas_bien;
 					debut = System.currentTimeMillis();
 					Moteur.MOTEUR_GAUCHE.setSpeed(defaultSpeedGauche*coef_gauche);
@@ -173,15 +178,19 @@ public class Pilote {
 					//gestion d'erreur le robot n'a pas pu se redresser sur une ligne de couleur et il est perdu. Il faut arrêter le mouvement
 					System.out.println("	entrée dans le code de correction");
 					MouvementsBasiques.chassis.setLinearAcceleration(40);
-					MouvementsBasiques.chassis.travel(-10);
+					MouvementsBasiques.chassis.travel(-25);
 					MouvementsBasiques.chassis.waitComplete();
 					cycles = 0;
-					seRedresserSurLigne(c, false, 90,250); // TODO à calibrer (l'angle max et la vitesse de rotation)
 					MouvementsBasiques.chassis.setLinearAcceleration(5);
-					MouvementsBasiques.chassis.travel(Float.POSITIVE_INFINITY); 	
+					boolean trouve;
+					trouve = tournerJusqua(c, true, 100, 0, 90);
+					trouve|= tournerJusqua(c, false, 100, 0, 90*2);
+					recursion = true;
+					suivreLigne(c);
+					return;
 				}
 				else if (cycles<max_cycles && seDeplace) { // On incrémente le nombre de cycles passés sans trouver la couleur.
-					if (last.couleur_x==CouleurLigne.GRIS || dec) { cycles++; } 
+					if (true ||last.couleur_x==CouleurLigne.GRIS || dec) { cycles++; } 
 				}
 			}
 			else {
@@ -225,7 +234,9 @@ public class Pilote {
 	 * Permet d'arrêter le suivi de ligne lancé
 	 */
 	public static void arreterSuivi() {
-		seDeplace = false;
+		while(recursion)
+			; // Si la fonction de suivi de ligne s'est appelée récursivement, on attend la fin de la transition entre les deux fonctions avant d'arrêter.
+		seDeplace = false; // On envoie le signal d'arrêt
 		chassis.waitComplete();
 		while(suiviLigne) // On ne rend pas la main à la fonction appelante tant que la fonction du suivi de ligne n'a pas totalement fini.
 			Thread.yield();
@@ -286,9 +297,9 @@ public class Pilote {
 			 * Si on a trouvé pendant la recherche, mais qu'on a légèrement dépassé, on revient en arrière très lentement pour retrouver la bonne position
 			 */
 			if (Couleur.getLastCouleur()!=c&&seDeplace) {
-				MouvementsBasiques.pilot.setAngularSpeed(vitesse_angulaire/4);
+				MouvementsBasiques.chassis.setAngularSpeed(vitesse_angulaire/4);
 				trouve = tournerJusqua(c, gauche_bouge, (int)(vitesse_angulaire/2), 0, (int)20);
-				MouvementsBasiques.pilot.setAngularSpeed(vitesse_angulaire);
+				MouvementsBasiques.chassis.setAngularSpeed(vitesse_angulaire);
 			}
 			if (seDeplace && iterations < max_iterations) { // Après avoir trouvé, on avance de 10cm pour vérifier si l'on sort ou pas
 				MouvementsBasiques.chassis.travel(10);
@@ -358,7 +369,7 @@ public class Pilote {
 			MouvementsBasiques.chassis.travel(Double.POSITIVE_INFINITY); // On lance le robot tout droit
 			vide = Couleur.videTouche(); // On remet le buffer du vide à 0
 			while(!(vide=Couleur.videTouche()) && (!c.contains(t=Couleur.getLastCouleur()))); // Tant qu'on a pas trouvé la bonne couleur, et qu'on ne voit pas du vide, on continue
-			if (vide) { // Si on voie du vide, on s'arrête, on se retorune (180°) et on retourne CouleurLigne.VIDE à l'appelant
+			if (vide) { // Si on voie du vide, on s'arrête, on se retourne (180°) et on retourne CouleurLigne.VIDE à l'appelant
 				MouvementsBasiques.chassis.setLinearAcceleration(250);
 				MouvementsBasiques.chassis.stop(); MouvementsBasiques.chassis.waitComplete();
 				MouvementsBasiques.chassis.setLinearAcceleration(accelerationLineaire);
@@ -371,8 +382,8 @@ public class Pilote {
 				MouvementsBasiques.chassis.waitComplete();
 			}
 		} while(vide);
-		tournerJusqua(t,adroite,250,200); // Puis on tourne jusuqu'à la bonne couleur.
-		tournerJusqua(t, !adroite, 40); // On tourne plus lentement de l'autre coté pour s'assurer qu'on n'a pas dépassé la couleur.
+		tournerJusqua(t,adroite,250,50); // Puis on tourne jusuqu'à la bonne couleur.
+		tournerJusqua(t, !adroite, 40, 0); // On tourne plus lentement de l'autre coté pour s'assurer qu'on n'a pas dépassé la couleur.
 		return t;
 		
 	}
@@ -677,7 +688,7 @@ public class Pilote {
 				}
 				else {
 					chassis.setLinearSpeed(10);
-					chassis.travel(-21); chassis.waitComplete();
+					chassis.travel(-30); chassis.waitComplete();
 				}
 			}
 			Pilote.tournerJusqua(Ligne.xToLongues.get(x), true, 50, 20, 15);
@@ -869,6 +880,7 @@ public class Pilote {
 		
 		// On vérifie que l'on n'est pas dans la ligne blanche en direction du camp, auquel cas il n'y a rien à vérifier.
 		if(Math.abs(prochain_y)<2 && (DEVANT&averifier)!=0) {
+			System.out.println("[verifierPalet] Je vérifie devant ! ");
 			// On essaie de vérifier si un palet se trouve dans la prochaine intersection
 			Ultrason.setDistance();
 			if(Ultrason.getDistance() <= .64f && Ultrason.getDistance() >= .40f) {
@@ -989,8 +1001,9 @@ public class Pilote {
 		 */
 		int lignes_verifiees = 0; y  = robot.getPosition().getY();
 		while(lignes_verifiees<3) { // Pour chacune des trois intersections on vérifie sur les cotés.
-			System.out.println("[trouverPalet] je vérifie pour la ligne numéro " + (lignes_verifiees+1));
-			point = verifierPalet();
+			System.out.println("[trouverPalet] je verifie pour la ligne numero " + (lignes_verifiees+1));
+			int verification = ACOTE | (lignes_verifiees < 2 ? DEVANT : 0);
+			point = verifierPalet(verification);
 			if(point!=Point.INCONNU) {
 				return point;
 			}
