@@ -8,7 +8,7 @@ import capteurs.CouleurLigne;
  * On considère un objet Ligne comme une droite parallèle a un axe du plan.
  * Il suffit de connaître sa coordonnée fixée puis de ne pas prendre compte de l'autre.
  * Puisqu'on peut simplement dire si elle est horizontale ou verticale.
- * De plus on la définit par une couleur pour faciliter l'association aux données recupérées par le capteur de couleurs.
+ * De plus on la définit par une couleur pour faciliter l'association aux données récupérées par le capteur de couleurs.
  */
 public class Ligne{
 	private boolean horizontale;

@@ -4,7 +4,7 @@ import exceptions.OuvertureException;
 import moteurs.MouvementsBasiques;
 import moteurs.Pince;
 /**
- * Classe statique dont les methodes permettent la recherche d'un palet grace au capteur ultrason
+ * Classe statique dont les méthodes permettent la recherche d'un palet grace au capteur ultrason
  * @see Capteur
  * @see Ultrason
  * @see Pince
