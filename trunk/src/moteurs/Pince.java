@@ -7,6 +7,11 @@ import java.io.IOException;
 import exceptions.OuvertureException;
 import lejos.hardware.Sound;
 import lejos.utility.Delay;
+
+/**
+ * Classe statique permettant de contrôler les pinces, ainsi que de mémoriser l'état des pinces
+ * durant l'execution du programme, et <b>entre l'execution de deux programmes</b> grâce à un fichier qui mémorise l'état.
+ */
 public class Pince {
 	
 	//Attribut

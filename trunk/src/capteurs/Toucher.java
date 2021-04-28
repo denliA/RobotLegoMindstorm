@@ -5,11 +5,11 @@ import lejos.utility.Delay;
 import lejos.utility.Timer;
 import lejos.utility.TimerListener;
 
+/**
+ * Classe gérant le capteur de contact.
+ * L'attribut status indique si le capteur est actif et touche indique si le capteur touche un palet.
+ */
 public class Toucher{
-	/**
-	 * Classe gérant le capteur de contact.
-	 * L'attribut status indique si le capteur est actif et touche indique si le capteur touche un palet.
-	 */
 	private static boolean status;
 	private static boolean touche;
 	private static boolean souvenir;
