@@ -5,6 +5,11 @@ import lejos.hardware.motor.EV3LargeRegulatedMotor;
 import lejos.hardware.port.MotorPort;
 import lejos.robotics.RegulatedMotor;
 
+/**
+ * Classe contenant les constantes représentant les moteurs de l'appareil.
+ * S'occupe d'ouvrir les moteurs, et de les fermer à la fin du programme.
+ *
+ */
 public class Moteur {
 	//ouvre les moteurs qui sont réutilisables dans les autres classes
 	/** Moteur contrôlant la roue gauche*/
