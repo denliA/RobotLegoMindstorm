@@ -12,8 +12,8 @@ public class Rectangle {
 	
 	/**
 	 * Constructeur d'un rectangle quelconque, il suffit de 2 coins pour construire un rectangle suivant les axes du plan.
-	 * @param infGauche
-	 * @param supDroite
+	 * @param infGauche point inférieur gauche du réctangle
+	 * @param supDroite point supérieur droit du réctangle
 	 */
 	public Rectangle(Point infGauche, Point supDroite) {
 	this.bas_gauche = infGauche;
@@ -21,13 +21,17 @@ public class Rectangle {
 	}
 	
 	/**
-	 * Les getters.
-	 * @return le coin, du rectangle, que l'on souhaite manipuler.
+	 * getter
+	 * @return le coin bas gauche du rectangle
 	 */
 	public Point getBasGauche() {
 		return(bas_gauche);
 	}
 	
+	/**
+	 * getter
+	 * @return le coin haut droit du rectangle
+	 */
 	public Point getHautDroite() {
 		return(haut_droite);
 	}
@@ -110,7 +114,7 @@ public class Rectangle {
 	
 	/**
 	 * Crée un rectangle a partir des coins reçus suite a l'appel des méthodes @see Rectangle#INFG(Rectangle) et @see Rectangle#SUPD(Rectangle) au dessus.
-	 * @param A
+	 * @param A deuxième rectangle
 	 * @return Le rectangle créé grace aux coins trouves par les méthodes INFG et SUPD.
 	 */
 	public Rectangle intersection(Rectangle A) {

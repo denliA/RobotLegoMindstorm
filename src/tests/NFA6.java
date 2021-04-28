@@ -1,5 +1,7 @@
 package tests;
 import capteurs.Ultrason;
+import capteurs.Capteur;
+import capteurs.Couleur;
 import capteurs.Toucher;
 import carte.Carte;
 import carte.Ligne;
@@ -24,6 +26,13 @@ public class NFA6 implements interfaceEmbarquee.Lancable{
 	Robot robot = carte.getRobot();
 	
 	public void lancer() {
+		
+		new Capteur();
+		Couleur.startScanAtRate(0);
+		Toucher.startScan();
+		if(!Pince.getOuvert()) {
+			Pince.ouvrir(0);
+		}
 		new Picker("Colonne départ?", Configurations.departX, true).lancer();
 		new Picker("Ligne départ ?", Configurations.departY, true).lancer();
 		new Picker("Direction ?", Configurations.departD, true).lancer();
@@ -38,6 +47,7 @@ public class NFA6 implements interfaceEmbarquee.Lancable{
 		Pilote.arreterSuivi(); 
 		Pince.fermer(500);
 		Pilote.rentrer(Configurations.campAdverse.getVal() == "porte" ? 90 : 270);
+		Pince.ouvrir();
 		
 	}
 	

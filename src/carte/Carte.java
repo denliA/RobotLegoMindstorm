@@ -42,9 +42,9 @@ public class Carte {
 	
 	/**
 	 * Le constructeur.
-	 * @param robot
-	 * @param lignes
-	 * @param terrain
+	 * @param robot robot associé à la carte
+	 * @param lignes dictionnaire liant des couleurs à des lignes
+	 * @param terrain terrain assicié à la carte
 	 */
 	public Carte(Robot robot, ConcurrentHashMap<CouleurLigne, Ligne> lignes, Rectangle terrain) {
 		this.robot = robot;
@@ -67,14 +67,26 @@ public class Carte {
 		return(robot);
 	}
 	
+	/**
+	 * Retourne la liste des lignes de la carte
+	 * @return dictionnaire liant chaque couleur à une ligne
+	 */
 	public ConcurrentHashMap<CouleurLigne, Ligne> getHashLignes(){
 		return(lignes);
 	}
 	
+	/**
+	 * Retourne la liste des intersection du terrain
+	 * @return liste des intersections du terrain
+	 */
 	public Point[][] getIntersections() {
 		return(intersections);
 	}
 	
+	/**
+	 * Retourne le terrain
+	 * @return le terrain
+	 */
 	public Rectangle getTerrain() {
 		return(terrain);
 	}
@@ -107,6 +119,12 @@ public class Carte {
 		robot.setDirection(etat.direction);
 	}
 	
+	/**
+	 * Calibre la position manuellement à partir des informations données
+	 * @param l la ligne suivie 
+	 * @param i1 la première intersection croisée
+	 * @param i2 la seconde intersection croisée
+	 */
 	public void calibrerPosition(CouleurLigne l, CouleurLigne i1, CouleurLigne i2 ) {
 		Etat etat = Ligne.hashPerdu.get(new Ligne.LCC(Ligne.hashLignes.get(l), i1,i2));
 		robot.setPosition(etat.position.getX(), etat.position.getY());
@@ -117,7 +135,7 @@ public class Carte {
 	 * Cette méthode permet de calibrer la position du robot sur la carte lorsque ce dernier traverse une ligne.
 	 * Cela permet d'eviter les imprecision qui s'accumulent dues a des approximations.
 	 * Le paramètre entre est la ligne en question. 
-	 * @param l
+	 * @param l ligne traversée
 	 */
 	public void traverseLigne(Ligne l) {
 		if(l.getDirection()) {
@@ -130,9 +148,9 @@ public class Carte {
 	
 	/**
 	 * Cette méthode permet de calibrer la position du robot lorsqu'il traverse une intersection.
-	 * Elle renvoie une erreur lorsque les 2 lignes sont parallèles.
-	 * @param l1
-	 * @param l2
+	 * @param l1 première ligne
+	 * @param l2 seconde ligne
+	 * @throws CalibrageException Elle renvoie une erreur lorsque les 2 lignes sont parallèles.
 	 */
 	public void traverseIntersection(Ligne l1, Ligne l2) throws CalibrageException{
 		if(!(l1.getDirection()^l2.getDirection())) {

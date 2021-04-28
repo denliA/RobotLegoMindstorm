@@ -40,6 +40,12 @@ public class Picker implements Lancable{
 		this(titre, c , false);
 	}
 	
+	/**
+	 * Construit un Picker
+	 * @param titre titre du Picker
+	 * @param c configuration à choisir
+	 * @param une_seule_fois si à true, on sort du Picker dès qu'on appuie sur entrée. Si à false, il faut toujours appuyer sur retour pour quitter.
+	 */
 	public Picker(String titre, Configurations c, boolean une_seule_fois) {
 		this.titre=titre;
 		this.configuration=c;
@@ -47,14 +53,14 @@ public class Picker implements Lancable{
 	}
 	
 	//affiche 1 seule configuration à la fois
-	//defilement vertical entre les configurations
-	//defilement horizontal pour afficher l'integralité de la chaine de caractères
+	//Défilement vertical entre les configurations
+	//Défilement horizontal pour afficher l'integralité de la chaîne de caractères
 	
 	/**
 	 * <p>Lance le Picker qui permet de choisir une Configuration.</p>
 	 * <p>Affiche 1 seule configuration à la fois au milieu de l'écran du robot.</p>
-	 * <p>Defilement vertical possible entre les configurations en appuyant sur les boutons "UP" et "DOWN".</p>
-	 * <p>Defilement horizontal possible pour afficher l'integralité du titre des Configurations.</p>
+	 * <p>Défilement vertical possible entre les configurations en appuyant sur les boutons "UP" et "DOWN".</p>
+	 * <p>Défilement horizontal possible pour afficher l'integralité du titre des Configurations.</p>
 	 * @see Lancable
 	 * @see Configurations
 	 * 
@@ -71,7 +77,7 @@ public class Picker implements Lancable{
 		//le buffer permettra de defiler à l'horizontale entre les caractères pour afficher l'integralité du titre
 		char[] buffer;
 		int j,k;
-		//indice du 1er caractère a afficher. C'est un curseur qui se déplace dans le buffer et permet le defilement horizontal
+		//indice du 1er caractère a afficher. C'est un curseur qui se déplace dans le buffer et permet le défilement horizontal
 		int debutColonne=0;
 		//tant que l'utilisateur n'appuie pas sur le bouton "ESCAPE", on reste dans la boucle
 		while(button != Button.ID_ESCAPE && !(une_seule_fois && button == Button.ID_ENTER)) {

@@ -15,31 +15,30 @@ import modeSolo.ModeSolo;
 /**
  * <p>ModeCompetition est une classe qui contient les strategies du ModeCompetition et qui s'appuie sur le ModeSolo.</p>
  * 
- * <p>Pour le moment, nous avons codé une seule strategie qui ramasse les 9 palets. Ce n'est pas un "vrai" mode competition vu que les deplacements 
- * du robot adverse et les palets qu'il a eventuellement ramssassés ne sont pas pris en compte. Dans une vrai competition, nous devons utiliser le 
- * capteur à ultrason pour connaitre les positions réelles des palets et du robot adverse.</p>
+ * <p>Pour le moment, nous avons codé une seule stratégie qui ramasse les 9 palets. Ce n'est pas un "vrai" mode competition vu que les déplacements 
+ * du robot adverse et les palets qu'il a éventuellement ramassés ne sont pas pris en compte. Dans une vrai competition, nous devons utiliser le 
+ * capteur à ultrason pour connaître les positions réelles des palets et du robot adverse.</p>
  * 
- * <p>Dans le ModeSolo, le robot doit deposer les palets derrière sa ligne blanche. Dans le ModeCompetition, il doit les deposer derrière 
- * la ligne blanche de l'adversaire. Cette strategie imite cette difference de zone d'en but.</p>
+ * <p>Dans le ModeSolo, le robot doit déposer les palets derrière sa ligne blanche. Dans le ModeCompetition, il doit les deposer derrière 
+ * la ligne blanche de l'adversaire. Cette stratégie imite cette difference de zone d'en but.</p>
  * 
- * <p>Le robot peut demarrer sur l'un des trois points de departs qui sont la ligne rouge, noire ou jaune. Deux possibilités :
+ * <p>Le robot peut démarrer sur l'un des trois points de departs qui sont la ligne rouge, noire ou jaune. Deux possibilités :
  *     <ul>
- *         <li>Le robot ramasse le premier palet qui se trouve devant lui, sort de la ligne et se decale pour ne pas pousser les autres palets. 
+ *         <li>Le robot ramasse le premier palet qui se trouve devant lui, sort de la ligne et se décale pour ne pas pousser les autres palets. 
  *         Puis, il avance tout droit et depose son palet derrière la ligne blanche de l'adversaire. Il se retourne et appelle le ramasserPalet()
  *         du modeSolo pour ramener les 8 palets restants. Ensuite, il les depose dans la zone d'en but derrière lui qui est celle de l'adversaire.
  *         </li>
- *         <li>Le robot a atteint la ligne blanche de l'adversaire sans ramener de palet. Il se decale sur une autre ligne et appelle le ramasserPalet() du modeSolo.</li>
+ *         <li>Le robot a atteint la ligne blanche de l'adversaire sans ramener de palet. Il se décale sur une autre ligne et appelle le ramasserPalet() du modeSolo.</li>
  *     </ul>
- * </p>
  * 
- * @see ModeSolo#ramasserPalets
+ * @see ModeSolo#ramasserPalet(int, int, boolean, boolean, boolean)
  * 
  */
 
 public class ModeCompetition {
 	
 	/**
-     * Unique strategie du ModeCompetition pour ramasser les 9 palets
+     * Unique stratégie du ModeCompetition pour ramasser les 9 palets
      * 
      * @param nbPalets
      *            Le nombre de palets à ramasser.

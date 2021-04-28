@@ -14,15 +14,21 @@ public class PaletUltrason {
 	private static int angleTotal;
 	private static float dDepart;
 	
+	/**Retourne l'angle total fait durant la recherche
+	 * @return angle total en degrés fait durant la recherche*/
 	public static int getAngle() {
 		return(angleTotal);
 	}
+	
+	/** Retourne la distance du palet trouvé par rapport au robot
+	 * @return distance en mètres entre la position de départ du robot et le palet
+	 * */
 	public static float getDistance() {
 		return dDepart;
 	}
 	/**
-	 * Méthode de recherche de palet reposant sur la recherche sequentielle du minimum dans un vecteur de distances
-	 * @throws OuvertureException
+	 * Méthode de recherche de palet reposant sur la recherche séquentielle du minimum dans un vecteur de distances
+	 * @throws OuvertureException dans le cas d'une mauvaise gestion des pinces
 	 * @deprecated 
 	 */
 	public static void sequentielle() throws OuvertureException {
@@ -121,7 +127,7 @@ public class PaletUltrason {
 	 * Méthode de recherche de palet reposant sur la recherche dichotomique de la distance minimale
 	 * @param range le rayon de recherche en mètre
 	 * @return 0 s'il trouve le palet, 1 s'il rencontre le vide (cas du mur), 2 si pas de palet en vue
-	 * @throws OuvertureException
+	 * @throws OuvertureException dans le cas d'une mauvaise gestion des pinces
 	 */
 	public static int dichotomique(int range) throws OuvertureException {
 		

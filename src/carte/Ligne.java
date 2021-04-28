@@ -17,9 +17,9 @@ public class Ligne{
 	
 	/**
 	 * Constructeur d'une ligne.
-	 * @param coord
-	 * @param horizontale
-	 * @param couleur
+	 * @param coord coordonnée de la ligne (en x ou en y selon la variable horizontale)
+	 * @param horizontale true si la ligne est horizontale, false sinon
+	 * @param couleur couleur de la ligne
 	 */
 	public Ligne(float coord, boolean horizontale, CouleurLigne couleur) {
 		this.coord = coord;
@@ -28,25 +28,32 @@ public class Ligne{
 	}
 	
 	/**
-	 * Les getters.
-	 * @return L'information d'interet sur la Ligne (direction = horizontale ou non, position = coordonnee fixee, couleur).
+	 * getter.
+	 * @return direction = horizontale ou non.
 	 */
-	
 	public boolean getDirection() {
 		return(horizontale);
 	}
 	
+	/**
+	 * getter
+	 * @return position = coordonnée fixée
+	 */
 	public float getPosition() {
 		return(coord);
 	}
 	
+	/**
+	 * getter
+	 * @return couleur de la ligne
+	 */
 	public CouleurLigne getCouleur() {
 		return(couleur);
 	}
 	
 	/**
-	 * Calcul du point d'intersection entre la Ligne appelant cette methode et la Ligne A passee en parametre.
-	 * @param A
+	 * Calcul du point d'intersection entre la Ligne appelant cette méthode et la Ligne A passée en paramètre.
+	 * @param A deuxième ligne
 	 * @return Le point en lequel s'intersectent les 2 Lignes
 	 */
 	public Point intersection(Ligne A) {
@@ -86,6 +93,12 @@ public class Ligne{
 		private Ligne ligne;
 		private CouleurLigne cl1;
 		private CouleurLigne cl2;
+		/**
+		 * Constructeur d'un objet LCC
+		 * @param ligne ligne suivie 
+		 * @param cl1 première intersection croisée
+		 * @param cl2 deuxième intersection croisée
+		 */
 		public LCC(Ligne ligne, CouleurLigne cl1, CouleurLigne cl2) {
 			this.ligne = ligne;
 			this.cl1 = cl1;
@@ -118,8 +131,13 @@ public class Ligne{
 	 * Représente un état à un moment donné, c'est à dire la position et la direction.
 	 */
 	public static class Etat{
-		public Point position;
-		public float direction;
+		/**Position de l'état */public Point position;
+		/**Direction de l'état*/public float direction;
+		/**
+		 * Constructeur de l'état
+		 * @param position position
+		 * @param direction direction
+		 */
 		public Etat(Point position, float direction) {
 			this.position = position;
 			this.direction = direction;

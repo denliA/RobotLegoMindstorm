@@ -65,6 +65,7 @@ public class Pilote {
 
 
 	private volatile static boolean recursion = false; // Permet d'éviter les problèmes de concurrence avec la récursion.
+	/**Est mis à true pour indiquer que la fonction suivre ligne est en phase de correction, phase qui rique de donner des faux positifs de NOIRE pour les couleurs*/
 	public volatile static boolean correctionSuivi = false;
 	/**
 	 * Fonction pour suivre une ligne de couleur sans s'en décaler
@@ -244,6 +245,11 @@ public class Pilote {
 	
 	/**
 	 * Se redresser sur la ligne précisée en faisant deux cycles de redressement
+	 * @param c couleur sur laquelle se redresser
+	 * @param gauche_bouge coté de rotation
+	 * @param max_angle angle maximal
+	 * @param vitesse_angulaire vitesse de rotation
+	 * @return true si le suivi s'est bien passé
 	 * @see #seRedresserSurLigne(CouleurLigne, boolean, double, double, int)
 	 */
 	public static boolean seRedresserSurLigne(CouleurLigne c, boolean gauche_bouge, float max_angle, int vitesse_angulaire) {
@@ -257,7 +263,7 @@ public class Pilote {
 	 * @param gauche_bouge si à true, le robot essaie d'abord de tourner dans le sens horaire pour trouver la ligne
 	 * @param max_angle angle maximum de recherche. Pour que le robot ne change pas de direction, mettre à 90°
 	 * @param vitesse_angulaire vitesse angulaire du redressement, inversement proportionnelle à la précision
-	 * @param max_iterations
+	 * @param max_iterations combien de fois le robot doit faire de cycles (gauche-/->droite-->avancer)
 	 * @return true si on a pu se redresser 
 	 */
 	public static boolean seRedresserSurLigne(CouleurLigne c, boolean gauche_bouge, double max_angle, double vitesse_angulaire, int max_iterations) {
@@ -336,6 +342,11 @@ public class Pilote {
 	 * 
 	 * @see #chercheLigne(Vector, double, double, double, boolean)
 	 * @param c coulerLigne cherchée
+	 * @param vitesseLineaire vitesse linéaire
+	 * @param accelerationLineaire accélération linéaire
+	 * @param vitesseAngulaire vitesse angulaire
+	 * @param adroite coté de la rotation
+	 * @return couleurLigne trouvée
 	 */
 	public static CouleurLigne chercheLigne(CouleurLigne c,double vitesseLineaire,double accelerationLineaire,double vitesseAngulaire, boolean adroite) {
 		Vector<CouleurLigne> v = new Vector<>();
@@ -354,7 +365,7 @@ public class Pilote {
 	 * @param accelerationLineaire accélération linéaire pendant la recherche
 	 * @param vitesseAngulaire vitesse angulaire pendant le redressement sur la ligne
 	 * @param adroite direction du redressement
-	 * @return la ligne trouvée si une ligne est trouvée, {@link capteurs.CouleurLigne.VIDE}
+	 * @return la ligne trouvée si une ligne est trouvée, {@link capteurs.CouleurLigne#VIDE}
 	 */
 	public static CouleurLigne chercheLigne(Vector <CouleurLigne> c,double vitesseLineaire,double accelerationLineaire,double vitesseAngulaire, boolean adroite) {
 		
@@ -392,7 +403,10 @@ public class Pilote {
 	
 	/**
 	 * Appelle la fonction tournerJusqua() avec une attente initiale par défaut de 300 milliSecondes et sans limite d'angle (4000, largement plus que le tour)
-	 * @see #tournerJusqua(CouleurLigne, boolean, int, int, int)
+	 * @param c couleurLigne vers laquelle tourner
+	 * @param adroite coté de rotation
+	 * @param vitesse vitesse de rotation
+	 * @return true si on a trouvé
 	 */
 	public static boolean tournerJusqua(CouleurLigne c, boolean adroite, int vitesse) {
 		return tournerJusqua(c, adroite, vitesse, 350);
@@ -400,8 +414,12 @@ public class Pilote {
 	
 	
 	/**
-	 * Appelle la fonction {@link #tournerJusqua(CouleurLigne, boolean, int, int, int)} sans limite d'angle (4000, largement plus que necessaire)
-	 * @see #tournerJusqua(CouleurLigne, boolean, int, int, int)
+	 * Appelle la fonction {@link #tournerJusqua(CouleurLigne, boolean, int, int, int)} sans limite d'angle (4000, largement plus que nécessaire)
+	 * @param c couleurLigne vers laquelle tourner
+	 * @param adroite coté de rotation
+	 * @param vitesse  vitesse de rotation 
+	 * @param temps_deb délai à attendre avant de commencer à vérifier la couleur
+	 * @return true si on a trouvé
 	 */
 	public static boolean tournerJusqua(CouleurLigne c, boolean adroite, int vitesse, int temps_deb) {
 		return tournerJusqua(c, adroite, vitesse, temps_deb, 4000);
@@ -417,7 +435,8 @@ public class Pilote {
 	 * @param vitesse vitesse à laquelle on tourne (vitesse des roues, en angle/s). Plus on est lent, plus on est précis
 	 * @param temps_deb temps à attendre après avoir commencé à tourner avant de commencer à vérifier la couleur. Utile quand on veut faire un 180° sur une couleur,
 	 * auquel cas il ne faut pas commencer à vérifier immédiatement car en se trouve sur la couleur au départ
-	 * @param max_angle 
+	 * @param max_angle angle maximal de la rotation
+	 * @return true si on a trouvé
 	 */
 	public static boolean tournerJusqua(CouleurLigne c,boolean adroite, int vitesse, int temps_deb, int max_angle) {
 		

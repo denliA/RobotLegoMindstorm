@@ -326,7 +326,7 @@ public class InterfaceTextuelle {
 	 */
 	Menu modeCompetition = new Menu("Mode Competition",new Lancable[] {lancerDuo,strategieDuo});
 	
-	
+	/**Menu contenant les scénarios de la recette*/
 	public Menu scenarios = new Menu("Scenarios",new Lancable[] {imposes,basiques,avances,optionnels});
 	
 	/**
@@ -354,7 +354,7 @@ public class InterfaceTextuelle {
 	
 	/**
 	 * <p>Point d'entrée du programme.</p>
-	 * 
+	 * @param args ignoré
 	 */
 	public static void main(String[] args) {
 		EV3LCDManager manager = EV3LCDManager.getLocalLCDManager();

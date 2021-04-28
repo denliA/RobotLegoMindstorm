@@ -18,8 +18,8 @@ public class Robot extends Rectangle {
 	
 	/**
 	 * Constructeur du robot. il suffit de donner le point au "centre" du robot et sa direction relative pour facilement construire notre robot virtuel.
-	 * @param position
-	 * @param direction
+	 * @param position position du centre/capteur couleur du robot
+	 * @param direction direction du robot
 	 */
 	public Robot(Point position, float direction) {
 		super(new Point(position.getX()-8f, position.getY()-14.5f), new Point(position.getX()+8f, position.getY()+14.5f));
@@ -37,17 +37,23 @@ public class Robot extends Rectangle {
 	static Robot robotUsuel = new Robot(Point.INCONNU, Float.NaN);
 	
 	/**
-	 * Les getters de la classe Robot.
-	 * @return L'attribut d'interet du robot : sa position, sa direction ou encore la position de son capteur de couleurs.
+	 * getter
+	 * @return la position du robot
 	 */
 	public Point getPosition() {
 		return(this.position);
 	}
-	
+	/**
+	 * getter
+	 * @return la direction du robot
+	 */
 	public float getDirection() {
 		return(this.direction);
 	}
-	
+	/**
+	 * getter
+	 * @return le cercle représentant le capteur
+	 */
 	public Cercle getCapteurCouleur() {
 		return(this.capteurCouleur);
 	}
@@ -56,8 +62,8 @@ public class Robot extends Rectangle {
 	 * Le setter de position.
 	 * Permet de modifier la position du robot, lorsqu'il se déplace notamment.
 	 * Permet de connaître a chaque instant la position du robot et donc de le faire agir en consequence.
-	 * @param x
-	 * @param y
+	 * @param x nouvelle coordonnée en x
+	 * @param y nouvelle coordonnée en y
 	 */
 	public void setPosition(float x, float y) {
 		this.position = new Point(x,y);
@@ -74,7 +80,7 @@ public class Robot extends Rectangle {
 	 * Le setter de direction.
 	 * Permet de modifier la direction du robot, lorsqu'il se tourne.
 	 * Permet de connaître a chaque instant la direction qu'a le robot et de le faire se redresser en consequence, lorsqu'il veut aller déposer un palet par exemple.
-	 * @param angle
+	 * @param angle nouvelle direction
 	 */
 	public void setDirection(float angle) {
 		this.direction = angle;
@@ -101,9 +107,9 @@ public class Robot extends Rectangle {
 	 * Permet de déplacer le robot de manière "humaine" dans le sens ou on considère qu'on le tourne comme on veut puis qu'on l'amene a un point (x,y).
 	 * Peut être utilise pour se calibrer après un mouvement complexe dont on aurait enregistre les informations durant le mouvement
 	 * en une seule étape dans la carte plutôt que de calculer en continue ce qui ne serait pas forcement utile.
-	 * @param x
-	 * @param y
-	 * @param directionRelative
+	 * @param x delta en x
+	 * @param y delta en y
+	 * @param directionRelative delta en angle
 	 */
 	public void deplacer(float x, float y, float directionRelative) {
 		this.tourner(directionRelative);
@@ -113,8 +119,8 @@ public class Robot extends Rectangle {
 	/**
 	 * Permet de déplacer le robot de manière simple, il avance d'une distance entrée en paramètre et avant cela tourne de la directionRelative entrée.
 	 * Le mouvement est donc une simple ligne droite dans une direction relative au robot.
-	 * @param distance
-	 * @param directionRelative
+	 * @param distance distance de déplacement
+	 * @param directionRelative angle de rotation avant d'avancer
 	 */
 	public void deplacer(float distance, float directionRelative) {
 		this.tourner(directionRelative);

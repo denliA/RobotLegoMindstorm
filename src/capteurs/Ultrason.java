@@ -91,6 +91,10 @@ public class Ultrason {
 		
 		bruitDetecte = autreRobot[0]==1;
 	}
+	/**
+	 * retourne si un autre robot a été détecté en face du notre
+	 * @return true si un autre robot est détecté.
+	 */
 	public static boolean getBruitDetecte() {
 		return bruitDetecte;
 	}
