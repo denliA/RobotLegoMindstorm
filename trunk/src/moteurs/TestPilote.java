@@ -52,7 +52,20 @@ public class TestPilote {
 //		Pilote.chercheLigne(couleurs, 25, 30, 180);
 		
 		
-		testVerifierPalet(1,1,90);
+//		testVerifierPalet(1,1,90);
+//		testTrouverPalet(1,-2,90);
+//		testTrouverPalet(0,-2,90);
+//		testTrouverPalet(1,0,270);
+//		System.out.println(Pilote.chercherPosition());
+		
+//		Pilote.lancerSuivi(CouleurLigne.JAUNE);
+//		Delay.msDelay(5000);
+//		Pilote.arreterSuivi();
+//		Delay.msDelay(100);
+//		Couleur.buffer.toCSV("./CouleursScannees");
+		
+		
+		carte.Carte.carteUsuelle.calibrerPosition();
 	}
 	
 	
@@ -140,6 +153,16 @@ public class TestPilote {
 		System.out.println("Point trouvé : "  + P);
 		System.out.println("Direction :" + r.getDirection());
 		
+	}
+	
+	public static void testTrouverPalet(float x, float y, float direction) {
+		new Capteur();
+		Couleur.startScanAtRate(0);
+		Carte c = carte.Carte.carteUsuelle;
+		Robot r = c.getRobot();
+		r.setDirection(direction);  r.setPosition(x, y);
+		Point P = Pilote.trouverPalet();
+		System.out.println("[testTrouverPalet]  point trouvé : "+P);
 	}
 	
 }

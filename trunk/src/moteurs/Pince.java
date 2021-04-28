@@ -28,7 +28,6 @@ public class Pince {
 			e.printStackTrace();
 		}
 	}
-//	Methodes
 	
 	private static void saveState() {
 		try {
@@ -41,12 +40,18 @@ public class Pince {
 		}
 	}
 	
+	/**
+	 * Retourne l'état des pinces
+	 * @return true si les pinces sont ouvertes, faux sinon
+	 */
 	public static boolean getOuvert() {
 		return ouvert;
 	}
 	
-	//Ouverture et fermeture des pinces
-	//methodes modifiant la valeur de ouvert simultanement
+	/**
+	 * Permet d'ouvrir les pinces.
+	 * @throws OuvertureException Si les pinces sont déjà ouvertes
+	 */
 	public static void ouvrir() throws OuvertureException {
 		if(ouvert) {
 			throw new OuvertureException("Pinces deja ouvertes.");
@@ -61,6 +66,10 @@ public class Pince {
 		}
 	}
 	
+	/**
+	 * Permet de fermer les pinces 
+	 * @throws OuvertureException Si les pinces sont déjà fermées
+	 */
 	public static void fermer() throws OuvertureException {
 		if(!ouvert) {
 			//TO DO
@@ -77,6 +86,12 @@ public class Pince {
 		}
 	}
 	
+	
+	/**
+	 * Permet d'ouvrir les pinces sans bloquer l'appelant (sans attendre que les pinces soient totalement ouvertes)
+	 * @param delai temps maximal avant de retourner la main à l'appelant
+	 * @throws OuvertureException si les pinces sont déjà ouvertes
+	 */
 	public static void ouvrir(int delai) throws OuvertureException {
 		if(ouvert) {
 			//envoyer message d'erreur ?
@@ -97,6 +112,11 @@ public class Pince {
 		}
 	}
 	
+	/**
+	 * Permet de fermer les pinces sans bloquer l'appelant (sans attendre que les pinces soient totalement fermées)
+	 * @param delai temps maximal avant de retourner la main à l'appelant
+	 * @throws OuvertureException si les pinces sont déjà fermées
+	 */
 	public static void  fermer(int delai) throws OuvertureException {
 		if(!ouvert) {
 			//TO DO
@@ -125,7 +145,6 @@ public class Pince {
 
 class TestPince{
 	public static void main(String[] args) {
-//		new Pince();  //juste pour voir s'il fallait charger la classe avant avec un new dans le vide
 		try {
 			Pince.ouvrir();
 		} catch (OuvertureException e) {

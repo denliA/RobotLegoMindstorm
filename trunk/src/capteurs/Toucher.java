@@ -69,6 +69,10 @@ public class Toucher{
 		touche = false;
 	}
 	
+	/**
+	 * Dès que le bouton retourne true, on garde l'information qu'il s'est activé à un moment jusuqu'à ce qu'elle soit traitée par une fonction extérieure.
+	 * @return true si le bouton était à true à un moment et que cette fonction n'a pas été appelée depuis, false sinon
+	 */
 	public static boolean aToucheAUnMoment() {
 		if(souvenir) {
 			souvenir = false; 

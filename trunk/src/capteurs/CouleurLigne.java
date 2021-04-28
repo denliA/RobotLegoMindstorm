@@ -50,7 +50,9 @@ public enum CouleurLigne {
 	NOIRE(new float[] {2,12,2,12,2,12 }, 1,-1, new float[] {0.55f, 1f, 0.40f, 0.67f, 0.40f, 0.98f}, 0, -.5f, new CouleurLigne[] {BLEUE, VERTE}, true),
 	ROUGE ( new float[] {22.5f, 36f, 5.75f, 13.5f, 2f, 11.25f}, 1,-.75f, new float[] {2.80f, 3.80f, 0.45f, 0.60f, 0.10f, 0.20f}, 1,-.75f, new CouleurLigne[] {BLEUE, VERTE, NOIRE, BLANCHE}, false), 
 	JAUNE (new float[] {38f, 58f, 50f, 71.5f, 7.5f, 13f}, 1,-.75f, new float[] {0.75f, 0.83f, 0.15f, 0.20f, 0.18f, 0.26f},1,-.75f, new CouleurLigne[] {BLEUE, VERTE, NOIRE, BLANCHE}, false),
+	/** Indique quand le robot voit le vide. Il est toujours détecté quand il n'y a aucune surface à mois de 5cm du capteur */
 	VIDE(new float[] {0,1,0,1,0,1 },null),
+	/** Constante représentant l'échec de reconnaissance de couleur. Apparaît notamment lorsque le capteur est entre deux couleurs, ou hors de la table*/
 	INCONNU(null, null),
 	NOIREH(null,null),
 	NOIREV(null,null),
