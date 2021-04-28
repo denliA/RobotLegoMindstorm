@@ -1,11 +1,11 @@
 package carte;
 
+/**
+ * Classe qui permet d'engendrer les classes Robot et Ligne. 
+ * Les intersections elles aussi sont des rectangles.
+ * Les rectangles, du moins, a leur creation suivent les axes du plan.
+ */
 public class Rectangle {
-	/**
-	 * Classe qui permet d'engendrer les classes Robot et Ligne. 
-	 * Les intersections elles aussi sont des rectangles.
-	 * Les rectangles, du moins, a leur creation suivent les axes du plan.
-	 */
 	
 	private Point bas_gauche;
 	private Point haut_droite;
@@ -33,7 +33,7 @@ public class Rectangle {
 	}
 	
 	/**
-	 * Le setter de la position du rectangle. Utilisee pour en deplacer un (@see Robot par exemple).
+	 * Le setter de la position du rectangle. Utilisée pour en déplacer un (@see Robot par exemple).
 	 * @param x
 	 * @param y
 	 */
@@ -45,8 +45,8 @@ public class Rectangle {
 	}
 	
 	/**
-	 * Utilisee pour verifier si 2 rectangles s'intersectent ou non.
-	 * Cette methode est utile pour ensuite calculer dans le cas ou il y en a une, l'intersection.
+	 * Utilisée pour verifier si 2 rectangles s'intersectent ou non.
+	 * Cette méthode est utile pour ensuite calculer dans le cas ou il y en a une, l'intersection.
 	 * @param A
 	 * @return Si oui ou non 2 rectangles s'intersectent.
 	 * 
@@ -60,10 +60,10 @@ public class Rectangle {
 	}
 	
 	/**
-	 * Appelle la methode @see Rectangle#intersect(Rectangle) puis si il y a en effet intersection, 
-	 * trouve le coin inferieur gauche de l'intersection entre le rectangle appelant la methode et le rectangle, A, passe en parametre.
+	 * Appelle la méthode @see Rectangle#intersect(Rectangle) puis si il y a en effet intersection, 
+	 * trouve le coin inférieur gauche de l'intersection entre le rectangle appelant la méthode et le rectangle, A, passe en paramètre.
 	 * @param A
-	 * @return Le coin inferieur de l'intersection formee par 2 rectangles.
+	 * @return Le coin inférieur de l'intersection formée par 2 rectangles.
 	 */
 	private Point INFG(Rectangle A) {
 		Point infg = null;
@@ -85,9 +85,9 @@ public class Rectangle {
 	}
 	
 	/**
-	 * Inferieur gauche devient superieur droit dans la description de la methode @see Rectangle#INFG(Rectangle) au dessus.
+	 * Inférieur gauche devient supérieur droit dans la description de la méthode @see Rectangle#INFG(Rectangle) au dessus.
 	 * @param A
-	 * @return Le coin superieur droit de l'intersection formee par 2 rectangles.
+	 * @return Le coin supérieur droit de l'intersection formée par 2 rectangles.
 	 */
 	private Point SUPD(Rectangle A) {
 		Point supd = null;
@@ -109,9 +109,9 @@ public class Rectangle {
 	}
 	
 	/**
-	 * Cree un rectangle a partir des coins recus suite a l'appel des methodes @see Rectangle#INFG(Rectangle) et @see Rectangle#SUPD(Rectangle) au dessus.
+	 * Crée un rectangle a partir des coins reçus suite a l'appel des méthodes @see Rectangle#INFG(Rectangle) et @see Rectangle#SUPD(Rectangle) au dessus.
 	 * @param A
-	 * @return Le rectangle cree grace aux coins trouves par les methodes INFG et SUPD.
+	 * @return Le rectangle créé grace aux coins trouves par les méthodes INFG et SUPD.
 	 */
 	public Rectangle intersection(Rectangle A) {
 		Rectangle inter = null;

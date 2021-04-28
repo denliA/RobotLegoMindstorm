@@ -1,13 +1,13 @@
 package carte;
 
+/**
+ * Classe représentant le robot dans la simulation du terrain de @see Carte. 
+ * Utilisée pour avoir les informations telles que la position et la direction (toutes 2 relatives a un plan orthogonal
+ * qui serait trace par les 2 lignes noire et dirige de manière a ce que l'axe des abscisse traverse les 2 lignes blanches)
+ * l'unite en abscisses est de 50cm et 60cm en ordonnées. 
+ * De plus ici sont certaines données en plus que nous n'avons malheureusement pas pu exploiter comme nous l'aurions voulu.
+ */
 public class Robot extends Rectangle {
-	/**
-	 * Classe representant le robot dans la simulation du terrain de @see Carte. 
-	 * Utilisee pour avoir les informations telles que la position et la direction (toutes 2 relatives a un plan orthogonal
-	 * qui serait trace par les 2 lignes noire et dirige de maniere a ce que l'axe des abscisse traverse les 2 lignes blanches)
-	 * l'unite en abscisses est de 50cm et 60cm en ordonnees. 
-	 * De plus ici sont certaines donnees en plus que nous n'avons malheureusement pas pu exploiter comme nous l'aurions voulu.
-	 */
 	private Point position;
 	final float longueur = 29f;
 	final float largeur = 16f;
@@ -32,7 +32,7 @@ public class Robot extends Rectangle {
 	
 	/**
 	 * Nous construisons un robot static,
-	 * il permettra d'�tre simplement modifie pour simplifier notre programme et ameliorer l'encapsulation car nous n'accedons qu'a une instance static du robot.
+	 * il permettra d'être simplement modifie pour simplifier notre programme et améliorer l'encapsulation car nous n'accedons qu'a une instance static du robot.
 	 */
 	static Robot robotUsuel = new Robot(Point.INCONNU, Float.NaN);
 	
@@ -54,8 +54,8 @@ public class Robot extends Rectangle {
 	
 	/**
 	 * Le setter de position.
-	 * Permet de modifier la position du robot, lorsqu'il se deplace notamment.
-	 * Permet de connaitre a chaque instant la position du robot et donc de le faire agir en consequence.
+	 * Permet de modifier la position du robot, lorsqu'il se déplace notamment.
+	 * Permet de connaître a chaque instant la position du robot et donc de le faire agir en consequence.
 	 * @param x
 	 * @param y
 	 */
@@ -73,15 +73,15 @@ public class Robot extends Rectangle {
 	/**
 	 * Le setter de direction.
 	 * Permet de modifier la direction du robot, lorsqu'il se tourne.
-	 * Permet de connaitre a chaque instant la direction qu'a le robot et de le faire se redresser en consequence, lorsqu'il veut aller deposer un palet par exemple.
+	 * Permet de connaître a chaque instant la direction qu'a le robot et de le faire se redresser en consequence, lorsqu'il veut aller déposer un palet par exemple.
 	 * @param angle
 	 */
 	public void setDirection(float angle) {
 		this.direction = angle;
 	}
 	 /**
-	  * Permet de calculer la direction qu'a le robot apres avoir tourner d'un certain angle entre en parametre.
-	  * Est utilisee dans la methode @see Robot#deplacer(float, float).
+	  * Permet de calculer la direction qu'a le robot après avoir tourner d'un certain angle entre en paramètre.
+	  * Est utilisée dans la méthode @see Robot#deplacer(float, float).
 	  * @param angle
 	  */
 	private void tourner(float angle) {
@@ -89,8 +89,8 @@ public class Robot extends Rectangle {
 	}
 	
 	/**
-	 * Permet de calculer la position du robot apres un deplacement en ligne droite suivant sa direction.
-	 * Est utilisee dans la methode @see Robot#deplacer(float, float).
+	 * Permet de calculer la position du robot après un deplacement en ligne droite suivant sa direction.
+	 * Est utilisée dans la méthode @see Robot#deplacer(float, float).
 	 * @param distance
 	 */
 	private void avancer(float distance) {
@@ -98,9 +98,9 @@ public class Robot extends Rectangle {
 	}
 	
 	/**
-	 * Permet de deplacer le robot de maniere "humaine" dans le sens ou on considere qu'on le tourne comme on veut puis qu'on l'amene a un point (x,y).
-	 * Peut etre utilise pour se calibrer apres un mouvement complexe dont on aurait enregistre les informations durant le mouvement
-	 * en une seule etape dans la carte plutot que de calculer en continue ce qui ne serait pas forcement utile.
+	 * Permet de déplacer le robot de manière "humaine" dans le sens ou on considère qu'on le tourne comme on veut puis qu'on l'amene a un point (x,y).
+	 * Peut être utilise pour se calibrer après un mouvement complexe dont on aurait enregistre les informations durant le mouvement
+	 * en une seule étape dans la carte plutôt que de calculer en continue ce qui ne serait pas forcement utile.
 	 * @param x
 	 * @param y
 	 * @param directionRelative
@@ -111,7 +111,7 @@ public class Robot extends Rectangle {
 	}
 	
 	/**
-	 * Permet de deplacer le robot de maniere simple, il avance d'une distance entree en parametre et avant cela tourne de la directionRelative entree.
+	 * Permet de déplacer le robot de manière simple, il avance d'une distance entrée en paramètre et avant cela tourne de la directionRelative entrée.
 	 * Le mouvement est donc une simple ligne droite dans une direction relative au robot.
 	 * @param distance
 	 * @param directionRelative
@@ -124,7 +124,7 @@ public class Robot extends Rectangle {
 	/**
 	 * Un simple toString, principalement utilise pour le debugging, mais peut servir si l'on a envie de faire une interface qui afficherai a chaque instant
 	 * (ou a chaque mise a jour) la position et la direction du robot, ou pour toute autre raison.
-	 * @return Une chaine de characteres contenant la position et la direction du robot (relativement a notre repere).
+	 * @return Une chaîne de caractères contenant la position et la direction du robot (relativement a notre repère).
 	 */
 	public String toString() {
 		return "Position : " + position + ". Direction : "+direction; 

@@ -1,10 +1,10 @@
 package carte;
 
+/**
+ * Une classe simple, servant a manipuler des points d'un plan.
+ * Est utilisée pour implementer les classes @see Ligne, @see Rectangle, @see Cercle et toutes les classes qu'elles engendrent.
+ */
 public class Point {
-	/**
-	 * Une classe simple, servant a manipuler des points d'un plan.
-	 * Est utilisee pour implementer les classes @see Ligne, @see Rectangle, @see Cercle et toutes les classes qu'elles engendrent.
-	 */
 	
 	public static final Point INCONNU = new Point(Float.NaN, Float.NaN);
 	
@@ -12,7 +12,7 @@ public class Point {
 	private float y;
 	
 	/**
-	 * Le constructeur, un point sur un plan a des coordonnees (x,y).
+	 * Le constructeur, un point sur un plan a des coordonnées (x,y).
 	 * @param x
 	 * @param y
 	 */
@@ -23,7 +23,7 @@ public class Point {
 	
 	/**
 	 * Les getters.
-	 * @return La coordonnee que l'on souhaite connaetre.
+	 * @return La coordonnée que l'on souhaite connaître.
 	 */
 	public float getX() {
 		return(this.x);
@@ -34,7 +34,7 @@ public class Point {
 	}
 	
 	/**
-	 * Les setters, ils permettent de modifier la coordonnee qui leur est associee.
+	 * Les setters, ils permettent de modifier la coordonnée qui leur est associée.
 	 * @param x
 	 * ou bien (pour le setY()
 	 * @param y
@@ -48,8 +48,8 @@ public class Point {
 	}
 	
 	/**
-	 * Calcule la distance entre le point appelant cette methode et le point A entre en parametre.
-	 * Utilise la formule classique consistant a faire la racine carree de la somme des carres des difference entre les coordonnees des points :
+	 * Calcule la distance entre le point appelant cette méthode et le point A entre en paramètre.
+	 * Utilise la formule classique consistant a faire la racine carrée de la somme des carres des difference entre les coordonnées des points :
 	 * sqrt((x-x0)^2+(y-y0)^2).
 	 * @param A
 	 * @return La distance entre 2 points.

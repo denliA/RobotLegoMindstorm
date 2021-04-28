@@ -21,7 +21,7 @@ public class PaletUltrason {
 		return dDepart;
 	}
 	/**
-	 * methode de recherche de palet reposant sur la recherche sequentielle du minimum dans un vecteur de distances
+	 * Méthode de recherche de palet reposant sur la recherche sequentielle du minimum dans un vecteur de distances
 	 * @throws OuvertureException
 	 * @deprecated 
 	 */
@@ -29,7 +29,7 @@ public class PaletUltrason {
 		
 		/**
 		 * initialiser l'infini
-		 * <p> Il sera utilise pour verifier que le robot trouve un palet. Condition d'arr�t d'une boucle while.</p>
+		 * <p> Il sera utilise pour verifier que le robot trouve un palet. Condition d'arrêt d'une boucle while.</p>
 		 */
 		float infini = Float.POSITIVE_INFINITY;
 		
@@ -46,8 +46,8 @@ public class PaletUltrason {
 		new Capteur();
 		/**
 		 * initialiser d
-		 * <p> d est la distance mesuree par le capteur ultrasons.
-		 * Elle est utilisee pour orienter le robot vers le palet.</p> 
+		 * <p> d est la distance mesurée par le capteur ultrasons.
+		 * Elle est utilise pour orienter le robot vers le palet.</p> 
 		 */
 		Ultrason.setDistance();
 		float d = Ultrason.getDistance();
@@ -55,14 +55,14 @@ public class PaletUltrason {
 		System.out.println("Premiere mesure de d : "+d);
 		
 			/**
-			 * Premiere boucle while : recherche grossiere du palet
-			 * <p>Le but de cette boucle est de capter le palet : le robot tourne de 10 degres dans le sens trigonometrique
-			 *  jusqu'a ce que d soit inferieure a 2m (succes) ou jusqu'a avoir fait un tour sur lui-meme (echec).</p>
+			 * Premiere boucle while : recherche grossière du palet
+			 * <p>Le but de cette boucle est de capter le palet : le robot tourne de 10 degrés dans le sens trigonométrique
+			 *  jusqu'a ce que d soit inférieure a 2m (succès) ou jusqu'a avoir fait un tour sur lui-même (échec).</p>
 			 */
 			int angle = 0;
 			while((d>2||d<=0)&&angle<360) {
 				angle+=10;
-				MouvementsBasiques.tourner(10);
+				MouvementsBasiques.chassis.rotate(10); MouvementsBasiques.chassis.waitComplete();
 				Ultrason.setDistance();
 				d = Ultrason.getDistance();
 				System.out.println(d);
@@ -73,27 +73,27 @@ public class PaletUltrason {
 			 * <p>But : trouver l'angle pour lequel la distance est la plus courte, 
 			 * s'orienter de cet angle puis avancer de cette distance.</p>
 			 * <ul>
-			 * <li> Etape 1 : le robot se decale de 5 degres pour arriver au milieu de la fenetre de captage
-			 * <li> Etape 2 : creer le tableau distances qui recueille les valeurs mesurees
-			 * <li> Etape 3 : mesures des valeurs tous les 2 degres
-			 * <li> Recherche de la distance minimale dans la meme boucle 
-			 * <li> Etape 4 : s'orienter correctement et avancer de la distance mesuree
+			 * <li> Étape 1 : le robot se décale de 5 degrés pour arriver au milieu de la fenetre de captage
+			 * <li> Étape 2 : créer le tableau distances qui recueille les valeurs mesurées
+			 * <li> Étape 3 : mesures des valeurs tous les 2 degrés
+			 * <li> Recherche de la distance minimale dans la même boucle 
+			 * <li> Étape 4 : s'orienter correctement et avancer de la distance mesurée
 			 * </ul>
 			 */
 			float dDepart = Ultrason.getDistance();
 			System.out.println("dDepart vaut : "+dDepart);
 			
-			MouvementsBasiques.tourner(5);
+			MouvementsBasiques.chassis.rotate(5); MouvementsBasiques.chassis.waitComplete();
 			
 			float[] distances = new float[10];
 			
-			MouvementsBasiques.tourner(-8);
+			MouvementsBasiques.chassis.rotate(-8); MouvementsBasiques.chassis.waitComplete();
 			Ultrason.setDistance();
 			distances[0]=Ultrason.getDistance();
 			
 			int indiceMin = 0;
 			for(int i =1;i<10;i++) {
-				MouvementsBasiques.tourner(2);
+				MouvementsBasiques.chassis.rotate(2); MouvementsBasiques.chassis.waitComplete();
 				Ultrason.setDistance();
 				float distance = Ultrason.getDistance();
 				distances[i]=distance;
@@ -106,11 +106,11 @@ public class PaletUltrason {
 				//TODO
 			}
 
-			MouvementsBasiques.tourner(-2*(8-indiceMin));
+			MouvementsBasiques.chassis.rotate(-2*(8-indiceMin)); MouvementsBasiques.chassis.waitComplete();
 			System.out.println(indiceMin+"\n"+distances[indiceMin]);
 			
 			//*100 parce que le capteur mesure en m et que la fonction prend en cm
-			MouvementsBasiques.avancerTravel(distances[indiceMin]*100);
+			MouvementsBasiques.chassis.travel(distances[indiceMin]*100); MouvementsBasiques.chassis.waitComplete();
 			
 			Pince.fermer();
 			
@@ -118,8 +118,8 @@ public class PaletUltrason {
 	
 	
 	/**
-	 * methode de recherche de palet reposant sur la recherche dichotomique de la distance minimale
-	 * @param range le rayon de recherche en metre
+	 * Méthode de recherche de palet reposant sur la recherche dichotomique de la distance minimale
+	 * @param range le rayon de recherche en mètre
 	 * @return 0 s'il trouve le palet, 1 s'il rencontre le vide (cas du mur), 2 si pas de palet en vue
 	 * @throws OuvertureException
 	 */
@@ -140,8 +140,8 @@ public class PaletUltrason {
 		new Capteur();
 		/**
 		 * initialiser d
-		 * <p> d est la distance mesuree par le capteur ultrasons.
-		 * Elle est utilisee pour orienter le robot vers le palet.</p> 
+		 * <p> d est la distance mesurée par le capteur ultrasons.
+		 * Elle est utilisée pour orienter le robot vers le palet.</p> 
 		 */
 		Ultrason.setDistance();
 		float d = Ultrason.getDistance();
@@ -149,14 +149,14 @@ public class PaletUltrason {
 		System.out.println("Premiere mesure de d : "+d);
 		
 		/**
-		 * Premiere boucle while : recherche grossiere du palet
-		 * <p>Le but de cette boucle est de capter le palet : le robot tourne de 10 degres dans le sens trigonometrique
-		 *  jusqu'a ce que d soit inferieure a 2m (succes) ou jusqu'a avoir fait un tour sur lui-meme (echec).</p>
+		 * Premiere boucle while : recherche grossière du palet
+		 * <p>Le but de cette boucle est de capter le palet : le robot tourne de 10 degrés dans le sens trigonométrique
+		 *  jusqu'a ce que d soit inférieure a 2m (succès) ou jusqu'a avoir fait un tour sur lui-même (échec).</p>
 		 */
 		int angle = 0;
 		while((d>range||d<=0)&&angle<360) {
 			angle+=10;
-			MouvementsBasiques.tourner(10);
+			MouvementsBasiques.chassis.rotate(10); MouvementsBasiques.chassis.waitComplete();
 			Ultrason.setDistance();
 			d = Ultrason.getDistance();
 			System.out.println(d);
@@ -169,22 +169,22 @@ public class PaletUltrason {
 		if(d<range) {
 			/**
 			 * L'algorithme d'affinement de l'angle 
-			 * <p>Il ne s'ex�cute que si le robot a capte un palet (d!=infini). 
-			 * Il consiste en une serie de comparaisons de distances mesurees.</p>
+			 * <p>Il ne s'exécute que si le robot a capte un palet (d!=infini). 
+			 * Il consiste en une série de comparaisons de distances mesurées.</p>
 			 * <ul>
-			 * <li> Etape 1 : sauvegarder la premiere distance captee dans dDepart.
-			 * <li> Etape 2 : tour est l'angle de rotation : il est divise par deux a chaque passage dans la boucle while
-			 * <li> Etape 3 : Boucle : on mesure a nouveau d
+			 * <li> Étape 1 : sauvegarder la premiere distance captée dans dDepart.
+			 * <li> Étape 2 : tour est l'angle de rotation : il est divise par deux a chaque passage dans la boucle while
+			 * <li> Étape 3 : Boucle : on mesure a nouveau d
 			 * <ul> 
 			 * <li> Si d<dDepart : dDepart vaut d
-			 * <li> Sinon : le robot se remet a sa position precedente
+			 * <li> Sinon : le robot se remet a sa position précédente
 			 * </ul>
 			 * </ul>
 			 */
 			trouve = true;
 			dDepart = d;
 			System.out.println("dDepart vaut : "+dDepart);
-			//On met 10.5 degres pour palier au probl�mes mecaniques de decallages
+			//On met 10.5 degrés pour palier au problèmes mécaniques de décalages
 			double tour = 10.5;
 			while(tour>1) {
 				MouvementsBasiques.chassis.rotate(tour);MouvementsBasiques.chassis.waitComplete();
@@ -205,7 +205,7 @@ public class PaletUltrason {
 			
 			//*100 parce que le capteur mesure en m et que la fonction prend en cm
 			MouvementsBasiques.chassis.travel(dDepart*100);
-			//cas ou le robot capte le vide : arret de dichotomique
+			//cas ou le robot capte le vide : arrêt de dichotomique
 			while(MouvementsBasiques.chassis.isMoving()) {
 				if(Couleur.videTouche()) {
 					MouvementsBasiques.chassis.stop();
@@ -223,7 +223,7 @@ public class PaletUltrason {
 	
 	/**
 	 * Permet de verifier que le robot est bien aligne avec le palet.
-	 * <p>Il faut ouvrir les pinces avant de lancer cette methode.</p>
+	 * <p>Il faut ouvrir les pinces avant de lancer cette méthode.</p>
 	 * @return true si le capteur de contact est actif
 	 */
 	public static boolean verif() {
