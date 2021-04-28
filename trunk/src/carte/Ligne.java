@@ -4,13 +4,13 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import capteurs.CouleurLigne;
 
+/**
+ * On considère un objet Ligne comme une droite parallèle a un axe du plan.
+ * Il suffit de connaître sa coordonnée fixée puis de ne pas prendre compte de l'autre.
+ * Puisqu'on peut simplement dire si elle est horizontale ou verticale.
+ * De plus on la définit par une couleur pour faciliter l'association aux données recupérées par le capteur de couleurs.
+ */
 public class Ligne{
-	/**
-	 * On considere la classe Ligne comme une droite parallele a un axe du plan.
-	 * Il suffit de connaitre sa coordonnee fixee puis de ne pas prendre compte de l'autre.
-	 * Puisqu'on peut simplement dire si elle est horizontale ou verticale.
-	 * De plus on la definit par une couleur pour faciliter l'association aux donnees recuperee par le capteur de couleurs.
-	 */
 	private boolean horizontale;
 	private float coord;
 	private CouleurLigne couleur;
@@ -74,15 +74,12 @@ public class Ligne{
 	}
 	
 	/**
-	 * Creation de 2 classes interne : 
-	 * - LCC (Ligne, Couleur, Couleur) 
-	 * - Etat (Position, direction) 
-	 * pour pouvoir utiliser une hashMap ou l'on fait se correspondre ces 2 informations.
-	 * L'idee derriere cela est que la LCC represente la Ligne que le robot suit, et les couleurs ici sont celle de 2 intersections qu'il traverse.
-	 * Cela permet de faciliter l'identification de sa position et de sa direction au robot. En effet le terrain etant connu, il suffit de :
-	 * - Connaitre la Ligne que l'on suit pour avoir le x (si la Ligne est verticale) ou le y (si elle est horizontale)
-	 * - Connaitre l'intersection pour avoir la coordonnee manquante
-	 * (ici c'est a la deuxieme intersection que le robot connait sa position car on n'a que faire de la premiere vu que l'on ne s'y arrete pas.)
+	 * Classe contenant trois données (Ligne, Couleur, Couleur) pour pouvoir utiliser une hashMap ou l'on fait se correspondre ces 2 informations.
+	 * L'idee Derrière cela est que la LCC représente la Ligne que le robot suit, et les couleurs ici sont celle de 2 intersections qu'il traverse.
+	 * Cela permet de faciliter l'identification de sa position et de sa direction au robot. En effet le terrain étant connu, il suffit de :
+	 * - Connaître la Ligne que l'on suit pour avoir le x (si la Ligne est verticale) ou le y (si elle est horizontale)
+	 * - Connaître l'intersection pour avoir la coordonnée manquante
+	 * (ici c'est a la deuxième intersection que le robot connaît sa position car on n'a que faire de la premiere vu que l'on ne s'y arrête pas.)
 	 * - Savoir dans quel ordre on a traverse 2 Lignes pour savoir dans quelle direction on va.
 	 */
 	public static class LCC {
@@ -100,10 +97,12 @@ public class Ligne{
 			return(ligne.hashCode()+cl1.hashCode()+cl2.hashCode());
 		}
 		
+		@Override
 		public String toString() {
 			return "Ligne : "+ligne.getCouleur()+"\n"+"Intersection 1: "+cl1+"\n"+"Intersection 2: "+cl2;
 		}
 		
+		@Override
 		public boolean equals(Object othe) {
 			if(!(othe instanceof LCC)) {
 				System.err.println("EEEEEEEHOOOOOOOH");
@@ -115,6 +114,9 @@ public class Ligne{
 		
 	}
 	
+	/**
+	 * Représente un état à un moment donné, c'est à dire la position et la direction.
+	 */
 	public static class Etat{
 		public Point position;
 		public float direction;
@@ -125,7 +127,7 @@ public class Ligne{
 	}
 	
 	/**
-	 * Dans cette hashMap on compte utiliser le robot de maniere a ce qu'il aille sur une ligne verticale pour se reperer, car cela nous facilite la tache.
+	 * Dans cette hashMap on compte utiliser le robot de manière a ce qu'il aille sur une ligne verticale pour se repérer, car cela nous facilite la tache.
 	 */
 	static public ConcurrentHashMap<LCC, Etat> hashPerdu = new ConcurrentHashMap<>();
 	static {
@@ -158,7 +160,7 @@ public class Ligne{
 	}
 	
 	/**
-	 * Cette hashMap permet de faire la correspondance entre une coordonnee (relative a notre repere) en abscisse et la ligne qui lui est associee.
+	 * Cette hashMap permet de faire la correspondance entre une coordonnée (relative a notre repère) en abscisse et la ligne qui lui est associée.
 	 */
 	static public ConcurrentHashMap<Float, CouleurLigne> xToLongues = new ConcurrentHashMap<>();
 	static {
@@ -168,7 +170,7 @@ public class Ligne{
 	}
 	
 	/**
-	 * Cette hashMap permet de faire la correspondance entre une coordonnee (relative a notre repere) en ordonnee et la ligne qui lui est associee.
+	 * Cette hashMap permet de faire la correspondance entre une coordonnée (relative a notre repère) en ordonnée et la ligne qui lui est associée.
 	 */
 	static public ConcurrentHashMap<Float, CouleurLigne> yToLongues = new ConcurrentHashMap<>();
 	static {

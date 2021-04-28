@@ -7,24 +7,24 @@ import carte.Ligne.Etat;
 import exceptions.CalibrageException;
 import moteurs.Pilote;
 
+/**
+ * La classe principale du package carte. Cette classe sert a simuler le terrain de la manière la plus precise possible.
+ * On calibre cette Carte a chaque fois que le robot travers une ligne, une intersection, ou revoit une information comme le contact, ou encore l'abscence d'un palet.
+ * On a decide de hardcoded les palets et les intersections pour s'eviter des algorithmes de calculs et de positionnement inutiles.
+ * De plus on utilise carteUsuelle pour créer une instance de Carte des le chargement de cette Classe et l'on l'utilisera comme la carte d'interet de notre partie.
+ * L'utilite de cette classe est que lorsque le robot a besoin d'une information, il peut se baser sur la dernière version de la carte qu'il a (la dernière mise a jour qu'il a effectuée).
+ * Cela permet d'avoir une connaissance en temps reel de la position approximative du robot et de sa direction.
+ * De plus cela permet d'avoir une connaissance de l'etat du terrain pour éviter de rechercher une deuxième fois un palet ou autre.
+ */
 public class Carte {
-	/**
-	 * La classe principale du package carte. Cette classe sert a simuler le terrain de la maniere la plus precise possible.
-	 * On calibre cette Carte a chaque fois que le robot travers une ligne, une intersection, ou revoit une information comme le contact, ou encore l'abscence d'un palet.
-	 * On a decide de hardcoded les palets et les intersections pour s'eviter des algorithmes de calculs et de positionnement inutiles.
-	 * De plus on utilise carteUsuelle pour creer une instance de Carte des le chargement de cette Classe et l'on l'utilisera comme la carte d'interet de notre partie.
-	 * L'utilite de cette classe est que lorsque le robot a besoin d'une information, il peut se baser sur la derniere version de la carte qu'il a (la derniere mise a jour qu'il a effectuee).
-	 * Cela permet d'avoir une connaissance en temps reel de la position approximative du robot et de sa direction.
-	 * De plus cela permet d'avoir une connaissance de l'etat du terrain pour eviter de rechercher une deuxieme fois un palet ou autre.
-	 */
 	
 	/**
 	 * Ici sont les arguments de la classe :
-	 * - robot qui reference l'entite au nom eponyme
+	 * - robot qui reference l'entite au nom éponyme
 	 * - lignes : notre hashMap de correspondance entre la couleur d'une Ligne et la Ligne en question
 	 * - intersections : la liste, hardcoded, des intersections du terrain qu'on manipule
-	 * - terrain : qui pose les limites du terrain, par son coin inferieur et son coin superieur
-	 * - palets : la liste, encore une fois hardcoded, des palets presents sur une table au debut d'un match ou d'une partie solo
+	 * - terrain : qui pose les limites du terrain, par son coin inférieur et son coin supérieur
+	 * - palets : la liste, encore une fois hardcoded, des palets presents sur une table au début d'un match ou d'une partie solo
 	 */
 	private Robot robot;
 	private ConcurrentHashMap<CouleurLigne, Ligne> lignes;
@@ -54,14 +54,14 @@ public class Carte {
 	
 	/**
 	 * Une initialisation de la carte qui a lieu lors du chargement de cette classe.
-	 * Elle sera utilisee comme une carte classique que l'on modifiera, on espere gagner en temps d'initialisation de notre carte par ce procede.
+	 * Elle sera utilisée comme une carte classique que l'on modifiera, on espère gagner en temps d'initialisation de notre carte par ce procédé.
 	 */
 	static public Carte carteUsuelle = new Carte(Robot.robotUsuel, Ligne.hashLignes, new Rectangle(new Point(-2f,-2.5f), new Point(2f,2.5f)));	
 	
 	
 	/**
 	 * Les getters.
-	 * @return La donnees d'interet sur la carte appelante : le robot, la hashMap des Lignes (meme si elle est hardcoded dans @see Ligne, pour la recuperer dans une variable au besoin), les intersections ou encore le terrain.
+	 * @return La données d'interet sur la carte appelante : le robot, la hashMap des Lignes (même si elle est hardcoded dans @see Ligne, pour la recuperer dans une variable au besoin), les intersections ou encore le terrain.
 	 */
 	public Robot getRobot() {
 		return(robot);
@@ -80,8 +80,8 @@ public class Carte {
 	}
 	
 	/**
-	 * Methode permettant de trouver le palet le plus proche du robot en calculant la distance entre le "centre" du robot et le centre du palet.
-	 * Cela nous permet au robot d'avoir un debut de "strategie" qui est d'aller au plus proche de lui.
+	 * Méthode permettant de trouver le palet le plus proche du robot en calculant la distance entre le "centre" du robot et le centre du palet.
+	 * Cela nous permet au robot d'avoir un début de "stratégie" qui est d'aller au plus proche de lui.
 	 * @return Le palet le plus proche du robot
 	 */
 	public Palet paletProche() {
@@ -97,8 +97,8 @@ public class Carte {
 	}
 	
 	/**
-	 * Cette methode permet d'utiliser la hashMap {@link Ligne#hashPerdu} pour trouver la position exacte du robot.
-	 * En effet on appel la methode @see Pilote#chercherPosition() de maniere � recuperer un objet du type @see LCC.
+	 * Cette méthode permet d'utiliser la hashMap {@link Ligne#hashPerdu} pour trouver la position exacte du robot.
+	 * En effet on appel la méthode @see Pilote#chercherPosition() de maniere à recuperer un objet du type @see LCC.
 	 * Ensuite en utilisant la hashMap {@link Ligne#hashPerdu} on fait la correspondance entre ce LCC et un objet du type @see Etat qui est juste la position et la direction du robot.
 	 */
 	public void calibrerPosition() {
@@ -114,9 +114,9 @@ public class Carte {
 	}
 	
 	/**
-	 * Cette methode permet de calibrer la position du robot sur la carte lorsque ce dernier traverse une ligne.
-	 * Cela permet d'eviter les imprecision qui s'accumulent duent a des approximations.
-	 * Le parametre entre est la ligne en question. 
+	 * Cette méthode permet de calibrer la position du robot sur la carte lorsque ce dernier traverse une ligne.
+	 * Cela permet d'eviter les imprecision qui s'accumulent dues a des approximations.
+	 * Le paramètre entre est la ligne en question. 
 	 * @param l
 	 */
 	public void traverseLigne(Ligne l) {
@@ -129,14 +129,14 @@ public class Carte {
 	}
 	
 	/**
-	 * Cette methode permet de calibrer la position du robot lorsqu'il traverse une intersection.
-	 * Elle renvoie une erreur lorsque les 2 lignes sont parall�les.
+	 * Cette méthode permet de calibrer la position du robot lorsqu'il traverse une intersection.
+	 * Elle renvoie une erreur lorsque les 2 lignes sont parallèles.
 	 * @param l1
 	 * @param l2
 	 */
 	public void traverseIntersection(Ligne l1, Ligne l2) throws CalibrageException{
 		if(!(l1.getDirection()^l2.getDirection())) {
-			throw new CalibrageException("Les deux lignes sont parall�les, elles n'ont pas d'interseciton.");
+			throw new CalibrageException("Les deux lignes sont parallèles, elles n'ont pas d'interseciton.");
 		}
 		else {
 			if(l1.getDirection()) {
