@@ -4,38 +4,44 @@ import java.util.Arrays;
 import java.util.Vector;
 
 /**
- * <p>Classe qui contient toutes les configurations possibles pour un Picker.</p>
+ * <p> Enumeration  qui contient toutes les configurations possibles pour un Picker.</p>
  * 
  * @see Picker
  * 
  */
 
 public enum Configurations{
-	/**
-     * enumeration des configurations choisies par l'utilisateur. Elles seront lancées depuis l'interface textuelle
-     * 
-     * @see InterfaceTextuelle
-     */
+	/** Permet de choisir quelle stratégie utiliser pour le mode solo */
 	strategieSolo("ramasserPalets",new String[] {"ramasserPalets"}),
+	/** Permet de choisir quelle stratégie utiliser pour le mode compétition*/
 	strategieDuo("ramasserPaletsDuo",new String[] {"ramasserPaletsDuo"}),
 	
+	/** Permet de choisir la musique */
 	musique("megalovania",new String[] {"megalovania","victory","losing"}),
+	/** Permet de choisir les bruitages */
 	bruitage("wow",new String[] {"wow","easy","ohNo","nani","missionFailed","whilhelmScream","goatScream","nope","ennemySpotted","targetAcquired","targetLocked"}),
+	/** Permet de choisir la danse */
 	danse("victoire",new String[] {"victoire","defaite"}),
 	
-	arriveeX("0", new String[] {"-2", "-1", "0", "1", "2", "3"}),
-	arriveeY("0", new String[] {"-2", "-1", "0", "1", "2", "3"}),
-	departX("0", new String[] {"-2", "-1", "0", "1", "2", "3"}),
-	departY("0", new String[] {"-2", "-1", "0", "1", "2", "3"}), 
+	/** Permet de choisir la coordonnée x du point d'arrivée*/
+	arriveeX("0", new String[] {"-2", "-1", "0", "1", "2"}),
+	/** Permet de choisir la coordonnée y du point d'arrivée */
+	arriveeY("0", new String[] {"-2", "-1", "0", "1", "2"}),
+	/** Permet de choisir la coordonnée x du point de départ */
+	departX("0", new String[] {"-2", "-1", "0", "1", "2"}),
+	/** Permet de choisir la coordonnée y du point de départ */
+	departY("0", new String[] {"-2", "-1", "0", "1", "2"}), 
+	/** Permet de choisir la direction au départ */
 	departD("porte", new String[] {"porte", "fenetre"}),
+	/** Permet de choisir le camp adverse */
 	campAdverse("porte", new String[] {"porte", "fenetre"});
 	
 	
 	 /**
-     * valeur choisie par défaut. Peut etre modifiée par l'utilisateur dans le Picker. 
+     * valeur choisie par défaut. Peut être modifiée par l'utilisateur dans le Picker. 
      * @see Picker
      */
-	private String val; //valeur selectionnée
+	private String val; //valeur sélectionnée
 	
 	/**
      * vecteur qui contient toutes les valeurs possibles de l'enumeration.

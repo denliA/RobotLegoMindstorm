@@ -1000,7 +1000,7 @@ public class Pilote {
 		}
 		
 		
-		// Si l'on a trouvé dans aucune intersection, on retroune INCONNU.
+		// Si l'on a trouvé dans aucune intersection, on retourne INCONNU.
 		return Point.INCONNU;
 	}
 	

@@ -339,7 +339,7 @@ public class InterfaceTextuelle {
 	
 	/**
 	 * <p>Menu principal depuis lequel on peut lancer tous les autres Lancables.</p>
-	 * <p>Il apparait lorsqu'on lance l'interface textuelle.</p>
+	 * <p>Il apparaît lorsqu'on lance l'interface textuelle.</p>
 	 * 
 	 */
 	Menu menuPrincipal = new Menu("Menu Principal",new Lancable[] {modeSolo,modeCompetition,scenarios,reglages});

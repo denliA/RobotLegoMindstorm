@@ -84,7 +84,7 @@ public class Picker implements Lancable{
 				LCD.drawString("X", 0, 4);
 			}
 			//sauvegarde dans le tableau de caractères, le titre de la configuration qui doit être affichée sur l'écran
-			buffer=configuration.s.get(choix-1).toCharArray(); //transforme la chaine de caractère en un tableau de caractères
+			buffer=configuration.s.get(choix-1).toCharArray(); //transforme la chaîne de caractère en un tableau de caractères
 			
 			/* La variable k permet de defiler entre les caractères du buffer. Elle indique à quelle case le caractère sera affiché.
 			 * On initialise k à deux car on laisse deux cases pour afficher la croix qui montre si la configuration affichée est choisie ou pas */
@@ -96,19 +96,19 @@ public class Picker implements Lancable{
 			// attend que l'utilisateur appuie sur un bouton du clavier du robot
 			button = Button.waitForAnyPress();
 			if (button == Button.ID_UP) {
-				//configuration précendente à afficher
+				//configuration précédente à afficher
 				choix = ((choix == 1) ? configuration.s.size() :(choix-1)); 
-				//on reinitialise la variable pour effacer le defilement horizontal
+				//on réinitialise la variable pour effacer le défilement horizontal
 				debutColonne=0; 
 			}
 			else if (button == Button.ID_DOWN) {
 				//configuration suivante à afficher
 				choix = (choix%configuration.s.size())+1; 
-				//on reinitialise la variable pour effacer le defilement horizontal
+				//on réinitialise la variable pour effacer le défilement horizontal
 				debutColonne=0; 
 			}
 			else if (button == Button.ID_RIGHT) {
-				//le defilement horizontal est permis si le titre est trop grand pour l'écran. On n'a que 16 cases restantes pour afficher le titre
+				//le défilement horizontal est permis si le titre est trop grand pour l'écran. On n'a que 16 cases restantes pour afficher le titre
 				if (configuration.s.get(choix-1).length()>16) { 	
 					/* si debutColonne est l'indice du dernier caractère du titre de la configuration, on ne defile plus à droite
 					 * sinon, on affiche le titre à partir du caractère suivant */
@@ -116,7 +116,7 @@ public class Picker implements Lancable{
 				}
 			}
 			else if (button == Button.ID_LEFT) {
-				//le defilement horizontal est permis si le titre est trop grand pour l'écran
+				//le défilement horizontal est permis si le titre est trop grand pour l'écran
 				if (configuration.s.get(choix-1).length()>16) {
 					/* si debutColonne est l'indice du premier caractère du titre de la configuration, on ne defile plus à gauche
 					 * sinon, on affiche le titre à partir du caractère précédent */
@@ -124,7 +124,7 @@ public class Picker implements Lancable{
 				}
 			}
 			else if (button == Button.ID_ENTER) {
-				//on selectionne la configuration à lancer
+				//on sélectionne la configuration à lancer
 				configuration.setVal(configuration.s.get(choix-1)); 
 			}
 			// on attend que l'utilisateur appuie sur un bouton du robot ou le relache

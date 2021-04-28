@@ -39,31 +39,44 @@ import java.util.concurrent.ConcurrentHashMap;
 public class Couleur {
 	
 	
-	//Attributs de la classe Couleur
+	//Attributs privés contenant les dernières mesures
 	private static float rouge;
 	private static float vert;
 	private static float bleu;
 	private static float lumiere;
 	private static float IDCouleur;
 	private static float intensiteRouge;
-	public static int scanRate=-1;
-	// Les deux attributs last est previous sont en doublon avec les deux dernières valeurs du buffer, mais utiles pour avoir un accès rapide sans avoir besoin
-	// d'assurer la synchronisation
+	/* Les deux attributs last est previous sont en doublon avec les deux dernières valeurs du buffer, 
+	 * mais utiles pour avoir un accès rapide sans avoir besoin d'assurer la synchronisation 
+	 */
 	private static BufferContexte last;
-	private static BufferContexte previous;
-	public static BufferCouleurs buffer = new BufferCouleurs(5000);
 	static CouleurLigne lastCouleur;
+	private static BufferContexte previous;
+	
+	/** Indique à quelle vitesse les mesures sont prises */
+	public static int scanRate=-1;
+	
+	/** bufferCouleurs gardant un historique des mesures*/
+	public static BufferCouleurs buffer = new BufferCouleurs(5000);
+	
+	// Ces trois attributs permettent une gestion à part du blanc et du vide, pour lesquels il faut avoir une plus grande réactivité
 	private static boolean blanche;
 	private static float[] blanche_bornesInf = CouleurLigne.BLANCHE.IRGB.min;
 	private static boolean vide;
 	
 	
 	// Constantes pour le modeFlag
+	/** Constance indiquant si il faut prendre la mesure d'intensité du rouge */
 	final static public byte REDMODE = 0b1;
+	/** Constante indiquant si il faut prendre la mesure de l'IDMode*/
 	final static public byte IDMODE = 0b10;
+	/** Constance indiquant si il faut prendre la mesure RGB*/
 	final static public byte RGBMODE = 0b100;
+	/** Constante indiquant si il faut prendre la mesure de luminosité*/
 	final static public byte LIGHTMODE = 0b1000;
+	/** Constante indiquant si il faut garder un historique des mesures prises*/ 
 	final static public byte BUFFERING = 0b10000;
+	/** Constante indiquant si il faut interpréter les mesures prises à chaque fois*/
 	final static public byte INTERPRETER = 0b10000;
 	
 	/**

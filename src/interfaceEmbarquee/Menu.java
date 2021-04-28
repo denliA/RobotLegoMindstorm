@@ -74,29 +74,28 @@ public class Menu implements Lancable{
 		int button = -1;
 		//indique le titre du Lancable sur lequel le curseur "->" pointe
 		int choix = 1;
-		//plusieurs pages permettent le defilement vertical entre les Lancables si leur nombre depasse la taille de l'écran du robot
+		//plusieurs pages permettent le défilement vertical entre les Lancables si leur nombre dépasse la taille de l'écran du robot
 		int page = 0;
 		//tableau de caractères qui contiendra les 6 titres de Lancables qu'on peut afficher sur une page
 		//on ne peut afficher que 6 Lancables à la fois car le titre du Menu prend une ligne et on saute une autre ligne pour aérer
 		char[][] buffer = new char[6][];
 		int i,j,k;
-		//indice du 1er caractère a afficher. C'est un curseur qui se déplace dans le buffer et permet le defilement horizontal
+		//indice du 1er caractère a afficher. C'est un curseur qui se déplace dans le buffer et permet le défilement horizontal
 		int debutColonne=0;
-		//indice qui limite le defilement à droite
+		//indice qui limite le défilement à droite
 		long max=0;
 		//tant que l'utilisateur n'appuie pas sur le bouton "ESCAPE", on reste dans la boucle
 		while(button != Button.ID_ESCAPE) {
-			//nettoie les 6 dernieres lignes de l'écran du robot.
+			//nettoie les 6 dernières lignes de l'écran du robot.
 			LCD.clear(1,2, 100);
 			//affiche le curseur "->" qui pointe sur le Lancable actuellement choisi
 			LCD.drawString("->", 0, choix+1);
 			//affiche le titre du Menu
 			LCD.drawString(titre, 3, 0);
-			//i est le nombre de lignes
-			for (i=0; i<6 && i+6*page<tab.length;i++) { 
+			for (i=0; i<6 && i+6*page<tab.length;i++) { // On boucle sur les 6 lignes à afficher pour cette fois, en sautant les lignes des pages précédentes
 				buffer[i]=tab[i+page*6].getTitre().toCharArray();
-				max= (max<buffer[i].length ? buffer[i].length : max);
-				for (j=debutColonne, k=0;j<buffer[i].length;j++,k++) {
+				max= (max<buffer[i].length ? buffer[i].length : max); // Permet de connaître la ligne la plus longue à afficher
+				for (j=debutColonne, k=0;j<buffer[i].length;j++,k++) { // Pour chaque ligne, on affiche les caractères, en prenant en compte le décalage (debutColonne)
 					LCD.drawChar(buffer[i][j], 2+k, i+2);
 				}
 			}
@@ -111,12 +110,12 @@ public class Menu implements Lancable{
 					}else { //sinon
 						//page suivante
 						page++;
-						//on reinitialise le choix
+						//on réinitialise le choix
 						choix = 1;
 					}
 				}
 				else
-				//on passe au Lancable suivant
+					//on passe au Lancable suivant
 					choix = (choix%Math.min(tab.length-6*page, 6))+1;
 			}
 			else if (button == Button.ID_UP) {
@@ -130,7 +129,7 @@ public class Menu implements Lancable{
 					}
 				}
 				//si la flèche pointe sur le 1er Lancable de la page, elle devra pointer sur le dernier Lancable de la page précédente
-				//sinon, on selectionne le Lancable précédent
+				//sinon, on sélectionne le Lancable précédent
 				choix = (choix == 1) ? Math.min(tab.length-6*page, 6) :(choix-1);
 			}
 			else if (button == Button.ID_ENTER) {
@@ -139,7 +138,7 @@ public class Menu implements Lancable{
 				tab[choix+6*page-1].lancer();
 			}
 			else if (button == Button.ID_RIGHT) {
-				//le defilement horizontal est permis si le titre est trop grand pour l'écran. On n'a que 16 cases restantes pour afficher le titre
+				//le défilement horizontal est permis si le titre est trop grand pour l'écran. On n'a que 16 cases restantes pour afficher le titre
 				if (tab[choix+6*page-1].getTitre().length()>15) {
 					/* si debutColonne est l'indice du dernier caractère du titre de la configuration, on ne defile plus à droite
 					 * sinon, on affiche le titre à partir du caractère suivant */
@@ -147,14 +146,14 @@ public class Menu implements Lancable{
 				}
 			}
 			else if (button == Button.ID_LEFT) {
-				//le defilement horizontal est permis si le titre est trop grand pour l'écran. On n'a que 16 cases restantes pour afficher le titre
+				//le défilement horizontal est permis si le titre est trop grand pour l'écran. On n'a que 16 cases restantes pour afficher le titre
 				if (tab[choix+6*page-1].getTitre().length()>15) {
 					/* si debutColonne est l'indice du premier caractère du titre de la configuration, on ne defile plus à gauche
 					 * sinon, on affiche le titre à partir du caractère précédent */
 					debutColonne = (debutColonne == 0)?debutColonne:--debutColonne;
 				}
 			}
-			// on attend que l'utilisateur appuie sur un bouton du robot ou le relache
+			// on attend que l'utilisateur appuie sur un bouton du robot ou le relâche
 			Button.waitForAnyEvent();
 		}
 	}

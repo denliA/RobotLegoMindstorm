@@ -6,12 +6,19 @@ import lejos.hardware.port.MotorPort;
 import lejos.robotics.RegulatedMotor;
 
 public class Moteur {
-	//ouvre les moteurs qui sont reutilisables dans les autres classes
+	//ouvre les moteurs qui sont réutilisables dans les autres classes
+	/** Moteur contrôlant la roue gauche*/
 	public static EV3LargeRegulatedMotor MOTEUR_GAUCHE = new EV3LargeRegulatedMotor(MotorPort.B);
+	/** Moteur contrôlant la roue droite*/
 	public static EV3LargeRegulatedMotor MOTEUR_DROIT = new EV3LargeRegulatedMotor(MotorPort.A);
 	static {Moteur.MOTEUR_GAUCHE.synchronizeWith(new RegulatedMotor[] {Moteur.MOTEUR_DROIT});}
+	/** Moteur contrôlant les pinces */
 	public static EV3MediumRegulatedMotor MOTEUR_PINCE = new EV3MediumRegulatedMotor(MotorPort.C);
 	
+	
+	/**
+	 * Permet de fermer tous les moteurs après la fin des opérations
+	 */
 	public static void fermerMoteurs() {
 		MOTEUR_GAUCHE.close();
 		MOTEUR_DROIT.close();
