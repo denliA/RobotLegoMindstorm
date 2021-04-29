@@ -30,9 +30,31 @@ import moteurs.Pince;
  * 
  */
 
-public class P7 implements interfaceEmbarquee.Lancable{
+public class P7 extends P6{
 	
+
 	public void lancer() {
+		int button = -1;
+		LCD.clear();
+		LCD.drawString("Porte ou fenetre?", 3, 1);
+		LCD.drawString("Porte <<  >> Fenetre", 1, 3);
+		int angleCamp = 90;
+		//Choix du camp ou deposer le palet
+		while((button!=Button.ID_LEFT)&&(button!=Button.ID_RIGHT)) {
+			button = Button.waitForAnyPress();
+		}
+		if (button == Button.ID_LEFT) {
+			this.direction_maison = 90;
+			angleCamp = 90;
+		}
+		else if (button == Button.ID_RIGHT) {
+			angleCamp = 270;
+			this.direction_maison = 270;
+		}
+		super.lancer();
+	}
+	
+	public void lancer2() {
 		int button = -1;
 		LCD.clear();
 		LCD.drawString("Porte ou fen�tre?", 3, 1);
