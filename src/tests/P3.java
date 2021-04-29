@@ -59,9 +59,15 @@ public class P3 implements Lancable {
 			chassis.rotate(180); chassis.waitComplete();
 		}
 		Toucher.aToucheAUnMoment();
+		Thread verif_toucher = new Thread(new Runnable() {public void run() {
+			while(!Toucher.getTouche()&&!Thread.interrupted());
+			if(Toucher.getTouche()) {Pince.fermer();}}
+		});
+		verif_toucher.start();
 		carte.calibrerPosition();
+		verif_toucher.interrupt();
 		if (Toucher.aToucheAUnMoment()) {
-			Pince.fermer();
+			if(Pince.getOuvert())Pince.fermer();
 		}
 		else {
 		
@@ -81,7 +87,7 @@ public class P3 implements Lancable {
 			Pilote.rentrer(campRentree);
 		}
 		
-		Pince.ouvrir();
+		if(!Pince.getOuvert())Pince.ouvrir();
 		
 	}
 	
