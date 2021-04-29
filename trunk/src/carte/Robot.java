@@ -90,7 +90,7 @@ public class Robot extends Rectangle {
 	  * Est utilisée dans la méthode @see Robot#deplacer(float, float).
 	  * @param angle
 	  */
-	private void tourner(float angle) {
+	public void tourner(float angle) {
 		this.direction = (direction + angle)%360;
 	}
 	
@@ -99,7 +99,7 @@ public class Robot extends Rectangle {
 	 * Est utilisée dans la méthode @see Robot#deplacer(float, float).
 	 * @param distance
 	 */
-	private void avancer(float distance) {
+	public void avancer(float distance) {
 		this.setPosition((float) (this.position.getX()+(Math.cos(direction)*distance)),(float) (this.position.getY()+(Math.sin(direction)*distance)));
 	}
 	

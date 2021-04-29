@@ -68,5 +68,29 @@ public class Point {
 	public String toString() {
 		return "("+x+", "+y+")";
 	}
-	//bonjour les gars
+	
+	public float scalaire(Point A) {
+		return(this.getX()*A.getX()+this.getY()*A.getY());
+	}
+	
+	public float norme() {
+		return (float) (Math.sqrt(this.scalaire(this)));
+	}
+	
+	public float det(Point A) {
+		return(this.getX()*A.getY()-this.getY()*A.getX());
+	}
+	
+	public static Point sub(Point A, Point B) {
+		return(new Point(B.getX()-A.getX(), B.getY()-A.getY()));
+	}
+	
+	public Point div(float x) {
+		return(new Point(this.getX()/x, this.getY()/x));
+	}
+	
+	public Point normaliser() {
+		return(this.div(this.norme()));
+	}
+	
 }
