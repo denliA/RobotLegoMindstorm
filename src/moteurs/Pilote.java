@@ -703,7 +703,13 @@ public class Pilote {
 			int bonne_bifurquation = (det ? -1 : 1)*(x>x_depart ? -1 : 1);
 			if (Math.abs(y_depart)==2 || y_depart ==0||true) {chassis.travel(30); chassis.waitComplete();}
 			chassis.rotate(bonne_bifurquation*90); chassis.waitComplete();
-			chercheLigne(ligne_arrivee, 20, 50, 180, (inverse ? !(bonne_bifurquation==1) : (bonne_bifurquation==1))); // On se gare dans la nouvelle ligne de manière à regarder direction le point cherché
+			boolean rotation = (inverse ? !(bonne_bifurquation==1) : (bonne_bifurquation==1));
+			CouleurLigne ligne_trouvee = chercheLigne(ligne_arrivee, 20, 50, 180, rotation); // On se gare dans la nouvelle ligne de manière à regarder direction le point cherché
+			while(CouleurLigne.VIDE==ligne_trouvee) {
+				rotation = !rotation;
+				Sound.twoBeeps();
+				ligne_trouvee = chercheLigne(ligne_arrivee, 20, 50, 180, (inverse ? !(bonne_bifurquation==1) : (bonne_bifurquation==1))); 
+			}
 			if ((true||Math.abs(y_depart)==2 || y_depart ==0)&&y==y_depart) { // On avance/recule pour regagner la distance perdue en tournant
 				if(!inverse) {
 					chassis.travel(15); chassis.waitComplete();
