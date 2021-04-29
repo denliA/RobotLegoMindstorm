@@ -51,7 +51,7 @@ public class P7 implements interfaceEmbarquee.Lancable{
 		new capteurs.Capteur();
 		capteurs.Couleur.startScanAtRate(0);
 		//Ouvrir les pinces pour mieux calibrer (les pinces fermees le poids en avant donne un risque de leger bascule qui fausse la mesure (rarement)
-		//De plus on peut trouver le palet et l'entrainer avec nous sans le faire exprès, nous vérifions cela en allant en (0,0) plus bas.
+		//De plus on peut trouver le palet et l'entrainer avec nous sans le faire exprï¿½s, nous vï¿½rifions cela en allant en (0,0) plus bas.
 		try {
 			Pince.ouvrir();
 		}
@@ -63,7 +63,7 @@ public class P7 implements interfaceEmbarquee.Lancable{
 		Carte.carteUsuelle.calibrerPosition();
 		//Aller au centre du terrain
 		Pilote.allerVersPoint(0, 0);
-		//Vérification de la présence ou non d'un palet entraine par les pinces du robot :
+		//Vï¿½rification de la prï¿½sence ou non d'un palet entraine par les pinces du robot :
 		boolean done = false;
 		try {
 			Pince.fermer();
@@ -99,6 +99,7 @@ public class P7 implements interfaceEmbarquee.Lancable{
 					}
 					//si on a bien un palet 
 					if(PaletUltrason.verif()) {
+						interfaceEmbarquee.Musique.startMusic("TargetAcquired.wav");
 						//Deposer le palet derriere la ligne blanche
 						try {
 							Pince.fermer();
