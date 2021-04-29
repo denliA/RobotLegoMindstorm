@@ -190,6 +190,7 @@ public class PaletUltrason {
 			 */
 			trouve = true;
 			dDepart = d;
+			interfaceEmbarquee.Musique.startMusic("TargetLocked.wav");
 			System.out.println("dDepart vaut : "+dDepart);
 			//On met 10.5 degrés pour palier au problèmes mécaniques de décalages
 			double tour = 10.5;
