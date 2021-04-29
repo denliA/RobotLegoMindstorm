@@ -148,6 +148,7 @@ public class ModeCompetition {
 			}
 			if(milieu){
 				//se decaler vers la gauche de la ligne
+				angle=-90;
 				MouvementsBasiques.chassis.rotate(angle); MouvementsBasiques.chassis.waitComplete();  
 				MouvementsBasiques.chassis.travel(25); MouvementsBasiques.chassis.waitComplete();  
 				MouvementsBasiques.chassis.rotate(-angle);	MouvementsBasiques.chassis.waitComplete(); 
