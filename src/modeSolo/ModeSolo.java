@@ -11,6 +11,7 @@ import capteurs.Toucher;
 import capteurs.Ultrason;
 import exceptions.*;
 import interfaceEmbarquee.Musique;
+import lejos.utility.Delay;
 
 /**
  * <p>ModeSolo est une classe qui contient les strategies du ModeSolo.</p>
@@ -88,6 +89,7 @@ public class ModeSolo {
 			Toucher.startScan();
 			Ultrason.startScan();
 			Couleur.startScanAtRate(0);
+			Delay.msDelay(500);
 		}
 		ExecutorService executor = Executors.newSingleThreadExecutor();
 		

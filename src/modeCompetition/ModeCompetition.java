@@ -7,6 +7,7 @@ import capteurs.Toucher;
 import capteurs.Ultrason;
 import exceptions.OuvertureException;
 import interfaceEmbarquee.Musique;
+import lejos.utility.Delay;
 import moteurs.MouvementsBasiques;
 import moteurs.Pilote;
 import moteurs.Pince;
@@ -56,6 +57,7 @@ public class ModeCompetition {
 		Toucher.startScan();
 		Ultrason.startScan();
 		Couleur.startScanAtRate(0);
+		Delay.msDelay(500);
 		
 		double angle;
 		boolean droite=false;
