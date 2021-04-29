@@ -59,14 +59,14 @@ public class TestPilote {
 //		testTrouverPalet(1,0,270);
 //		System.out.println(Pilote.chercherPosition());
 		
-//		Pilote.lancerSuivi(CouleurLigne.JAUNE);
+		Pilote.lancerSuivi(CouleurLigne.JAUNE);
 //		Delay.msDelay(5000);
 //		Pilote.arreterSuivi();
 //		Delay.msDelay(100);
 //		Couleur.buffer.toCSV("./CouleursScannees");
 		
 		
-		carte.Carte.carteUsuelle.calibrerPosition();
+//		carte.Carte.carteUsuelle.calibrerPosition();
 	}
 	
 	

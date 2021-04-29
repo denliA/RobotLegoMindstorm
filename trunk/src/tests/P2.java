@@ -106,6 +106,7 @@ public class P2 implements interfaceEmbarquee.Lancable{
 			Pilote.arreterSuivi(); 
 			Pince.fermer(); 
 			Pilote.rentrer(avancement == 1 ? 90 : 270);
+			Pince.ouvrir();
 		}
 //		System.out.println("[Ultrason P2] Position : " + robot);
 //		

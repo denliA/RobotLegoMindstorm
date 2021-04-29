@@ -171,6 +171,7 @@ public class PaletUltrason {
 //				return 2;
 //			}
 		angleTotal = angle;
+		System.out.println("[paletUltrason] Angle total fait : "+angleTotal);
 		boolean trouve = false;
 		if(d<range) {
 			/**

@@ -74,7 +74,7 @@ public class Pilote {
 	 * @param c couleurLigne qu'on doit suivre
 	 */
 	public static void suivreLigne(CouleurLigne c) {
-		if(recursion) {
+		if(!recursion) {
 			seDeplace = true;
 			suiviLigne = true;
 		}
@@ -92,7 +92,7 @@ public class Pilote {
 		final long dureeRotation = 250; //possibilité de mieux calibrer, en fonction de la vitesse? (200 bien mais se décale vers la gauche des fois)
 		MouvementsBasiques.chassis.setLinearSpeed(20);
 		MouvementsBasiques.chassis.setLinearAcceleration(5);
-		final int max_cycles = 1; //nombre de fois ou il ne trouve pas la couleur avant d'appeler seRedresserSurLigne. Cycles commence à 0.
+		final int max_cycles = 2; //nombre de fois ou il ne trouve pas la couleur avant d'appeler seRedresserSurLigne. Cycles commence à 0.
 		
 		long debut;
 
@@ -179,13 +179,14 @@ public class Pilote {
 					//gestion d'erreur le robot n'a pas pu se redresser sur une ligne de couleur et il est perdu. Il faut arrêter le mouvement
 					System.out.println("	entrée dans le code de correction");
 					MouvementsBasiques.chassis.setLinearAcceleration(40);
-					MouvementsBasiques.chassis.travel(-25);
+					MouvementsBasiques.chassis.travel(-30);
 					MouvementsBasiques.chassis.waitComplete();
 					cycles = 0;
 					MouvementsBasiques.chassis.setLinearAcceleration(5);
-					boolean trouve;
-					trouve = tournerJusqua(c, true, 100, 0, 90);
-					trouve|= tournerJusqua(c, false, 100, 0, 90*2);
+//					boolean trouve;
+//					trouve = tournerJusqua(c, true, 100, 0, 90);
+//					trouve|= tournerJusqua(c, false, 100, 0, 90*2);
+					seRedresserSurLigne(c, true, 90, 150);
 					recursion = true;
 					suivreLigne(c);
 					return;
@@ -307,7 +308,7 @@ public class Pilote {
 				trouve = tournerJusqua(c, gauche_bouge, (int)(vitesse_angulaire/2), 0, (int)20);
 				MouvementsBasiques.chassis.setAngularSpeed(vitesse_angulaire);
 			}
-			if (seDeplace && iterations < max_iterations) { // Après avoir trouvé, on avance de 10cm pour vérifier si l'on sort ou pas
+			if (seDeplace && iterations < max_iterations-1) { // Après avoir trouvé, on avance de 10cm pour vérifier si l'on sort ou pas
 				MouvementsBasiques.chassis.travel(10);
 				MouvementsBasiques.chassis.waitComplete();
 			}
@@ -513,6 +514,7 @@ public class Pilote {
 		int acceleration = 10;
 		chassis.setLinearSpeed(vitesse);
 		chassis.setLinearAcceleration(acceleration);
+		chassis.setAngularSpeed(180);
 		Delay.msDelay(1000);
 		Couleur.videTouche(); Couleur.blacheTouchee(); // Remise à 0 des buffers de blanc et de vide
 		
@@ -646,6 +648,7 @@ public class Pilote {
 		boolean sens_change=false;
 		chassis.setLinearSpeed(20);
 		chassis.setLinearAcceleration(30);
+		chassis.setAngularSpeed(150);
 		
 		if(robot.getPosition()==Point.INCONNU) { // Si la position du robot n'est pas calibrée, on la calibre avant d'aller au point
 			carte.calibrerPosition();
@@ -763,6 +766,7 @@ public class Pilote {
 	 * @param direction angle indiquant la direction du bon camp
 	 */
 	public static void rentrer(float direction) {
+		chassis.setAngularSpeed(180);
 		System.out.println("[rentrer] direction : " + direction + "Robot actuellement : " + robot.getDirection() + "Ce que je dois faire : " + (direction  - robot.getDirection()));
 		chassis.rotate(direction  - robot.getDirection()); chassis.waitComplete(); // On tourne de l'angle necessaire pour atteindre l'angle recherché.
 		Couleur.blacheTouchee(); // On reset le détecteur de blanc

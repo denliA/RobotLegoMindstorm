@@ -52,7 +52,7 @@ public class NFA7 implements interfaceEmbarquee.Lancable{
 		}
 		LCD.clear();
 		LCD.drawString("Debut match", 3, 1);
-		Delay.msDelay(3000); //laisser le temps de lire
+		Delay.msDelay(2000); //laisser le temps de lire
 		
 		//appeler la fonction a executer dans un thread
 		future = executor.submit(new ArgCallable(cote));
@@ -95,9 +95,7 @@ class ArgCallable implements Callable<Void> {
 		this.truc = truc;
 	}
 	public Void call() throws OuvertureException {
-        while(!Thread.interrupted()) {
-        	modeSolo.ModeSolo.ramasserPalet(9, truc);
-        }
+        modeSolo.ModeSolo.ramasserPalet(9, truc);
         return null;
     }
 }
