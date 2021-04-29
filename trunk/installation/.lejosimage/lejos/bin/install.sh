@@ -30,9 +30,14 @@ cd $rootfs/lejosimage
 log "Start install"
 ./update_sdcard.sh $bootfs $rootfs $current
 # début installation programme L2A2
-cp $bootfs/InterfaceTextuelle.jar $rootfs /home/lejos/programs/
-echo "lejos.default_program = /home/lejos/programs/InterfaceTextuelle.jar" >> /home/root/lejos/settings.properties
-echo "lejos.default_autoRun = ON" >> /home/root/lejos/settings.properties
+log "Installing Palets"
+cp $bootfs/InterfaceTextuelle.jar $rootfs/home/lejos/programs/
+log "Setting up default program"
+echo "lejos.default_program = /home/lejos/programs/InterfaceTextuelle.jar" >> $rootfs/home/root/lejos/settings.properties
+echo "lejos.default_autoRun = ON" >> $rootfs/home/root/lejos/settings.properties
+log "Replacing EV3Menu.jar with fixed default startup"
+mv $rootfs/home/root/lejos/bin/utils/EV3Menu.jar $rootfs/home/root/lejos/bin/utils/EV3Menu.jar.old
+mv $bootfs/GraphicStartup.jar $rootfs/home/root/lejos/bin/utils/EV3Menu.jar
 # fin installation programme L2A2
 log "Remove temp files"
 cd $rootfs
