@@ -210,21 +210,24 @@ public class PaletUltrason {
 				}
 				tour=tour/2;
 			}
-			
+			Couleur.videTouche();
 			//*100 parce que le capteur mesure en m et que la fonction prend en cm
 			MouvementsBasiques.chassis.travel(dDepart*100);
 			//cas ou le robot capte le vide : arrêt de dichotomique
 			while(MouvementsBasiques.chassis.isMoving()) {
 				if(Couleur.videTouche()) {
 					MouvementsBasiques.chassis.stop();
+					System.out.println("Quitte avec 1");
 					return(1);
 				}
 			}
 		}
 //			Pince.fermer();
 		if(trouve) {
+			System.out.println("Quitte avec 0");
 			return(0);
 		}
+		System.out.println("Quitte avec 2");
 		return(2);
 			
 	}//fin dichotomique

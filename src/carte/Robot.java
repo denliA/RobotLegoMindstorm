@@ -100,7 +100,7 @@ public class Robot extends Rectangle {
 	 * @param distance
 	 */
 	public void avancer(float distance) {
-		this.setPosition((float) (this.position.getX()+(Math.cos(direction)*distance)),(float) (this.position.getY()+(Math.sin(direction)*distance)));
+		this.setPosition((float) (this.position.getX()+(Math.cos(Math.toRadians(direction))*distance)),(float) (this.position.getY()+(Math.sin(Math.toRadians(direction))*distance)));
 	}
 	
 	/**

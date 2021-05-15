@@ -135,14 +135,14 @@ public class ModeCompetition {
 			if(gauche){
 				//se decaler vers la gauche de la ligne
 				MouvementsBasiques.chassis.rotate(angle); MouvementsBasiques.chassis.waitComplete();  
-				MouvementsBasiques.chassis.travel(25); MouvementsBasiques.chassis.waitComplete();  
+				MouvementsBasiques.chassis.travel(28); MouvementsBasiques.chassis.waitComplete();  
 				MouvementsBasiques.chassis.rotate(-angle);	MouvementsBasiques.chassis.waitComplete(); 	
 			}
 			if(droite){
 				//se decaler vers la droite de la ligne
 				angle=-90;
 				MouvementsBasiques.chassis.rotate(angle); MouvementsBasiques.chassis.waitComplete(); 
-				MouvementsBasiques.chassis.travel(25); MouvementsBasiques.chassis.waitComplete();  
+				MouvementsBasiques.chassis.travel(28); MouvementsBasiques.chassis.waitComplete();  
 				MouvementsBasiques.chassis.rotate(-angle); MouvementsBasiques.chassis.waitComplete();  
 				
 			}
@@ -150,7 +150,7 @@ public class ModeCompetition {
 				//se decaler vers la gauche de la ligne
 				angle=-90;
 				MouvementsBasiques.chassis.rotate(angle); MouvementsBasiques.chassis.waitComplete();  
-				MouvementsBasiques.chassis.travel(25); MouvementsBasiques.chassis.waitComplete();  
+				MouvementsBasiques.chassis.travel(28); MouvementsBasiques.chassis.waitComplete();  
 				MouvementsBasiques.chassis.rotate(-angle);	MouvementsBasiques.chassis.waitComplete(); 
 			}
 			MouvementsBasiques.chassis.travel(Double.POSITIVE_INFINITY); //le robot avance tout droit tant qu'il n'est pas arrete
@@ -172,8 +172,14 @@ public class ModeCompetition {
 			}
 			/* si le robot a franchi la ligne de couleur de depart, on tourne dans la meme direction que le decalage
 			 * pour revenir sur la ligne de depart */
+			if(milieu)  {
+				MouvementsBasiques.chassis.rotate(-angle); MouvementsBasiques.chassis.waitComplete();
+				Pilote.chercheLigne(couleur,vitesse,acceleration,vitesse_angulaire,true); //se gare sur la ligne de couleur initiale
+			}
+			else {
 			MouvementsBasiques.chassis.rotate(angle); MouvementsBasiques.chassis.waitComplete();
 			Pilote.chercheLigne(couleur,vitesse,acceleration,vitesse_angulaire,true); //se gare sur la ligne de couleur initiale
+			}
 			//appelle le ramasserPalet du modeSolo sachant qu'un palet a été ramassé
 			modeSolo.ModeSolo.ramasserPalet(nbPalets-1,true,!rougeAgauche); 
 			

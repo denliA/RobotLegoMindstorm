@@ -137,7 +137,7 @@ public class P6 implements interfaceEmbarquee.Lancable{
 					MouvementsBasiques.chassis.stop();
 					//il, le robot, retourne ou il etait (son point de depart, le centre de la table)
 					MouvementsBasiques.chassis.travel(-PaletUltrason.getDistance()*100); MouvementsBasiques.chassis.waitComplete();
-					MouvementsBasiques.chassis.rotate(-PaletUltrason.getAngle()+180);MouvementsBasiques.chassis.waitComplete();
+//					MouvementsBasiques.chassis.rotate(-PaletUltrason.getAngle()+180);MouvementsBasiques.chassis.waitComplete();
 					palet = PaletUltrason.dichotomique(1);
 					break;
 				//gestion du "pas de palet" : cas ou le robot est trop proche du palet pour le voir avec le capteur ultrason
