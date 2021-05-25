@@ -3,14 +3,9 @@ import capteurs.Couleur;
 import capteurs.Ultrason;
 import capteurs.Toucher;
 
-import capteurs.Capteur;
-import capteurs.Couleur;
-import capteurs.Toucher;
 import carte.*;
 import lejos.hardware.Button;
 import lejos.hardware.lcd.LCD;
-import moteurs.Pilote;
-import moteurs.Pince;
 
 /**
  * <p>Situation initiale :
