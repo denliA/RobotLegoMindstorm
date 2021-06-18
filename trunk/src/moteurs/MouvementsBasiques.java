@@ -3,6 +3,7 @@ package moteurs;
 import java.lang.reflect.Field;
 import java.util.concurrent.Semaphore;
 
+import lejos.robotics.chassis.Chassis;
 import lejos.robotics.chassis.Wheel;
 import lejos.robotics.chassis.WheeledChassis;
 import lejos.robotics.navigation.MovePilot;
@@ -28,7 +29,7 @@ public class MouvementsBasiques {
 	 * Contrôleur principal du mouvement du robot
 	 * @see lejos.robotics.chassis.Chassis
 	 */
-	public static WheeledChassis chassis = new WheeledChassis2(
+	public static SynchronizedChassis chassis = new SynchronizedChassis(
 			new WheeledChassis.Modeler[] { 
 					WheeledChassis.modelWheel(Moteur.MOTEUR_GAUCHE, leftWheelDiameter).offset(trackWidth / 2).invert(false),
 					WheeledChassis.modelWheel(Moteur.MOTEUR_DROIT, rightWheelDiameter).offset(-trackWidth / 2).invert(false) },
@@ -39,13 +40,3 @@ public class MouvementsBasiques {
 	public static MovePilot pilot = new MovePilot (chassis);
 	
 }
-
-class WheeledChassis2 extends WheeledChassis{
-
-	public WheeledChassis2(Wheel[] wheels, int dim) {
-		super(wheels, dim);
-	}
-}
-
-
-

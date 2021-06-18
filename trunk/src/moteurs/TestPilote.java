@@ -9,18 +9,19 @@ import carte.Point;
 import carte.Robot;
 import lejos.hardware.Button;
 import lejos.hardware.Sound;
+import lejos.robotics.chassis.Chassis;
 import lejos.robotics.chassis.WheeledChassis;
 
 public class TestPilote {
-	static WheeledChassis chassis = MouvementsBasiques.chassis;
+	static SynchronizedChassis chassis = MouvementsBasiques.chassis;
 	public static void main(String args[]) throws Exception {
-		new Capteur();
-		Couleur.startScanAtRate(0); //commence le scan de la couleur immediatement. Quand une tache est finie, une autre est relancée sans délai.
+		//new Capteur();
+		//Couleur.startScanAtRate(0); //commence le scan de la couleur immediatement. Quand une tache est finie, une autre est relancée sans délai.
 		MouvementsBasiques.chassis.setLinearAcceleration(10);
-		MouvementsBasiques.chassis.setLinearSpeed(20);
+		MouvementsBasiques.chassis.setLinearSpeed(40);
 		chassis.waitComplete();
 		//testSeRedresserSurLigne(CouleurLigne.JAUNE);
-
+		chassisIntensif();
 		
 		//MouvementsBasiques.setAccelerationRobot(MouvementsBasiques.getAccelerationRobot()/5);
 		//MouvementsBasiques.setVitesseRobot(MouvementsBasiques.getVitesseRobot()/2);
@@ -59,7 +60,6 @@ public class TestPilote {
 //		testTrouverPalet(1,0,270);
 //		System.out.println(Pilote.chercherPosition());
 		
-		Pilote.lancerSuivi(CouleurLigne.JAUNE);
 //		Delay.msDelay(5000);
 //		Pilote.arreterSuivi();
 //		Delay.msDelay(100);
@@ -72,7 +72,8 @@ public class TestPilote {
 	
 	public static void chassisIntensif() {
 		while(true) {
-			Pilote.tournerJusqua(CouleurLigne.JAUNE, true,360);
+			//Pilote.tournerJusqua(CouleurLigne.JAUNE, true,360);
+			chassis.travel(Double.POSITIVE_INFINITY);
 			Button.waitForAnyEvent(); Button.waitForAnyEvent();
 //			//chassis.waitComplete();
 //			while(chassis.isMoving());
